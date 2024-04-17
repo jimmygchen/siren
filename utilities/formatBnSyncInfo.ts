@@ -4,13 +4,13 @@ import getPercentage from './getPercentage';
 const formatBnSyncInfo = (data: BeaconSyncResult): BeaconSyncInfo => {
   const { head_slot, sync_distance, is_syncing } = data
 
-  const distance = head_slot + sync_distance
+  const distance = Number(head_slot) + Number(sync_distance)
 
   return {
-    headSlot: head_slot,
+    headSlot: Number(head_slot),
     slotDistance: distance,
     beaconPercentage: getPercentage(head_slot, distance),
-    beaconSyncTime: sync_distance * 12,
+    beaconSyncTime: Number(sync_distance) * 12,
     isSyncing: is_syncing,
   }
 }

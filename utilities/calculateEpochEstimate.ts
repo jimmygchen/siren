@@ -16,7 +16,7 @@ const calculateEpochEstimate = (
 
   if (!epochCount || epochCount === 1) return difference
 
-  const timeMultiplier = timeInSeconds / (secondsInSlot * slotsInEpoc * epochCount)
+  const timeMultiplier = Number(timeInSeconds) / (secondsInSlot * slotsInEpoc * epochCount)
 
   difference =
     epochValues[epochValues.length - 1].reduce(reduceAddNum, 0) -
