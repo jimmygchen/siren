@@ -1,7 +1,13 @@
 import fetchFromApi from '../../utilities/fetchFromApi';
 
-const beaconUrl = process.env.BEACON_URL;
+const backendUrl = process.env.BACKEND_URL;
+const secondsInSlot = Number(process.env.SECONDS_IN_SLOT) || 12;
+const slotInterval = secondsInSlot - 1;
 
-export const fetchBeaconHealth = async () => await fetchFromApi(`${beaconUrl}/lighthouse/ui/health`, {next: {revalidate: 6}})
-export const fetchBeaconSync = async () => await fetchFromApi(`${beaconUrl}/eth/v1/node/syncing`, {next: {revalidate: 12}})
-export const fetchExecutionSync = async () => await fetchFromApi(`${beaconUrl}/lighthouse/eth1/syncing`, {next: {revalidate: 12}})
+
+export const fetchNodeHealth = async () => await fetchFromApi(`${backendUrl}/node/health`, {next: {revalidate: (slotInterval / 2)}})
+export const fetchSyncData = async () => await fetchFromApi(`${backendUrl}/beacon/sync`, {next: {revalidate: slotInterval}})
+export const fetchInclusionRate = async () => await fetchFromApi(`${backendUrl}/beacon/inclusion`, {next: {revalidate: slotInterval}})
+export const fetchPeerData = async () => await fetchFromApi(`${backendUrl}/beacon/peer`, {next: {revalidate: slotInterval}})
+export const fetchBeaconSpec = async () => await fetchFromApi(`${backendUrl}/beacon/spec`)
+export const fetchValidatorCountData = async () => await fetchFromApi(`${backendUrl}/beacon/validator-count`, {next: {revalidate: 60}})

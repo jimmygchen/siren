@@ -1,7 +1,8 @@
 import fetchFromApi from '../../utilities/fetchFromApi';
 
-const validatorUrl = process.env.VALIDATOR_URL;
-const beaconUrl = process.env.BEACON_URL;
+const backendUrl = process.env.BACKEND_URL;
 
-export const fetchBeaconNodeVersion = async () => await fetchFromApi(`${beaconUrl}/eth/v1/node/version`)
-export const fetchValidatorAuthKey = async () => await fetchFromApi(`${validatorUrl}/lighthouse/auth`)
+export const fetchBeaconNodeVersion = async () => await fetchFromApi(`${backendUrl}/beacon/node-version`, {cache: 'no-store'})
+export const fetchValidatorAuthKey = async () => await fetchFromApi(`${backendUrl}/validator/auth-key`, {cache: 'no-store'})
+export const fetchValidatorVersion = async () => await fetchFromApi(`${backendUrl}/validator/version`, { cache: 'no-store' })
+export const fetchGenesisData = async () => await fetchFromApi(`${backendUrl}/beacon/genesis`)

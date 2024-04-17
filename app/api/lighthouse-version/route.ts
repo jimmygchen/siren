@@ -1,18 +1,11 @@
 import { NextResponse } from 'next/server'
-import fetchFromApi from '../../../utilities/fetchFromApi';
-
-const validatorUrl = process.env.VALIDATOR_URL;
-const apiToken = process.env.API_TOKEN;
+import { fetchValidatorVersion } from '../config';
 
 export async function GET() {
   try {
-    const { data } = await fetchFromApi(`${validatorUrl}/lighthouse/version`, {
-      headers: {
-        'Authorization': `Bearer ${apiToken}`,
-      }
-    });
-    return NextResponse.json({data: data})
+    const { version } = await fetchValidatorVersion();
+    return NextResponse.json({data: version})
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch beacon node version' }, {status: 500})
+    return NextResponse.json({ error: 'Failed to fetch lighthouse version' }, {status: 500})
   }
 }
