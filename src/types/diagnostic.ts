@@ -57,6 +57,7 @@ export type BeaconSyncInfo = {
   slotDistance: number
   beaconPercentage: number
   isSyncing: boolean
+  syncDistance: number
   beaconSyncTime: number // Time in seconds
 }
 
@@ -64,7 +65,10 @@ export type Diagnostics = {
   totalDiskSpace: number
   diskUtilization: number
   totalDiskFree: number
-  diskStatus: StatusColor
+  diskStatus: {
+    synced: StatusColor,
+    syncing: StatusColor
+  }
   totalMemory: number
   memoryUtilization: number
   frequency?: string
@@ -73,7 +77,20 @@ export type Diagnostics = {
   cpuUtilization: string
   networkName?: string
   natOpen: boolean
-  uptime: string
-  healthCondition: DiagnosticRate
-  overallHealthStatus: StatusColor
+  uptime: {
+    beacon: string
+    validator: string
+  }
+  healthCondition: {
+    synced: DiagnosticRate
+    syncing: DiagnosticRate
+  }
+  overallHealthStatus: {
+    synced: StatusColor,
+    syncing: StatusColor
+  }
+}
+
+export type PeerDataResults = {
+  connected: number,
 }

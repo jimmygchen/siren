@@ -1,3 +1,5 @@
+import { StatusColor } from './index';
+
 export type ValidatorStatus =
   | 'pending_initialized'
   | 'pending_queued'
@@ -31,6 +33,11 @@ export type ValidatorInfo = {
   missed: number
   attested: number
   aggregated: number
+}
+
+export type ValidatorBalanceInfo = {
+  validators: ValidatorInfo[]
+  balances: FormattedValidatorCache[]
 }
 
 export type LighthouseValidatorResult = {
@@ -110,4 +117,9 @@ export type SignedExitData = {
     validator_index: string
   }
   signature: string
+}
+
+export type ValidatorInclusionData = {
+  rate: number
+  status: StatusColor
 }
