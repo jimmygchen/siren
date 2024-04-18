@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
-import {fetchBeaconNodeVersion, fetchValidatorAuthKey} from './app/api/config';
+import { fetchBeaconNodeVersion, fetchValidatorVersion } from './app/api/config';
 
 const restrictedEndpoints = [
   '/setup/health-check',
+  '/setup/node-sync',
+  '/dashboard',
+  '/dashboard/logs',
+  '/dashboard/settings',
+  '/dashboard/validators',
 ] as any;
 
 export async function middleware(request) {
@@ -13,13 +18,21 @@ export async function middleware(request) {
 
   const responses = await Promise.all([
     fetchBeaconNodeVersion(),
-    fetchValidatorAuthKey(),
+    fetchValidatorVersion(),
   ]);
 
-  const hasError = responses.some(response => 'error' in response);
+  if(!responses.length) {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
 
-  if (hasError) {
-    return NextResponse.redirect(new URL('/fuck', request.url));
+
+
+
+  const beaconData = responses[0]?.version
+  const validatorData = responses[1]?.version
+
+  if (!beaconData || !validatorData) {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
 
