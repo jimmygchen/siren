@@ -2,6 +2,7 @@
 
 import React, { FC, ReactElement } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { ToastContainer } from 'react-toastify'
 import { RecoilRoot } from 'recoil';
 import 'react-tooltip/dist/react-tooltip.css'
 import 'react-toastify/dist/ReactToastify.min.css'
@@ -18,6 +19,7 @@ const Providers:FC<ProviderProps> = ({children}) => {
     <RecoilRoot>
       <QueryClientProvider client={queryClient}>
         {children}
+        <ToastContainer/>
       </QueryClientProvider>
     </RecoilRoot>
   )

@@ -1,8 +1,6 @@
-import axios from 'axios';
 import { useRouter } from 'next/navigation'
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useSWRMutation from 'swr/mutation';
 import AlertIcon from '../src/components/AlertIcon/AlertIcon';
 import AppDescription from '../src/components/AppDescription/AppDescription';
 import Button, { ButtonFace } from '../src/components/Button/Button';
@@ -12,41 +10,35 @@ import Typography from '../src/components/Typography/Typography';
 import { REQUIRED_VALIDATOR_VERSION } from '../src/constants/constants';
 import formatSemanticVersion from '../utilities/formatSemanticVersion';
 import isRequiredVersion from '../utilities/isRequiredVersion';
-import swrGetFetcher from '../utilities/swrGetFetcher';
 
 export interface InitProps {
   beaconNodeVersion?: string | undefined
-  apiTokenPath?: string | undefined
+  lighthouseVersion?: string | undefined
 }
 
-const Main:FC<InitProps> = ({beaconNodeVersion, apiTokenPath}) => {
+const Main:FC<InitProps> = ({beaconNodeVersion, lighthouseVersion}) => {
   const { t } = useTranslation()
   const router = useRouter()
-  const {data, trigger} = useSWRMutation('/api/lighthouse-version', swrGetFetcher)
-  const [isVersionError, setError] = useState(false)
+  const [isVersionError, setVersionError] = useState(false)
 
-  const configError = !beaconNodeVersion || !apiTokenPath
+  const configError = !beaconNodeVersion || !lighthouseVersion
   const { major, minor, patch } = REQUIRED_VALIDATOR_VERSION
   const vcVersion = beaconNodeVersion ? formatSemanticVersion(beaconNodeVersion as string) : undefined;
 
   const [step, setStep] = useState<number>(1)
 
   useEffect(() => {
-    if(data) {
-      const { version } = data.data
-
-      if(!isRequiredVersion(version, REQUIRED_VALIDATOR_VERSION)) {
-        setError(true)
+    if(lighthouseVersion) {
+      setStep(2)
+      if(!isRequiredVersion(lighthouseVersion, REQUIRED_VALIDATOR_VERSION)) {
+        setVersionError(true)
         return
       }
 
       router.push('/setup/health-check')
+      return
     }
-  }, [data])
-
-  useEffect(() => {
-    void trigger().then(() => setStep(2))
-  }, [trigger, setStep])
+  }, [lighthouseVersion, router])
 
   return (
     <div className='relative w-screen h-screen bg-gradient-to-r from-primary to-tertiary'>
@@ -57,7 +49,7 @@ const Main:FC<InitProps> = ({beaconNodeVersion, apiTokenPath}) => {
             <Typography type="text-subtitle3" isUpperCase fontWeight="font-light">Configuration Error!</Typography>
           </div>
           <div className="space-y-4">
-            <Typography type="text-caption1">Siren was unable to establish a successful connection to designated...Please review your configuration file and make appropriate adjustments. For additional information refer to the Lighthouse Book.</Typography>
+            <Typography type="text-caption1">Siren was unable to establish a successful connection to designated {!beaconNodeVersion ? 'Beacon' : ''} {!beaconNodeVersion && !lighthouseVersion ? 'and' : ''} {!lighthouseVersion ? 'Validator' : ''}  node...Please review your configuration file and make appropriate adjustments. For additional information refer to the Lighthouse Book.</Typography>
           </div>
           <div className="w-full flex justify-end pt-8">
             <Button type={ButtonFace.SECONDARY}>

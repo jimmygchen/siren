@@ -1,12 +1,12 @@
-import { fetchBeaconNodeVersion, fetchValidatorAuthKey } from './api/config';
+import { fetchBeaconNodeVersion, fetchValidatorVersion } from './api/config';
 import Wrapper from './Wrapper';
 import '../src/global.css'
 
 export default async function Page() {
-  const version = await fetchBeaconNodeVersion()
-  const apiKey = await fetchValidatorAuthKey()
+  const bnVersion = await fetchBeaconNodeVersion()
+  const lighthouseVersion = await fetchValidatorVersion()
 
   return (
-    <Wrapper apiTokenPath={apiKey?.token_path} beaconNodeVersion={version?.data?.version}/>
+    <Wrapper lighthouseVersion={lighthouseVersion?.version} beaconNodeVersion={bnVersion?.version}/>
   )
 }
