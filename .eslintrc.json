@@ -1,9 +1,12 @@
 {
   "plugins": [
     "@typescript-eslint",
-    "import"
+    "import",
+    "react-hooks"
   ],
-  "extends": "next/core-web-vitals",
+  "extends": [
+    "next/core-web-vitals"
+  ],
   "rules": {
     "@typescript-eslint/ban-ts-comment": "off",
     "import/order": ["error", {
@@ -11,6 +14,8 @@
         "order": "asc",
         "caseInsensitive": true
       }
-    }]
+    }],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "off"
   }
 }
