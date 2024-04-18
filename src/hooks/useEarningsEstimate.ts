@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { ValidatorBalanceInfo } from '../types/validator';
 import useValidatorEarnings from './useValidatorEarnings'
 
-const useEarningsEstimate = (indices?: string[]) => {
+const useEarningsEstimate = (validatorData: ValidatorBalanceInfo) => {
+
   const [estimateSelection, setEstimate] = useState<number | undefined>(undefined)
   const {
     annualizedEarningsPercent,
@@ -10,7 +12,7 @@ const useEarningsEstimate = (indices?: string[]) => {
     dailyEstimate,
     weeklyEstimate,
     monthlyEstimate,
-  } = useValidatorEarnings(indices)
+  } = useValidatorEarnings(validatorData)
 
   const currentEstimate = () => {
     switch (estimateSelection) {

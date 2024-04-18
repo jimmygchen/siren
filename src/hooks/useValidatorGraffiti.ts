@@ -10,20 +10,20 @@ import { ValidatorGraffitiResults, ValidatorInfo } from '../types/validator'
 const useValidatorGraffiti = (validator?: ValidatorInfo) => {
   const { t } = useTranslation()
   const [isLoading, setLoading] = useState(false)
-  const { apiToken, validatorUrl } = useRecoilValue(activeDevice)
+  // const { apiToken, validatorUrl } = useRecoilValue(activeDevice)
   const [results, setResults] = useState<ValidatorGraffitiResults | undefined>()
 
-  const fetchGraffiti = async (url: string, token: string) => {
-    try {
-      const { data } = await fetchValidatorGraffiti(url, token)
-
-      if (data) {
-        setResults(data.data)
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  }
+  // const fetchGraffiti = async (url: string, token: string) => {
+  //   try {
+  //     const { data } = await fetchValidatorGraffiti(url, token)
+  //
+  //     if (data) {
+  //       setResults(data.data)
+  //     }
+  //   } catch (e) {
+  //     console.error(e)
+  //   }
+  // }
   const updateGraffiti = async (graffiti: string) => {
     const pubKey = validator?.pubKey
 
@@ -31,30 +31,28 @@ const useValidatorGraffiti = (validator?: ValidatorInfo) => {
 
     setLoading(true)
 
-    try {
-      const { status } = await updateValidator(validatorUrl, pubKey as string, apiToken, {
-        graffiti,
-      })
-
-      setLoading(false)
-
-      if (status === 200) {
-        setResults((prev) => ({ ...prev, [pubKey]: graffiti }))
-        displayToast(t('validatorEdit.graffiti.successUpdate'), ToastType.SUCCESS)
-      } else {
-        displayToast(t('validatorEdit.graffiti.unexpectedError'), ToastType.ERROR)
-      }
-    } catch (e) {
-      setLoading(false)
-      displayToast(t('validatorEdit.graffiti.errorUpdate'), ToastType.ERROR)
-    }
+    // try {
+    //   const { status } = await updateValidator(validatorUrl, pubKey as string, apiToken, { graffiti })
+    //
+    //   setLoading(false)
+    //
+    //   if (status === 200) {
+    //     setResults((prev) => ({ ...prev, [pubKey]: graffiti }))
+    //     displayToast(t('validatorEdit.graffiti.successUpdate'), ToastType.SUCCESS)
+    //   } else {
+    //     displayToast(t('validatorEdit.graffiti.unexpectedError'), ToastType.ERROR)
+    //   }
+    // } catch (e) {
+    //   setLoading(false)
+    //   displayToast(t('validatorEdit.graffiti.errorUpdate'), ToastType.ERROR)
+    // }
   }
 
-  useEffect(() => {
-    if (apiToken && validatorUrl) {
-      void fetchGraffiti(validatorUrl, apiToken)
-    }
-  }, [apiToken, validatorUrl])
+  // useEffect(() => {
+  //   if (apiToken && validatorUrl) {
+  //     void fetchGraffiti(validatorUrl, apiToken)
+  //   }
+  // }, [apiToken, validatorUrl])
 
   const validatorGraffiti = useMemo(() => {
     if (!validator || !results) return

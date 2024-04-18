@@ -1,11 +1,7 @@
 import { useMemo } from 'react'
-import { useRecoilValue } from 'recoil'
-import { validatorCacheBalanceResult } from '../recoil/atoms'
 import { ValidatorCache } from '../types/validator'
 
-const useFilteredValidatorCacheData = (indices?: string[]): ValidatorCache | undefined => {
-  const validatorCacheData = useRecoilValue(validatorCacheBalanceResult)
-
+const useFilteredValidatorCacheData = (validatorCacheData: ValidatorCache, indices?: string[]): ValidatorCache | undefined => {
   return useMemo(() => {
     if (!validatorCacheData) return undefined
 

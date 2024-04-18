@@ -51,7 +51,7 @@ function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T) => voi
 
   useEffect(() => {
     setStoredValue(readValue())
-  }, [setStoredValue, readValue])
+  }, [])
 
   useEffect(() => {
     const handleStorageChange = () => {

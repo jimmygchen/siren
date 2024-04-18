@@ -1,10 +1,10 @@
+import { throttle } from 'lodash';
 import moment from 'moment'
-import { MutableRefObject, useEffect, useMemo, useRef } from 'react'
+import { MutableRefObject, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next'
 import { ALERT_ID, MAX_PERSISTED_LOGS } from '../constants/constants'
 import { LogLevels, SSELog, StatusColor } from '../types'
 import useDiagnosticAlerts from './useDiagnosticAlerts'
-import useSSE from './useSSE'
 
 export type trackedLogData = {
   data: SSELog[]
@@ -24,7 +24,7 @@ export const defaultLogData = {
   cleanLogs: () => {},
 }
 
-const useTrackLogs = (url?: string, onError?: () => void): trackedLogData => {
+const useTrackLogs = (url: string, onError: () => void, isReady: boolean): trackedLogData => {
   const { t } = useTranslation()
   const dataRef = useRef<SSELog[]>([])
   const infoPerHour = useRef<number[]>([])
@@ -54,7 +54,7 @@ const useTrackLogs = (url?: string, onError?: () => void): trackedLogData => {
     }
   }
 
-  const trackLogs = (event: MessageEvent) => {
+  const trackLogs = useCallback((event: MessageEvent) => {
     let newData
 
     try {
@@ -75,7 +75,7 @@ const useTrackLogs = (url?: string, onError?: () => void): trackedLogData => {
       }
       dataRef.current.push(newData)
     }
-  }
+  }, [dataRef])
 
   const pruneLogRef = (ref: MutableRefObject<number[]>) => {
     while (ref.current.length > 0) {
@@ -95,7 +95,41 @@ const useTrackLogs = (url?: string, onError?: () => void): trackedLogData => {
     pruneLogRef(infoPerHour)
   }
 
-  useSSE({ url, callback: trackLogs, onError })
+  const eventSourceRef = useRef<EventSource | null>(null)
+  const controllerRef = useRef<AbortController | null>(null)
+  const errorCountRef = useRef<number>(0)
+
+  useEffect(() => {
+    if (!url || !isReady) return
+
+    const controller = new AbortController()
+    controllerRef.current = controller
+
+    const eventSource = new EventSource(url)
+    eventSourceRef.current = eventSource
+
+    const throttledCallback = throttle(trackLogs, 0)
+    eventSource.onmessage = (event) => throttledCallback(event)
+
+    eventSource.onerror = () => {
+      if (errorCountRef.current++ >= 2) {
+        controller.abort()
+        eventSource.close()
+        eventSourceRef.current = null
+        onError?.()
+      }
+    }
+
+    eventSource.onopen = () => {
+      errorCountRef.current = 0
+    }
+
+    return () => {
+      eventSource.close()
+      eventSourceRef.current = null
+      controllerRef.current = null
+    }
+  }, [url, trackLogs, onError, isReady])
 
   const criticalCount = criticalPerHour.current.length
   const infoCount = infoPerHour.current.length
@@ -117,7 +151,7 @@ const useTrackLogs = (url?: string, onError?: () => void): trackedLogData => {
         id: crit.msg.replace(' ', ''),
       })
     })
-  }, [parsedCrit])
+  }, [parsedCrit, storeAlert])
 
   const parsedErrors = useMemo(() => {
     return dataRef.current.filter((data) => data.level === LogLevels.ERRO)
@@ -132,7 +166,7 @@ const useTrackLogs = (url?: string, onError?: () => void): trackedLogData => {
         id: error.msg.replace(' ', ''),
       })
     })
-  }, [parsedErrors])
+  }, [parsedErrors, storeAlert])
 
   useEffect(() => {
     if (warningCount > 5) {
@@ -147,7 +181,7 @@ const useTrackLogs = (url?: string, onError?: () => void): trackedLogData => {
     }
 
     removeAlert(ALERT_ID.WARNING_LOG)
-  }, [warningCount])
+  }, [warningCount, storeAlert, removeAlert])
 
   return {
     data: dataRef.current,

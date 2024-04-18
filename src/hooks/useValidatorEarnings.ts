@@ -8,69 +8,52 @@ import {
   secondsInHour,
   secondsInWeek,
 } from '../constants/constants'
-import { selectBnSpec } from '../recoil/selectors/selectBnSpec'
-import { selectValidatorInfos } from '../recoil/selectors/selectValidatorInfos'
-import { FormattedValidatorCache } from '../types/validator'
-import useFilteredValidatorCacheData from './useFilteredValidatorCacheData'
+import { beaconNodeSpec } from '../recoil/atoms';
+import { FormattedValidatorCache, ValidatorBalanceInfo, ValidatorCache } from '../types/validator';
 
-const useValidatorEarnings = (indices?: string[]) => {
-  const { SECONDS_PER_SLOT } = useRecoilValue(selectBnSpec)
-  const validators = useRecoilValue(selectValidatorInfos)
+const useValidatorEarnings = (validatorData: ValidatorBalanceInfo) => {
+  const spec = useRecoilValue(beaconNodeSpec)
+  const interval = spec?.SECONDS_PER_SLOT || 12
+  const { validators, balances } = validatorData || {}
 
-  const filteredCacheData = useFilteredValidatorCacheData(indices)
-  const filteredValidators = useMemo(() => {
-    return indices ? validators.filter(({ index }) => indices.includes(String(index))) : validators
-  }, [validators, indices])
-
-  const formattedEpochs = useMemo(() => {
-    if (!filteredCacheData) return undefined
-
-    return Object.values(filteredCacheData)
-      .flat()
-      .reduce(function (r, a) {
-        r[a.epoch] = r[a.epoch] || []
-        r[a.epoch].push(a.total_balance)
-        return r
-      }, Object.create({}))
-  }, [filteredCacheData])
-  const epochKeys = formattedEpochs ? Object.keys(formattedEpochs) : undefined
+  const epochKeys = balances ? Object.keys(balances) : undefined
   const lastEpoch = epochKeys ? epochKeys[epochKeys.length - 1] : undefined
 
   const [epochCaches, setCaches] = useState<FormattedValidatorCache | undefined>()
 
   useEffect(() => {
-    setCaches((prev) => Object.assign({} as FormattedValidatorCache, prev, formattedEpochs))
-  }, [lastEpoch])
+    setCaches((prev) => Object.assign({} as FormattedValidatorCache, prev, balances))
+  }, [lastEpoch, balances])
 
   const total = useMemo(() => {
-    return filteredValidators.map((validator) => validator.balance).reduce((a, b) => a + b, 0)
-  }, [filteredValidators])
+    return validators?.map((validator) => validator.balance).reduce((a, b) => a + b, 0)
+  }, [validators])
 
   const totalEarnings = useMemo(() => {
-    return filteredValidators.map((validator) => validator.rewards).reduce((a, b) => a + b, 0)
-  }, [filteredValidators])
+    return validators?.map((validator) => validator.rewards).reduce((a, b) => a + b, 0)
+  }, [validators])
 
   const hourlyEstimate = useMemo(
-    () => calculateEpochEstimate(secondsInHour, SECONDS_PER_SLOT, epochCaches),
-    [epochCaches, SECONDS_PER_SLOT],
+    () => calculateEpochEstimate(secondsInHour, interval, epochCaches),
+    [epochCaches, interval],
   )
 
   const dailyEstimate = useMemo(
-    () => calculateEpochEstimate(secondsInDay, SECONDS_PER_SLOT, epochCaches),
-    [epochCaches, SECONDS_PER_SLOT],
+    () => calculateEpochEstimate(secondsInDay, interval, epochCaches),
+    [epochCaches, interval],
   )
 
   const weeklyEstimate = useMemo(
-    () => calculateEpochEstimate(secondsInWeek, SECONDS_PER_SLOT, epochCaches),
-    [epochCaches, SECONDS_PER_SLOT],
+    () => calculateEpochEstimate(secondsInWeek, interval, epochCaches),
+    [epochCaches, interval],
   )
 
   const monthlyEstimate = useMemo(
-    () => calculateEpochEstimate(secondsInWeek * 4, SECONDS_PER_SLOT, epochCaches),
-    [epochCaches, SECONDS_PER_SLOT],
+    () => calculateEpochEstimate(secondsInWeek * 4, interval, epochCaches),
+    [epochCaches, interval],
   )
 
-  const initialEth = filteredValidators.length * initialEthDeposit
+  const initialEth = (validators?.length || 0) * initialEthDeposit
   const annualizedEarningsPercent = calculateAprPercentage(total, initialEth)
 
   return {
