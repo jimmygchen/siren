@@ -1,22 +1,22 @@
-import { NextFetchRequestInit } from '../src/types';
+import { NextFetchRequestInit } from '../src/types'
 
 const fetchFromApi = async (url: string, options: NextFetchRequestInit = {}) => {
   const defaultOptions: RequestInit = {
     method: 'GET',
-  };
+  }
 
-  const finalOptions: RequestInit = { ...defaultOptions, ...options };
+  const finalOptions: RequestInit = { ...defaultOptions, ...options }
 
   try {
-    const response = await fetch(url, finalOptions);
+    const response = await fetch(url, finalOptions)
 
     if (!response.ok) {
-      return ({error: `HTTP error! status: ${response.status}`})
+      return { error: `HTTP error! status: ${response.status}` }
     }
 
-    return await response.json();
+    return await response.json()
   } catch (e) {
-    return ({error: `HTTP error! status: ${e}`})
+    return { error: `HTTP error! status: ${e}` }
   }
 }
 

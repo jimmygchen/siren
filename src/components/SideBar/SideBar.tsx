@@ -1,4 +1,3 @@
-
 import { usePathname } from 'next/navigation'
 import { createElement, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -52,12 +51,7 @@ const SideBar = () => {
           </div>
           <ul className='space-y-4'>
             {PRIMARY_VIEWS.map(({ logoComponent, key, isDisabled, href }) => (
-              <SideItem
-                key={key}
-                href={href}
-                isDisabled={isDisabled}
-                isActive={pathname === href}
-              >
+              <SideItem key={key} href={href} isDisabled={isDisabled} isActive={pathname === href}>
                 {createElement(logoComponent)}
               </SideItem>
             ))}
@@ -66,12 +60,7 @@ const SideBar = () => {
         <div className='w-full pb-4'>
           <ul className='space-y-4'>
             {SECONDARY_VIEWS.map(({ logoComponent, key, isDisabled, href }) => (
-              <SideItem
-                key={key}
-                href={href}
-                isDisabled={isDisabled}
-                isActive={pathname === href}
-              >
+              <SideItem key={key} href={href} isDisabled={isDisabled} isActive={pathname === href}>
                 {createElement(logoComponent)}
               </SideItem>
             ))}

@@ -9,7 +9,7 @@ import {
   ProposerDuty,
   ValAliases,
 } from '../types'
-import { BeaconNodeSpecResults, BeaconValidatorMetricResults } from '../types/beacon';
+import { BeaconNodeSpecResults, BeaconValidatorMetricResults } from '../types/beacon'
 import { BeaconSyncResult, HealthDiagnosticResult, ValidatorSyncResult } from '../types/diagnostic'
 import { BeaconValidatorResult, ValidatorCache } from '../types/validator'
 

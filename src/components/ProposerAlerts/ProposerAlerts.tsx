@@ -4,7 +4,7 @@ import getSlotTimeData from '../../../utilities/getSlotTimeData'
 import groupArray from '../../../utilities/groupArray'
 import { proposerDuties } from '../../recoil/atoms'
 import { ProposerDuty } from '../../types'
-import { BeaconNodeSpecResults } from '../../types/beacon';
+import { BeaconNodeSpecResults } from '../../types/beacon'
 import AlertGroup from './AlertGroup'
 import ProposalAlert from './ProposalAlert'
 

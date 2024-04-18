@@ -1,12 +1,14 @@
 import '../../src/global.css'
 import {
-  fetchBeaconSpec, fetchInclusionRate, fetchNodeHealth,
-  fetchPeerData, fetchSyncData
-} from '../api/beacon';
-import { fetchBeaconNodeVersion, fetchGenesisData, fetchValidatorVersion } from '../api/config';
-import { fetchValCaches, fetchValStates } from '../api/validator';
-import Wrapper from './Wrapper';
-
+  fetchBeaconSpec,
+  fetchInclusionRate,
+  fetchNodeHealth,
+  fetchPeerData,
+  fetchSyncData,
+} from '../api/beacon'
+import { fetchBeaconNodeVersion, fetchGenesisData, fetchValidatorVersion } from '../api/config'
+import { fetchValCaches, fetchValStates } from '../api/validator'
+import Wrapper from './Wrapper'
 
 export default async function Page() {
   const beaconSpec = await fetchBeaconSpec()
@@ -29,7 +31,6 @@ export default async function Page() {
       initSyncData={syncData}
       initInclusionRate={inclusion}
       initPeerData={peerData}
-
       genesisTime={Number(genesisBlock.genesis_time)}
       lighthouseVersion={lighthouseVersion.version}
       bnVersion={bnVersion.version}

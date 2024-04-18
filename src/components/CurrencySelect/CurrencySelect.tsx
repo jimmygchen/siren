@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { CURRENCIES } from '../../constants/constants'
@@ -13,7 +13,7 @@ export interface CurrencySelectProps {
   selection: string
 }
 
-const CurrencySelect:FC<CurrencySelectProps> = ({selection, onSelect}) => {
+const CurrencySelect: FC<CurrencySelectProps> = ({ selection, onSelect }) => {
   const { t } = useTranslation()
   const data = useRecoilValue(exchangeRates)
 

@@ -1,16 +1,16 @@
-import { FC } from 'react';
+import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-import formatBnSyncInfo from '../../../utilities/formatBnSyncInfo';
+import formatBnSyncInfo from '../../../utilities/formatBnSyncInfo'
 import { formatLocalCurrency } from '../../../utilities/formatLocalCurrency'
 import secondsToShortHand from '../../../utilities/secondsToShortHand'
-import { BeaconSyncInfo, BeaconSyncResult } from '../../types/diagnostic';
+import { BeaconSyncInfo, BeaconSyncResult } from '../../types/diagnostic'
 import SyncCard from '../SyncCard/SyncCard'
 
 export interface BeaconSyncCardProps {
   data: BeaconSyncInfo
 }
 
-const BeaconSyncCard:FC<BeaconSyncCardProps> = ({data}) => {
+const BeaconSyncCard: FC<BeaconSyncCardProps> = ({ data }) => {
   const { t } = useTranslation()
   const { headSlot, slotDistance, beaconPercentage, beaconSyncTime } = data
   const remainingBeaconTime = secondsToShortHand(beaconSyncTime || 0)
@@ -21,7 +21,7 @@ const BeaconSyncCard:FC<BeaconSyncCardProps> = ({data}) => {
       title='Ethereum Beacon'
       subTitle='Lighthouse Node'
       timeRemaining={beaconSyncTime ? remainingBeaconTime : t('synced')}
-      status={`${formatLocalCurrency(headSlot, { isStrict: true })} / ${formatLocalCurrency(slotDistance, { isStrict: true },)}`}
+      status={`${formatLocalCurrency(headSlot, { isStrict: true })} / ${formatLocalCurrency(slotDistance, { isStrict: true })}`}
       progress={beaconPercentage}
     />
   )

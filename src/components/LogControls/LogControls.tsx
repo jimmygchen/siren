@@ -1,12 +1,12 @@
-import React, { FC, useContext } from 'react';
-import { useTranslation } from 'react-i18next';
-import { LogTypeOptions } from '../../constants/constants';
-import { LogType } from '../../types';
-import Button, { ButtonFace } from '../Button/Button';
-import SelectDropDown, { OptionType } from '../SelectDropDown/SelectDropDown';
-import { SSEContext } from '../SSELogProvider/SSELogProvider';
-import Toggle from '../Toggle/Toggle';
-import Typography from '../Typography/Typography';
+import React, { FC, useContext } from 'react'
+import { useTranslation } from 'react-i18next'
+import { LogTypeOptions } from '../../constants/constants'
+import { LogType } from '../../types'
+import Button, { ButtonFace } from '../Button/Button'
+import SelectDropDown, { OptionType } from '../SelectDropDown/SelectDropDown'
+import { SSEContext } from '../SSELogProvider/SSELogProvider'
+import Toggle from '../Toggle/Toggle'
+import Typography from '../Typography/Typography'
 
 export interface LogControlsProps {
   logType: LogType
@@ -14,15 +14,15 @@ export interface LogControlsProps {
   onSetLoading: (value: boolean) => void
 }
 
-const LogControls:FC<LogControlsProps> = React.memo(function ({logType, onTypeSelect, onSetLoading}) {
-  const {t} = useTranslation()
+const LogControls: FC<LogControlsProps> = React.memo(function ({
+  logType,
+  onTypeSelect,
+  onSetLoading,
+}) {
+  const { t } = useTranslation()
 
-  const {
-    intervalId,
-    clearRefreshInterval,
-    startRefreshInterval,
-    triggerRefresh
-  } = useContext(SSEContext)
+  const { intervalId, clearRefreshInterval, startRefreshInterval, triggerRefresh } =
+    useContext(SSEContext)
 
   const toggleTriggerInterval = (value: boolean) => {
     if (!value) {
@@ -84,6 +84,6 @@ const LogControls:FC<LogControlsProps> = React.memo(function ({logType, onTypeSe
   )
 })
 
-LogControls.displayName = 'LogControls';
+LogControls.displayName = 'LogControls'
 
 export default LogControls

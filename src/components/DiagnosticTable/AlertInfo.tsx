@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRecoilValue } from 'recoil'
 import sortAlertMessagesBySeverity from '../../../utilities/sortAlerts'
@@ -9,12 +9,12 @@ import { proposerDuties } from '../../recoil/atoms'
 import { StatusColor } from '../../types'
 import AlertCard from '../AlertCard/AlertCard'
 import AlertFilterSettings, { FilterValue } from '../AlertFilterSettings/AlertFilterSettings'
-import ProposerAlerts, { ProposerAlertsProps } from '../ProposerAlerts/ProposerAlerts';
+import ProposerAlerts, { ProposerAlertsProps } from '../ProposerAlerts/ProposerAlerts'
 import Typography from '../Typography/Typography'
 
-export interface AlertInfoProps extends Omit<ProposerAlertsProps, 'duties'>{}
+export interface AlertInfoProps extends Omit<ProposerAlertsProps, 'duties'> {}
 
-const AlertInfo:FC<AlertInfoProps> = (props) => {
+const AlertInfo: FC<AlertInfoProps> = (props) => {
   const { t } = useTranslation()
   const { alerts, dismissAlert, resetDismissed } = useDiagnosticAlerts()
   const { ref, dimensions } = useDivDimensions()

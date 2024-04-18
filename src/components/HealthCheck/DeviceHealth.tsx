@@ -1,8 +1,8 @@
-import { FC } from 'react';
+import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import addSuffixString from '../../../utilities/addSuffixString'
 import { DiagnosticRate, DiagnosticType } from '../../constants/enums'
-import {  Diagnostics } from '../../types/diagnostic';
+import { Diagnostics } from '../../types/diagnostic'
 import DiagnosticCard from '../DiagnosticCard/DiagnosticCard'
 import DiagnosticSummaryCard from '../DiagnosticSummaryCard/DiagnosticSummaryCard'
 
@@ -11,7 +11,7 @@ export interface DeviceHealthProps {
   isSyncing: boolean
 }
 
-const DeviceHealth:FC<DeviceHealthProps> = ({nodeHealth, isSyncing}) => {
+const DeviceHealth: FC<DeviceHealthProps> = ({ nodeHealth, isSyncing }) => {
   const { t } = useTranslation()
   const {
     totalDiskSpace,

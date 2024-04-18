@@ -1,13 +1,12 @@
-import React, { FC } from 'react';
-import addClassString from '../../../utilities/addClassString';
-
+import React, { FC } from 'react'
+import addClassString from '../../../utilities/addClassString'
 
 export interface AlertIconProps {
   type: 'info' | 'warning' | 'error'
   className?: string
 }
 
-const AlertIcon:FC<AlertIconProps> = ({type, className = 'md:mr-14 h-12 w-12'}) => {
+const AlertIcon: FC<AlertIconProps> = ({ type, className = 'md:mr-14 h-12 w-12' }) => {
   const isWarning = type === 'warning'
   const isInfo = type === 'info'
   const isError = type === 'error'

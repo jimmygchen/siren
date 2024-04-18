@@ -1,13 +1,13 @@
-import { FC } from 'react';
+import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BeaconSyncInfo } from '../../types/diagnostic';
+import { BeaconSyncInfo } from '../../types/diagnostic'
 import SyncMetric from '../SyncMetric/SyncMetric'
 
 export interface BeaconMetricProps {
   data: BeaconSyncInfo
 }
 
-const BeaconMetric:FC<BeaconMetricProps> = ({data}) => {
+const BeaconMetric: FC<BeaconMetricProps> = ({ data }) => {
   const { t } = useTranslation()
   const { headSlot, slotDistance, isSyncing, beaconPercentage } = data
 

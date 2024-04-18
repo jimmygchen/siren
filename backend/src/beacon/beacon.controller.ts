@@ -7,7 +7,7 @@ export class BeaconController {
 
   @Get('spec')
   async getBeaconSpec() {
-    return this.beaconService.fetchBeaconSpec()
+    return this.beaconService.fetchBeaconSpec();
   }
 
   @Get('node-version')

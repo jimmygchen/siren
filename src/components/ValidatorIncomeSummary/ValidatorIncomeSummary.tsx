@@ -2,7 +2,7 @@ import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import { EARNINGS_OPTIONS } from '../../constants/constants'
 import useEarningsEstimate from '../../hooks/useEarningsEstimate'
-import { ValidatorBalanceInfo } from '../../types/validator';
+import { ValidatorBalanceInfo } from '../../types/validator'
 import Typography from '../Typography/Typography'
 
 export interface ValidatorIncomeSummaryProps {

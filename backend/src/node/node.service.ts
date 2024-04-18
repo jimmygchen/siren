@@ -16,15 +16,20 @@ export class NodeService {
   async fetchNodeHealth() {
     try {
       const [beaconHealth, validatorHealth] = await Promise.all([
-        this.utilsService.sendHttpRequest({url: `${this.beaconUrl}/lighthouse/ui/health`}),
-        this.utilsService.sendHttpRequest({url: `${this.validatorUrl}/lighthouse/ui/health`, config: {
+        this.utilsService.sendHttpRequest({
+          url: `${this.beaconUrl}/lighthouse/ui/health`,
+        }),
+        this.utilsService.sendHttpRequest({
+          url: `${this.validatorUrl}/lighthouse/ui/health`,
+          config: {
             headers: {
-              'Authorization': `Bearer ${this.apiToken}`,
-            }
-          }})
+              Authorization: `Bearer ${this.apiToken}`,
+            },
+          },
+        }),
       ]);
 
-      const { app_uptime: vcUptime } = validatorHealth.data.data
+      const { app_uptime: vcUptime } = validatorHealth.data.data;
 
       const {
         disk_bytes_free,
@@ -36,58 +41,69 @@ export class NodeService {
         network_name,
         nat_open,
         global_cpu_frequency,
-      } = beaconHealth.data.data
+      } = beaconHealth.data.data;
 
+      const diskUtilization = Math.round(
+        getPercentage(disk_bytes_total - disk_bytes_free, disk_bytes_total),
+      );
 
-      const diskUtilization = Math.round(getPercentage(disk_bytes_total - disk_bytes_free, disk_bytes_total))
-
-      const totalDiskSpace = formatGigBytes(disk_bytes_total)
-      const totalDiskFree = formatGigBytes(disk_bytes_free)
+      const totalDiskSpace = formatGigBytes(disk_bytes_total);
+      const totalDiskFree = formatGigBytes(disk_bytes_free);
 
       const diskStatus = {
-        synced: totalDiskFree > 300
+        synced:
+          totalDiskFree > 300
+            ? StatusColor.SUCCESS
+            : totalDiskFree >= 200 && totalDiskFree < 300
+              ? StatusColor.WARNING
+              : StatusColor.ERROR,
+        syncing:
+          totalDiskFree > 100
+            ? StatusColor.SUCCESS
+            : totalDiskFree >= 50 && totalDiskFree < 100
+              ? StatusColor.WARNING
+              : StatusColor.ERROR,
+      };
+
+      const memoryUtilization = Math.round(
+        getPercentage(used_memory, total_memory),
+      );
+      const totalMemory = formatGigBytes(total_memory);
+      const usedMemory = formatGigBytes(used_memory);
+
+      const totalMemoryFree = totalMemory - usedMemory;
+
+      const ramStatus =
+        totalMemoryFree >= 3
           ? StatusColor.SUCCESS
-          : totalDiskFree >= 200 && totalDiskFree < 300
+          : totalMemoryFree > 1 && totalMemoryFree < 3
             ? StatusColor.WARNING
-            : StatusColor.ERROR,
-        syncing: totalDiskFree > 100
+            : StatusColor.ERROR;
+
+      const cpuUtilization = sys_loadavg_5.toFixed(1);
+
+      const cpuStatus =
+        sys_loadavg_5 <= 80
           ? StatusColor.SUCCESS
-          : totalDiskFree >= 50 && totalDiskFree < 100
+          : sys_loadavg_5 > 80 && sys_loadavg_5 < 90
             ? StatusColor.WARNING
-            : StatusColor.ERROR
-      }
+            : StatusColor.ERROR;
 
-      const memoryUtilization = Math.round(getPercentage(used_memory, total_memory))
-      const totalMemory = formatGigBytes(total_memory)
-      const usedMemory = formatGigBytes(used_memory)
-
-      const totalMemoryFree = totalMemory - usedMemory
-
-      const ramStatus = totalMemoryFree >= 3
-        ? StatusColor.SUCCESS
-        : totalMemoryFree > 1 && totalMemoryFree < 3
-          ? StatusColor.WARNING
-          : StatusColor.ERROR
-
-      const cpuUtilization = sys_loadavg_5.toFixed(1)
-
-      const cpuStatus = sys_loadavg_5 <= 80
-        ? StatusColor.SUCCESS
-        : sys_loadavg_5 > 80 && sys_loadavg_5 < 90
-          ? StatusColor.WARNING
-          : StatusColor.ERROR
-
-      const overallSyncingHealth = [diskStatus.syncing, cpuStatus, ramStatus]
-      const overallSyncedHealth = [diskStatus.synced, cpuStatus, ramStatus]
+      const overallSyncingHealth = [diskStatus.syncing, cpuStatus, ramStatus];
+      const overallSyncedHealth = [diskStatus.synced, cpuStatus, ramStatus];
 
       const overallHealthStatus = {
         syncing: this.utilsService.getHealthStatus(overallSyncingHealth),
-        synced: this.utilsService.getHealthStatus(overallSyncedHealth)
-      }
+        synced: this.utilsService.getHealthStatus(overallSyncedHealth),
+      };
       const healthCondition = {
-        syncing: this.utilsService.getHealthCondition(overallHealthStatus.syncing),
-        synced: this.utilsService.getHealthCondition(overallHealthStatus.synced)
-      }
+        syncing: this.utilsService.getHealthCondition(
+          overallHealthStatus.syncing,
+        ),
+        synced: this.utilsService.getHealthCondition(
+          overallHealthStatus.synced,
+        ),
+      };
 
       return {
         totalDiskSpace,
@@ -104,15 +120,14 @@ export class NodeService {
         natOpen: nat_open,
         uptime: {
           beacon: secondsToShortHand(bnUptime || 0),
-          validator: secondsToShortHand(vcUptime || 0)
+          validator: secondsToShortHand(vcUptime || 0),
         },
         healthCondition,
         overallHealthStatus,
-      }
-
+      };
     } catch (e) {
-      console.error(e)
-      throwServerError('Unable to fetch beacon health data')
+      console.error(e);
+      throwServerError('Unable to fetch beacon health data');
     }
   }
 }

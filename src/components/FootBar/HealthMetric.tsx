@@ -1,6 +1,6 @@
-import { FC } from 'react';
+import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-import {  Diagnostics } from '../../types/diagnostic';
+import { Diagnostics } from '../../types/diagnostic'
 import DiagnosticCard from '../DiagnosticCard/DiagnosticCard'
 import Spinner from '../Spinner/Spinner'
 
@@ -15,9 +15,13 @@ export interface HealthMetricProps {
   nodeHealth: Diagnostics
 }
 
-const HealthMetric:FC<HealthMetricProps> = ({ nodeHealth, isSyncing}) => {
+const HealthMetric: FC<HealthMetricProps> = ({ nodeHealth, isSyncing }) => {
   const { t } = useTranslation()
-  const { healthCondition, overallHealthStatus, uptime: {beacon} } = nodeHealth
+  const {
+    healthCondition,
+    overallHealthStatus,
+    uptime: { beacon },
+  } = nodeHealth
   const condition = isSyncing ? healthCondition.syncing : healthCondition.synced
   const healthStatus = isSyncing ? overallHealthStatus.syncing : overallHealthStatus.synced
 

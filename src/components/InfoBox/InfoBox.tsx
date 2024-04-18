@@ -1,6 +1,6 @@
 import React, { FC, ReactNode } from 'react'
 import addClassString from '../../../utilities/addClassString'
-import AlertIcon from '../AlertIcon/AlertIcon';
+import AlertIcon from '../AlertIcon/AlertIcon'
 import Typography from '../Typography/Typography'
 
 export enum InfoBoxType {
@@ -27,7 +27,7 @@ const InfoBox: FC<InfoBoxProps> = ({ type, children, text }) => {
 
   return (
     <div className={warningClasses}>
-      <AlertIcon type={type.toLowerCase() as any}/>
+      <AlertIcon type={type.toLowerCase() as any} />
       {children ? (
         children
       ) : text ? (

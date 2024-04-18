@@ -13,10 +13,10 @@ const LogRow: FC<LogRowProps> = ({ log }) => {
     level === LogLevels.CRIT || level === LogLevels.ERRO
       ? 'text-error'
       : level === LogLevels.WARN
-      ? 'text-warning'
-      : LogLevels.INFO
-      ? 'text-success'
-      : undefined
+        ? 'text-warning'
+        : LogLevels.INFO
+          ? 'text-success'
+          : undefined
 
   const remainingData = Object.keys(log)
     .filter((key) => !['level', 'msg', 'time'].includes(key))

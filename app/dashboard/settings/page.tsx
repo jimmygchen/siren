@@ -1,10 +1,7 @@
 import '../../../src/global.css'
-import {
-  fetchBeaconSpec, fetchNodeHealth,
-  fetchSyncData
-} from '../../api/beacon';
-import { fetchBeaconNodeVersion, fetchValidatorVersion } from '../../api/config';
-import Wrapper from './Wrapper';
+import { fetchBeaconSpec, fetchNodeHealth, fetchSyncData } from '../../api/beacon'
+import { fetchBeaconNodeVersion, fetchValidatorVersion } from '../../api/config'
+import Wrapper from './Wrapper'
 
 export default async function Page() {
   const beaconSpec = await fetchBeaconSpec()

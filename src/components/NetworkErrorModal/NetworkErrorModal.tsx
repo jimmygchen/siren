@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { DiscordUrl } from '../../constants/constants'
 import RodalModal from '../RodalModal/RodalModal'
@@ -9,7 +9,10 @@ export interface NetworkErrorModalProps {
   isValidatorNetworkError: boolean
 }
 
-const NetworkErrorModal:FC<NetworkErrorModalProps> = ({isBeaconNetworkError, isValidatorNetworkError}) => {
+const NetworkErrorModal: FC<NetworkErrorModalProps> = ({
+  isBeaconNetworkError,
+  isValidatorNetworkError,
+}) => {
   const { t } = useTranslation()
 
   const effectedNetworkText = () => {

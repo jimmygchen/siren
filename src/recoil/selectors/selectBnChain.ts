@@ -1,6 +1,6 @@
 import { selector } from 'recoil'
 import { Network } from '../../constants/enums'
-import { beaconNodeSpec } from '../atoms';
+import { beaconNodeSpec } from '../atoms'
 
 export const selectBnChain = selector({
   key: 'selectBnChain',

@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
-        - name: Check that the pull request is not targeting the stable branch
-          run: test ${{ github.base_ref }} != "stable"
+      - name: Check that the pull request is not targeting the stable branch
+        run: test ${{ github.base_ref }} != "stable"
   # Run visual and composition tests with Chromatic
   visual-and-composition:
     runs-on: ubuntu-latest

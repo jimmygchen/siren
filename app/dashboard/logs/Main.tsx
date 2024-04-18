@@ -1,13 +1,13 @@
-import { FC, useEffect, useState } from 'react';
-import DashboardWrapper from '../../../src/components/DashboardWrapper/DashboardWrapper';
-import LogControls from '../../../src/components/LogControls/LogControls';
-import LogDisplay from '../../../src/components/LogDisplay/LogDisplay';
-import { OptionType } from '../../../src/components/SelectDropDown/SelectDropDown';
-import useNetworkMonitor from '../../../src/hooks/useNetworkMonitor';
-import useSWRPolling from '../../../src/hooks/useSWRPolling';
-import { LogType } from '../../../src/types';
-import { BeaconNodeSpecResults, SyncData } from '../../../src/types/beacon';
-import { Diagnostics } from '../../../src/types/diagnostic';
+import { FC, useEffect, useState } from 'react'
+import DashboardWrapper from '../../../src/components/DashboardWrapper/DashboardWrapper'
+import LogControls from '../../../src/components/LogControls/LogControls'
+import LogDisplay from '../../../src/components/LogDisplay/LogDisplay'
+import { OptionType } from '../../../src/components/SelectDropDown/SelectDropDown'
+import useNetworkMonitor from '../../../src/hooks/useNetworkMonitor'
+import useSWRPolling from '../../../src/hooks/useSWRPolling'
+import { LogType } from '../../../src/types'
+import { BeaconNodeSpecResults, SyncData } from '../../../src/types/beacon'
+import { Diagnostics } from '../../../src/types/diagnostic'
 
 export interface MainProps {
   initNodeHealth: Diagnostics
@@ -15,10 +15,10 @@ export interface MainProps {
   initSyncData: SyncData
 }
 
-const Main:FC<MainProps> = ({initSyncData, beaconSpec, initNodeHealth}) => {
-  const {SECONDS_PER_SLOT} = beaconSpec
+const Main: FC<MainProps> = ({ initSyncData, beaconSpec, initNodeHealth }) => {
+  const { SECONDS_PER_SLOT } = beaconSpec
   const { isValidatorError, isBeaconError } = useNetworkMonitor()
-  const networkError = isValidatorError || isBeaconError;
+  const networkError = isValidatorError || isBeaconError
   const slotInterval = SECONDS_PER_SLOT * 1000
 
   const [logType, selectType] = useState(LogType.VALIDATOR)
@@ -30,9 +30,16 @@ const Main:FC<MainProps> = ({initSyncData, beaconSpec, initNodeHealth}) => {
     }, 500)
   }, [])
 
-
-  const { data: syncData } = useSWRPolling<SyncData>('/api/node-sync', {refreshInterval: slotInterval, fallbackData: initSyncData, networkError})
-  const { data: nodeHealth } = useSWRPolling<Diagnostics>('/api/node-health', {refreshInterval: 6000, fallbackData: initNodeHealth, networkError})
+  const { data: syncData } = useSWRPolling<SyncData>('/api/node-sync', {
+    refreshInterval: slotInterval,
+    fallbackData: initSyncData,
+    networkError,
+  })
+  const { data: nodeHealth } = useSWRPolling<Diagnostics>('/api/node-health', {
+    refreshInterval: 6000,
+    fallbackData: initNodeHealth,
+    networkError,
+  })
 
   const toggleLogType = (selection: OptionType) => {
     if (selection === logType) return

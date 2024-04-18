@@ -1,4 +1,4 @@
-import { StatusColor } from './index';
+import { StatusColor } from './index'
 
 export type ValidatorStatus =
   | 'pending_initialized'

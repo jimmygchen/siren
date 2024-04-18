@@ -1,5 +1,5 @@
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from 'next/image'
+import Link from 'next/link'
 import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import addClassString from '../../../utilities/addClassString'
@@ -24,7 +24,11 @@ const ValidatorInfoCard: FC<ValidatorInfoCardProps> = ({ validator, className })
   return (
     <Link href={`/dashboard/validators?id=${index}`}>
       <div className={classes}>
-        <Image className='z-10 w-full h-full absolute left-0 top-0 opacity-10' alt="waves" src={Waves} />
+        <Image
+          className='z-10 w-full h-full absolute left-0 top-0 opacity-10'
+          alt='waves'
+          src={Waves}
+        />
         <div className='w-full flex flex-col justify-between space-y-3 lg:space-y-0 h-full z-20 relative'>
           <div className='w-full flex justify-between'>
             <IdenticonIcon size={144} type='CIRCULAR' hash={pubKey} />
@@ -51,7 +55,10 @@ const ValidatorInfoCard: FC<ValidatorInfoCardProps> = ({ validator, className })
               <Typography type='text-caption2' color='text-dark300' isUpperCase>
                 Pubkey
               </Typography>
-              <Typography type='text-caption1' isBold>{`${pubKey?.substring(0, 12)}...`}</Typography>
+              <Typography
+                type='text-caption1'
+                isBold
+              >{`${pubKey?.substring(0, 12)}...`}</Typography>
             </div>
             <div className='flex-1 space-y-2'>
               <Typography type='text-caption2' color='text-dark300' isUpperCase>

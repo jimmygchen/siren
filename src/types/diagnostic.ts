@@ -66,7 +66,7 @@ export type Diagnostics = {
   diskUtilization: number
   totalDiskFree: number
   diskStatus: {
-    synced: StatusColor,
+    synced: StatusColor
     syncing: StatusColor
   }
   totalMemory: number
@@ -86,11 +86,11 @@ export type Diagnostics = {
     syncing: DiagnosticRate
   }
   overallHealthStatus: {
-    synced: StatusColor,
+    synced: StatusColor
     syncing: StatusColor
   }
 }
 
 export type PeerDataResults = {
-  connected: number,
+  connected: number
 }

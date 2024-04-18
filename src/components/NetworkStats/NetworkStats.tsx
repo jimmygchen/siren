@@ -1,10 +1,10 @@
-import { FC } from 'react';
+import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import addClassString from '../../../utilities/addClassString'
 import formatAtHeadSlotStatus from '../../../utilities/formatAtHeadSlotStatus'
-import { SyncData } from '../../types/beacon';
-import { Diagnostics, PeerDataResults } from '../../types/diagnostic';
-import { ValidatorInclusionData } from '../../types/validator';
+import { SyncData } from '../../types/beacon'
+import { Diagnostics, PeerDataResults } from '../../types/diagnostic'
+import { ValidatorInclusionData } from '../../types/validator'
 import NetworkPeerSpeedometer from '../NetworkPeerSpeedometer/NetworkPeerSpeedometer'
 import NetworkStatBlock from './NetworkStatBlock'
 
@@ -15,10 +15,19 @@ export interface NetworkStatsProps {
   valInclusionData: ValidatorInclusionData
 }
 
-const NetworkStats:FC<NetworkStatsProps> = ({nodeHealth, syncData, peerData, valInclusionData}) => {
+const NetworkStats: FC<NetworkStatsProps> = ({
+  nodeHealth,
+  syncData,
+  peerData,
+  valInclusionData,
+}) => {
   const { t } = useTranslation()
-  const { uptime: {beacon, validator} } = nodeHealth
-  const { beaconSync: { syncDistance } } = syncData
+  const {
+    uptime: { beacon, validator },
+  } = nodeHealth
+  const {
+    beaconSync: { syncDistance },
+  } = syncData
 
   const { rate, status } = valInclusionData
   const headSlotStatus = formatAtHeadSlotStatus(-syncDistance)
@@ -56,9 +65,7 @@ const NetworkStats:FC<NetworkStatsProps> = ({nodeHealth, syncData, peerData, val
         toolTipId='participationRate'
         toolTipWidth={200}
         toolTipText={
-          rate
-            ? t('networkStats.toolTips.participation')
-            : t('networkStats.toolTips.noData')
+          rate ? t('networkStats.toolTips.participation') : t('networkStats.toolTips.noData')
         }
         className={participationClasses}
         title={t('networkStats.participationRate')}

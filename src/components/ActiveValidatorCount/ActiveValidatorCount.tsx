@@ -1,14 +1,14 @@
-import { FC } from 'react';
+import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatLocalCurrency } from '../../../utilities/formatLocalCurrency'
-import { ValidatorCountResult } from '../../types/validator';
+import { ValidatorCountResult } from '../../types/validator'
 import Typography from '../Typography/Typography'
 
 export interface ActiveValidatorCountProps {
   validatorNetworkData: ValidatorCountResult
 }
 
-const ActiveValidatorCount:FC<ActiveValidatorCountProps> = ({validatorNetworkData}) => {
+const ActiveValidatorCount: FC<ActiveValidatorCountProps> = ({ validatorNetworkData }) => {
   const { t } = useTranslation()
 
   const { active_ongoing } = validatorNetworkData

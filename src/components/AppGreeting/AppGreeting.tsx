@@ -1,9 +1,9 @@
-import React, { FC, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import AppVersion from '../AppVersion/AppVersion';
-import DashboardOptions from '../DashboardOptions/DashboardOptions';
-import PillIcon from '../PillIcon/PillIcon';
-import Typography from '../Typography/Typography';
+import React, { FC, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import AppVersion from '../AppVersion/AppVersion'
+import DashboardOptions from '../DashboardOptions/DashboardOptions'
+import PillIcon from '../PillIcon/PillIcon'
+import Typography from '../Typography/Typography'
 
 export interface AppGreetingProps {
   sirenVersion?: string
@@ -12,8 +12,8 @@ export interface AppGreetingProps {
   userName: string
 }
 
-const AppGreeting:FC<AppGreetingProps> = ({sirenVersion, userName, ...props}) => {
-  const {t} = useTranslation()
+const AppGreeting: FC<AppGreetingProps> = ({ sirenVersion, userName, ...props }) => {
+  const { t } = useTranslation()
   const [isReady, setReady] = useState(false)
 
   useEffect(() => {

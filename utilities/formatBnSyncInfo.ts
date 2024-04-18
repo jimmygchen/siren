@@ -1,5 +1,5 @@
-import { BeaconSyncInfo, BeaconSyncResult } from '../src/types/diagnostic';
-import getPercentage from './getPercentage';
+import { BeaconSyncInfo, BeaconSyncResult } from '../src/types/diagnostic'
+import getPercentage from './getPercentage'
 
 const formatBnSyncInfo = (data: BeaconSyncResult): BeaconSyncInfo => {
   const { head_slot, sync_distance, is_syncing } = data

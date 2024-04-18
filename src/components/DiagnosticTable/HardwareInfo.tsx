@@ -1,12 +1,12 @@
-import { FC, useState } from 'react';
+import { FC, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import addSuffixString from '../../../utilities/addSuffixString'
 import secondsToShortHand from '../../../utilities/secondsToShortHand'
 import { DiagnosticType } from '../../constants/enums'
 import useMediaQuery from '../../hooks/useMediaQuery'
 import { StatusColor } from '../../types'
-import { SyncData } from '../../types/beacon';
-import { Diagnostics } from '../../types/diagnostic';
+import { SyncData } from '../../types/beacon'
+import { Diagnostics } from '../../types/diagnostic'
 import DiagnosticCard from '../DiagnosticCard/DiagnosticCard'
 import Typography from '../Typography/Typography'
 
@@ -15,13 +15,25 @@ export interface HardwareInfoProps {
   beanHealth: Diagnostics
 }
 
-const HardwareInfo:FC<HardwareInfoProps> = ({syncData, beanHealth}) => {
+const HardwareInfo: FC<HardwareInfoProps> = ({ syncData, beanHealth }) => {
   const { t } = useTranslation()
-  const { beaconSync: {beaconSyncTime, beaconPercentage, isSyncing}, executionSync: {syncPercentage, isReady} } = syncData
+  const {
+    beaconSync: { beaconSyncTime, beaconPercentage, isSyncing },
+    executionSync: { syncPercentage, isReady },
+  } = syncData
   const [view, setView] = useState<DiagnosticType>(DiagnosticType.DEVICE)
-  const {diskStatus, totalDiskSpace, diskUtilization, totalMemory,
-  memoryUtilization, ramStatus, cpuUtilization, cpuStatus, frequency,
-    networkName, natOpen
+  const {
+    diskStatus,
+    totalDiskSpace,
+    diskUtilization,
+    totalMemory,
+    memoryUtilization,
+    ramStatus,
+    cpuUtilization,
+    cpuStatus,
+    frequency,
+    networkName,
+    natOpen,
   } = beanHealth
 
   const diskData = isSyncing ? diskStatus.syncing : diskStatus.synced

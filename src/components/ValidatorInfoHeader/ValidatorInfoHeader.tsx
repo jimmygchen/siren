@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from 'next/image'
 import { FC } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { useRecoilValue } from 'recoil'
@@ -20,7 +20,7 @@ const ValidatorInfoHeader: FC<ValidatorInfoHeaderProps> = ({ validator }) => {
   return (
     <div className='w-full relative'>
       <div className='absolute overflow-hidden z-10 top-0 left-0 w-full h-full'>
-        <Image className='z-10 absolute w-full left-0 top-0 opacity-10' alt="waves" src={Waves} />
+        <Image className='z-10 absolute w-full left-0 top-0 opacity-10' alt='waves' src={Waves} />
         <div className='absolute top-0 z-20 right-0 w-3/4 h-full bg-gradient-to-l from-white dark:from-dark750 via-white dark:via-dark750 to-transparent' />
       </div>
       <div className='w-full z-20 flex relative p-6'>

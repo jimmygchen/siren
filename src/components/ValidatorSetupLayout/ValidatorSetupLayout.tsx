@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from 'next/link'
 import { FC, ReactNode } from 'react'
 import BreadCrumb from '../BreadCrumb/BreadCrumb'
 import Button, { ButtonFace } from '../Button/Button'

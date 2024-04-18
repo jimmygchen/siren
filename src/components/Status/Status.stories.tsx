@@ -24,5 +24,4 @@ Error.args = {
   status: StatusColor.ERROR,
 }
 
-
 export default StatusStory

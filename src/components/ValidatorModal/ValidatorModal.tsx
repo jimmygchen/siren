@@ -1,13 +1,13 @@
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'
 import Carousel from 'nuka-carousel'
-import { createContext, FC, useEffect, useMemo, useState } from 'react';
-import formatValidatorEpochData from '../../../utilities/formatValidatorEpochData';
+import { createContext, FC, useEffect, useMemo, useState } from 'react'
+import formatValidatorEpochData from '../../../utilities/formatValidatorEpochData'
 import { ValidatorModalView } from '../../constants/enums'
 import useMediaQuery from '../../hooks/useMediaQuery'
-import { ValidatorBalanceInfo } from '../../types/validator';
+import { ValidatorBalanceInfo } from '../../types/validator'
 import RodalModal from '../RodalModal/RodalModal'
 import Spinner from '../Spinner/Spinner'
-import ValidatorDetails, { ValidatorDetailsProps } from './views/ValidatorDetails';
+import ValidatorDetails, { ValidatorDetailsProps } from './views/ValidatorDetails'
 import ValidatorExit from './views/ValidatorExit'
 
 export interface ValidatorModalContextProps {
@@ -22,7 +22,11 @@ export const ValidatorModalContext = createContext<ValidatorModalContextProps>({
 
 export interface ValidatorModalProps extends ValidatorDetailsProps {}
 
-const ValidatorModal:FC<ValidatorModalProps> = ({validator, validatorMetrics, validatorCacheData}) => {
+const ValidatorModal: FC<ValidatorModalProps> = ({
+  validator,
+  validatorMetrics,
+  validatorCacheData,
+}) => {
   const [isReady, setReady] = useState(false)
   const router = useRouter()
   const [activeIndex, setIndex] = useState(0)
@@ -31,9 +35,9 @@ const ValidatorModal:FC<ValidatorModalProps> = ({validator, validatorMetrics, va
   const isLargeScreen = useMediaQuery('(min-width: 1540px)')
 
   const validatorEpochData = useMemo<ValidatorBalanceInfo | undefined>(() => {
-    if (!validatorCacheData || !validator) return;
-    return formatValidatorEpochData([validator], validatorCacheData);
-  }, [validator, validatorCacheData]);
+    if (!validatorCacheData || !validator) return
+    return formatValidatorEpochData([validator], validatorCacheData)
+  }, [validator, validatorCacheData])
 
   useEffect(() => {
     setReady(true)
@@ -85,7 +89,11 @@ const ValidatorModal:FC<ValidatorModalProps> = ({validator, validatorMetrics, va
       {validator && validatorMetrics ? (
         <ValidatorModalContext.Provider value={{ moveToView, closeModal }}>
           <Carousel swiping={false} slideIndex={activeIndex} dragging={false} withoutControls>
-            <ValidatorDetails validator={validator} validatorCacheData={validatorCacheData} validatorMetrics={validatorMetrics} />
+            <ValidatorDetails
+              validator={validator}
+              validatorCacheData={validatorCacheData}
+              validatorMetrics={validatorMetrics}
+            />
             {renderContent()}
           </Carousel>
         </ValidatorModalContext.Provider>

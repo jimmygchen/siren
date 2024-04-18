@@ -1,11 +1,11 @@
-import React, { FC, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { debounce } from '../../../utilities/debounce'
 import { LogType } from '../../types'
 import Input from '../Input/Input'
 import LogStats from '../LogStats/LogStats'
 import Spinner from '../Spinner/Spinner'
-import { SSEContext } from '../SSELogProvider/SSELogProvider';
+import { SSEContext } from '../SSELogProvider/SSELogProvider'
 import Typography from '../Typography/Typography'
 import LogRow from './LogRow'
 
@@ -14,15 +14,12 @@ export interface LogDisplayProps {
   isLoading?: boolean
 }
 
-const LogDisplay: FC<LogDisplayProps> = React.memo(function({ type, isLoading }) {
+const LogDisplay: FC<LogDisplayProps> = React.memo(function ({ type, isLoading }) {
   const { t } = useTranslation()
   const [searchText, setText] = useState('')
   const scrollableRef = useRef<HTMLDivElement | null>(null)
 
-  const {
-    beaconLogs,
-    vcLogs,
-  } = useContext(SSEContext)
+  const { beaconLogs, vcLogs } = useContext(SSEContext)
 
   const logs = useMemo(() => {
     return type === LogType.BEACON ? beaconLogs : vcLogs
@@ -53,18 +50,25 @@ const LogDisplay: FC<LogDisplayProps> = React.memo(function({ type, isLoading })
     })
   }
 
-  const logCounts = useMemo(() => ({
-    totalLogsPerHour,
-    criticalPerHour,
-    warningsPerHour,
-    errorsPerHour,
-  }), [totalLogsPerHour, criticalPerHour, warningsPerHour, errorsPerHour])
+  const logCounts = useMemo(
+    () => ({
+      totalLogsPerHour,
+      criticalPerHour,
+      warningsPerHour,
+      errorsPerHour,
+    }),
+    [totalLogsPerHour, criticalPerHour, warningsPerHour, errorsPerHour],
+  )
 
   const filteredLogs = useMemo(() => {
     const text = searchText.toLowerCase()
-    return text ? data.filter((log) =>
-      Object.values(log).some((value) => value && value.toString().toLowerCase().includes(text)),
-    ) : data
+    return text
+      ? data.filter((log) =>
+          Object.values(log).some(
+            (value) => value && value.toString().toLowerCase().includes(text),
+          ),
+        )
+      : data
   }, [data, searchText])
 
   const onSearchText = debounce(500, (e: any) => {
@@ -141,6 +145,6 @@ const LogDisplay: FC<LogDisplayProps> = React.memo(function({ type, isLoading })
   )
 })
 
-LogDisplay.displayName = 'LogDisplay';
+LogDisplay.displayName = 'LogDisplay'
 
 export default LogDisplay

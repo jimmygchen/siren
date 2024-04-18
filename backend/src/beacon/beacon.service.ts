@@ -9,50 +9,68 @@ export class BeaconService {
   constructor(private utilsService: UtilsService) {}
   private beaconUrl = process.env.BEACON_URL;
 
-  async fetchBeaconSpec () {
+  async fetchBeaconSpec() {
     try {
-      const { data } = await this.utilsService.sendHttpRequest({url: `${this.beaconUrl}/eth/v1/config/spec`})
-      return data.data
-    } catch (e) {
-      console.error(e)
-      throwServerError('Unable to fetch beacon spec')
-    }
-  }
-
-  async fetchBeaconNodeVersion () {
-    try {
-
-      const {data} = await this.utilsService.sendHttpRequest({url: `${this.beaconUrl}/eth/v1/node/version`});
+      const { data } = await this.utilsService.sendHttpRequest({
+        url: `${this.beaconUrl}/eth/v1/config/spec`,
+      });
       return data.data;
-
     } catch (e) {
-      console.error(e)
-      throwServerError('Unable to fetch beacon node version')
+      console.error(e);
+      throwServerError('Unable to fetch beacon spec');
     }
   }
 
-  async fetchGenesisData () {
+  async fetchBeaconNodeVersion() {
     try {
-      const {data} = await this.utilsService.sendHttpRequest({url: `${this.beaconUrl}/eth/v1/beacon/genesis`})
-      return data.data
+      const { data } = await this.utilsService.sendHttpRequest({
+        url: `${this.beaconUrl}/eth/v1/node/version`,
+      });
+      return data.data;
     } catch (e) {
-      console.error(e)
-      throwServerError('Unable to fetch beacon node version')
+      console.error(e);
+      throwServerError('Unable to fetch beacon node version');
+    }
+  }
+
+  async fetchGenesisData() {
+    try {
+      const { data } = await this.utilsService.sendHttpRequest({
+        url: `${this.beaconUrl}/eth/v1/beacon/genesis`,
+      });
+      return data.data;
+    } catch (e) {
+      console.error(e);
+      throwServerError('Unable to fetch beacon node version');
     }
   }
 
   async fetchSyncData() {
     try {
-      const [beaconSpec, beaconResponse, executionResponse] = await Promise.all([
-        this.utilsService.sendHttpRequest({url: `${this.beaconUrl}/eth/v1/config/spec`}),
-        this.utilsService.sendHttpRequest({url: `${this.beaconUrl}/eth/v1/node/syncing`}),
-        this.utilsService.sendHttpRequest({url: `${this.beaconUrl}/lighthouse/eth1/syncing`}),
-      ]);
+      const [beaconSpec, beaconResponse, executionResponse] = await Promise.all(
+        [
+          this.utilsService.sendHttpRequest({
+            url: `${this.beaconUrl}/eth/v1/config/spec`,
+          }),
+          this.utilsService.sendHttpRequest({
+            url: `${this.beaconUrl}/eth/v1/node/syncing`,
+          }),
+          this.utilsService.sendHttpRequest({
+            url: `${this.beaconUrl}/lighthouse/eth1/syncing`,
+          }),
+        ],
+      );
 
-      const {SECONDS_PER_SLOT} = beaconSpec.data.data
-      const {head_slot, sync_distance, is_syncing} = beaconResponse.data.data;
-      const { head_block_number, head_block_timestamp, latest_cached_block_number,
-        latest_cached_block_timestamp, voting_target_timestamp, eth1_node_sync_status_percentage } = executionResponse.data.data;
+      const { SECONDS_PER_SLOT } = beaconSpec.data.data;
+      const { head_slot, sync_distance, is_syncing } = beaconResponse.data.data;
+      const {
+        head_block_number,
+        head_block_timestamp,
+        latest_cached_block_number,
+        latest_cached_block_timestamp,
+        voting_target_timestamp,
+        eth1_node_sync_status_percentage,
+      } = executionResponse.data.data;
 
       const distance = Number(head_slot) + Number(sync_distance);
 
@@ -84,27 +102,39 @@ export class BeaconService {
   async fetchInclusionRate() {
     try {
       const [beaconSpec, beaconResponse] = await Promise.all([
-        this.utilsService.sendHttpRequest({url: `${this.beaconUrl}/eth/v1/config/spec`}),
-        this.utilsService.sendHttpRequest({url: `${this.beaconUrl}/eth/v1/node/syncing`}),
+        this.utilsService.sendHttpRequest({
+          url: `${this.beaconUrl}/eth/v1/config/spec`,
+        }),
+        this.utilsService.sendHttpRequest({
+          url: `${this.beaconUrl}/eth/v1/node/syncing`,
+        }),
       ]);
 
-      const {SLOTS_PER_EPOCH} = beaconSpec.data.data
-      const {head_slot} = beaconResponse.data.data;
+      const { SLOTS_PER_EPOCH } = beaconSpec.data.data;
+      const { head_slot } = beaconResponse.data.data;
 
-      const epoch = Math.floor(Number(head_slot) / Number(SLOTS_PER_EPOCH)) - 1
+      const epoch = Math.floor(Number(head_slot) / Number(SLOTS_PER_EPOCH)) - 1;
 
-      const {data} = await this.utilsService.sendHttpRequest({url: `${this.beaconUrl}/lighthouse/validator_inclusion/${epoch}/global`})
+      const { data } = await this.utilsService.sendHttpRequest({
+        url: `${this.beaconUrl}/lighthouse/validator_inclusion/${epoch}/global`,
+      });
 
-      const { previous_epoch_target_attesting_gwei, previous_epoch_active_gwei } = data.data
+      const {
+        previous_epoch_target_attesting_gwei,
+        previous_epoch_active_gwei,
+      } = data.data;
 
-      const rate = Math.round((previous_epoch_target_attesting_gwei / previous_epoch_active_gwei) * 100)
+      const rate = Math.round(
+        (previous_epoch_target_attesting_gwei / previous_epoch_active_gwei) *
+          100,
+      );
 
-      const status = getStatus(rate)
+      const status = getStatus(rate);
 
       return {
         rate,
-        status
-      }
+        status,
+      };
     } catch (e) {
       console.error(e);
       throw new Error('Unable to fetch inclusion data');
@@ -113,21 +143,25 @@ export class BeaconService {
 
   async fetchPeerData() {
     try {
-      const {data} = await this.utilsService.sendHttpRequest({url: `${this.beaconUrl}/eth/v1/node/peer_count`})
-      return {connected: Number(data.data.connected)}
+      const { data } = await this.utilsService.sendHttpRequest({
+        url: `${this.beaconUrl}/eth/v1/node/peer_count`,
+      });
+      return { connected: Number(data.data.connected) };
     } catch (e) {
-      console.error(e)
-      throwServerError('Unable to fetch peer data')
+      console.error(e);
+      throwServerError('Unable to fetch peer data');
     }
   }
 
   async fetchValidatorCount() {
     try {
-      const {data} = await this.utilsService.sendHttpRequest({url: `${this.beaconUrl}/lighthouse/ui/validator_count`})
-      return data.data
+      const { data } = await this.utilsService.sendHttpRequest({
+        url: `${this.beaconUrl}/lighthouse/ui/validator_count`,
+      });
+      return data.data;
     } catch (e) {
-      console.error(e)
-      throwServerError('Unable to fetch validator count data')
+      console.error(e);
+      throwServerError('Unable to fetch validator count data');
     }
   }
 }

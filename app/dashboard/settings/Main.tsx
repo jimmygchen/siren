@@ -1,30 +1,34 @@
 'use client'
 
-import React, { FC, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import React, { FC, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import LighthouseSvg from '../../../src/assets/images/lighthouse-black.svg'
-import AppDescription from '../../../src/components/AppDescription/AppDescription';
-import AppVersion from '../../../src/components/AppVersion/AppVersion';
-import DashboardWrapper from '../../../src/components/DashboardWrapper/DashboardWrapper';
-import Input from '../../../src/components/Input/Input';
-import SocialIcon from '../../../src/components/SocialIcon/SocialIcon';
-import Toggle from '../../../src/components/Toggle/Toggle';
-import Typography from '../../../src/components/Typography/Typography';
-import UiModeIcon from '../../../src/components/UiModeIcon/UiModeIcon';
-import { DiscordUrl, LighthouseBookUrl, SigPGithubUrl, SigPIoUrl, SigPTwitter } from '../../../src/constants/constants';
-import { UiMode } from '../../../src/constants/enums';
-import useLocalStorage from '../../../src/hooks/useLocalStorage';
-import useNetworkMonitor from '../../../src/hooks/useNetworkMonitor';
-import useSWRPolling from '../../../src/hooks/useSWRPolling';
-import useUiMode from '../../../src/hooks/useUiMode';
-import { OptionalString } from '../../../src/types';
-import { BeaconNodeSpecResults, SyncData } from '../../../src/types/beacon';
+import AppDescription from '../../../src/components/AppDescription/AppDescription'
+import AppVersion from '../../../src/components/AppVersion/AppVersion'
+import DashboardWrapper from '../../../src/components/DashboardWrapper/DashboardWrapper'
+import Input from '../../../src/components/Input/Input'
+import SocialIcon from '../../../src/components/SocialIcon/SocialIcon'
+import Toggle from '../../../src/components/Toggle/Toggle'
+import Typography from '../../../src/components/Typography/Typography'
+import UiModeIcon from '../../../src/components/UiModeIcon/UiModeIcon'
 import {
-  Diagnostics,
-} from '../../../src/types/diagnostic';
-import { UsernameStorage } from '../../../src/types/storage';
-import addClassString from '../../../utilities/addClassString';
+  DiscordUrl,
+  LighthouseBookUrl,
+  SigPGithubUrl,
+  SigPIoUrl,
+  SigPTwitter,
+} from '../../../src/constants/constants'
+import { UiMode } from '../../../src/constants/enums'
+import useLocalStorage from '../../../src/hooks/useLocalStorage'
+import useNetworkMonitor from '../../../src/hooks/useNetworkMonitor'
+import useSWRPolling from '../../../src/hooks/useSWRPolling'
+import useUiMode from '../../../src/hooks/useUiMode'
+import { OptionalString } from '../../../src/types'
+import { BeaconNodeSpecResults, SyncData } from '../../../src/types/beacon'
+import { Diagnostics } from '../../../src/types/diagnostic'
+import { UsernameStorage } from '../../../src/types/storage'
+import addClassString from '../../../utilities/addClassString'
 
 export interface MainProps {
   initNodeHealth: Diagnostics
@@ -34,14 +38,11 @@ export interface MainProps {
   lighthouseVersion?: string
 }
 
-const Main:FC<MainProps> = (props) => {
-  const {t} = useTranslation()
-  const {
-    initNodeHealth, initSyncData, beaconSpec,
-    lighthouseVersion, bnVersion
-  } = props
+const Main: FC<MainProps> = (props) => {
+  const { t } = useTranslation()
+  const { initNodeHealth, initSyncData, beaconSpec, lighthouseVersion, bnVersion } = props
 
-  const {SECONDS_PER_SLOT} = beaconSpec
+  const { SECONDS_PER_SLOT } = beaconSpec
   const { isValidatorError, isBeaconError } = useNetworkMonitor()
   const { mode, toggleUiMode } = useUiMode()
   const [userNameError, setError] = useState<OptionalString>()
@@ -58,10 +59,18 @@ const Main:FC<MainProps> = (props) => {
     storeUserName(value)
   }
 
-  const networkError = isValidatorError || isBeaconError;
+  const networkError = isValidatorError || isBeaconError
   const slotInterval = SECONDS_PER_SLOT * 1000
-  const { data: nodeHealth } = useSWRPolling<Diagnostics>('/api/node-health', {refreshInterval: 6000, fallbackData: initNodeHealth, networkError})
-  const { data: syncData } = useSWRPolling<SyncData>('/api/node-sync', {refreshInterval: slotInterval, fallbackData: initSyncData, networkError})
+  const { data: nodeHealth } = useSWRPolling<Diagnostics>('/api/node-health', {
+    refreshInterval: 6000,
+    fallbackData: initNodeHealth,
+    networkError,
+  })
+  const { data: syncData } = useSWRPolling<SyncData>('/api/node-sync', {
+    refreshInterval: slotInterval,
+    fallbackData: initSyncData,
+    networkError,
+  })
 
   const svgClasses = addClassString('hidden md:block absolute top-14 right-10', [
     mode === UiMode.DARK ? 'opacity-20' : 'opacity-40',
@@ -186,6 +195,5 @@ const Main:FC<MainProps> = (props) => {
     </DashboardWrapper>
   )
 }
-
 
 export default Main

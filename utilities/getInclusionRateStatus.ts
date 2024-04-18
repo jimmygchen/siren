@@ -1,4 +1,4 @@
-import { StatusColor } from '../src/types';
+import { StatusColor } from '../src/types'
 
 const getStatus = (rate?: number) => {
   if (!rate) return StatusColor.DARK

@@ -3,8 +3,8 @@ import { useMemo } from 'react'
 import { useRecoilValue } from 'recoil'
 import calculateAprPercentage from '../../utilities/calculateAprPercentage'
 import formatBalanceColor from '../../utilities/formatBalanceColor'
-import { beaconNodeSpec } from '../recoil/atoms';
-import { ValidatorCache } from '../types/validator';
+import { beaconNodeSpec } from '../recoil/atoms'
+import { ValidatorCache } from '../types/validator'
 import useFilteredValidatorCacheData from './useFilteredValidatorCacheData'
 
 const useEpochAprEstimate = (validatorCacheData: ValidatorCache, indices?: string[]) => {

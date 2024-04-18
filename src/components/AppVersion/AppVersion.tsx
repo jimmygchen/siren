@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import formatNodeVersion from '../../../utilities/formatNodeVersion';
+import formatNodeVersion from '../../../utilities/formatNodeVersion'
 import { NodeVersion } from '../../types'
 import Typography from '../Typography/Typography'
 

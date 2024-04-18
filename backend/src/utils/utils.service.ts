@@ -12,12 +12,16 @@ import * as EventSource from 'eventsource';
 export class UtilsService {
   constructor(private httpService: HttpService) {}
 
-  async sendHttpRequest<T>(data: {url: string, method?: Method, config?: AxiosRequestConfig}): Promise<AxiosResponse> {
-    const { url, method = 'GET', config } = data
+  async sendHttpRequest<T>(data: {
+    url: string;
+    method?: Method;
+    config?: AxiosRequestConfig;
+  }): Promise<AxiosResponse> {
+    const { url, method = 'GET', config } = data;
     const observable$ = this.httpService.request({
       url,
       method,
-      ...config
+      ...config,
     } as any);
     return firstValueFrom(observable$);
   }
@@ -27,7 +31,7 @@ export class UtilsService {
       ? StatusColor.ERROR
       : statuses.includes(StatusColor.WARNING)
         ? StatusColor.WARNING
-        : StatusColor.SUCCESS
+        : StatusColor.SUCCESS;
   }
 
   getHealthCondition(status: StatusColor) {
@@ -35,15 +39,15 @@ export class UtilsService {
       ? DiagnosticRate.POOR
       : status === StatusColor.WARNING
         ? DiagnosticRate.FAIR
-        : DiagnosticRate.GOOD
+        : DiagnosticRate.GOOD;
   }
 
   handleSse(req: Request, res: Response, url: string) {
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
-      'X-Accel-Buffering': 'no'
+      Connection: 'keep-alive',
+      'X-Accel-Buffering': 'no',
     });
     res.flushHeaders();
 

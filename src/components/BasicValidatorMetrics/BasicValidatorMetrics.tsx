@@ -1,10 +1,10 @@
-import { FC, useMemo } from 'react';
+import { FC, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRecoilValue } from 'recoil'
 import { formatLocalCurrency } from '../../../utilities/formatLocalCurrency'
-import useFilteredValidatorCacheData from '../../hooks/useFilteredValidatorCacheData';
+import useFilteredValidatorCacheData from '../../hooks/useFilteredValidatorCacheData'
 import { exchangeRates } from '../../recoil/atoms'
-import { ValidatorBalanceInfo, ValidatorCache, ValidatorInfo } from '../../types/validator';
+import { ValidatorBalanceInfo, ValidatorCache, ValidatorInfo } from '../../types/validator'
 import Typography from '../Typography/Typography'
 import ValidatorIncomeSummary from '../ValidatorIncomeSummary/ValidatorIncomeSummary'
 
@@ -13,7 +13,10 @@ export interface BasicValidatorMetricsProps {
   validator: ValidatorInfo
 }
 
-const BasicValidatorMetrics: FC<BasicValidatorMetricsProps> = ({ validatorEpochData, validator }) => {
+const BasicValidatorMetrics: FC<BasicValidatorMetricsProps> = ({
+  validatorEpochData,
+  validator,
+}) => {
   const { t } = useTranslation()
   const data = useRecoilValue(exchangeRates)
   const activeRate = data?.rates.USD

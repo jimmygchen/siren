@@ -44,7 +44,7 @@ module.exports = {
         lightError200: '#FFB7B3',
       },
       backgroundImage: {
-        lighthouse: 'url(\'./assets/images/lightHouseBg.png\')',
+        lighthouse: "url('./assets/images/lightHouseBg.png')",
       },
       fontFamily: {
         openSauce: 'var(--openSauce)',

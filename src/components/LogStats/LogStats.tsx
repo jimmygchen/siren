@@ -39,15 +39,15 @@ const LogStats: FC<LogStatsProps> = ({
     ? errorPercentage <= 0
       ? StatusColor.SUCCESS
       : errorPercentage <= 2
-      ? StatusColor.WARNING
-      : StatusColor.ERROR
+        ? StatusColor.WARNING
+        : StatusColor.ERROR
     : StatusColor.SUCCESS
   const warnStatus = totalLogsPerHour
     ? warnPercentage < 5
       ? StatusColor.SUCCESS
       : warnPercentage <= 50
-      ? StatusColor.WARNING
-      : StatusColor.ERROR
+        ? StatusColor.WARNING
+        : StatusColor.ERROR
     : StatusColor.SUCCESS
 
   return (

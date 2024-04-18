@@ -1,8 +1,8 @@
-import { BeaconValidatorResult } from '../src/types/validator';
-import formatDefaultValName from './formatDefaultValName';
-import { formatUnits } from 'ethers/lib/utils';
-import { initialEthDeposit } from '../src/constants/constants';
-import { ValAliases } from '../src/types';
+import { BeaconValidatorResult } from '../src/types/validator'
+import formatDefaultValName from './formatDefaultValName'
+import { formatUnits } from 'ethers/lib/utils'
+import { initialEthDeposit } from '../src/constants/constants'
+import { ValAliases } from '../src/types'
 
 const formatValidatorStateInfo = (validators?: BeaconValidatorResult[], aliases?: ValAliases) => {
   if (!validators) return

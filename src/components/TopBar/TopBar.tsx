@@ -1,10 +1,10 @@
-import { FC } from 'react';
+import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSetRecoilState } from 'recoil'
 import LightHouseFullLogo from '../../assets/images/lightHouseFull.svg'
 import SlasherLogo from '../../assets/images/slasher.svg'
 import { isSideBarOpen } from '../../recoil/atoms'
-import { SyncData } from '../../types/beacon';
+import { SyncData } from '../../types/beacon'
 import BeaconNetwork from '../BeaconNetwork/BeaconNetwork'
 import Button, { ButtonFace } from '../Button/Button'
 import Typography from '../Typography/Typography'
@@ -16,7 +16,7 @@ export interface TopBarProps {
   syncData: SyncData
 }
 
-const TopBar:FC<TopBarProps> = ({ syncData}) => {
+const TopBar: FC<TopBarProps> = ({ syncData }) => {
   const { t } = useTranslation()
   const toggleSideBar = useSetRecoilState(isSideBarOpen)
   const { beaconSync, executionSync } = syncData

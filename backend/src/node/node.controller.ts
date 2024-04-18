@@ -7,6 +7,6 @@ export class NodeController {
 
   @Get('health')
   async getHealthData() {
-    return this.nodeService.fetchNodeHealth()
+    return this.nodeService.fetchNodeHealth();
   }
 }

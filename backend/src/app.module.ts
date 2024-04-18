@@ -8,9 +8,15 @@ import { NodeModule } from './node/node.module';
 import { LogsModule } from './logs/logs.module';
 
 @Module({
-  imports: [BeaconModule, ValidatorModule, ConfigModule.forRoot({
-    envFilePath: '../.env',
-  }), NodeModule, LogsModule],
+  imports: [
+    BeaconModule,
+    ValidatorModule,
+    ConfigModule.forRoot({
+      envFilePath: '../.env',
+    }),
+    NodeModule,
+    LogsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -32,7 +32,7 @@ const EditValidatorForm: FC<EditValidatorFormProps> = ({ children, validator }) 
   const setAlias = useSetRecoilState(validatorAliases)
   const [aliases, storeValAliases] = useLocalStorage<ValAliases>('val-aliases', {})
 
-  const storedAliasIndex = Object.keys(aliases).find(index => Number(index) === validator.index)
+  const storedAliasIndex = Object.keys(aliases).find((index) => Number(index) === validator.index)
   const validatorName = storedAliasIndex ? aliases[storedAliasIndex] : name
 
   const {

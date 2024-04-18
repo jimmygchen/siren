@@ -1,11 +1,16 @@
 import { Protocol } from '../constants/enums'
-import { BeaconNodeSpecResults, SyncData } from './beacon';
-import { BeaconSyncResult, Diagnostics, HealthDiagnosticResult, ValidatorSyncResult } from './diagnostic';
+import { BeaconNodeSpecResults, SyncData } from './beacon'
+import {
+  BeaconSyncResult,
+  Diagnostics,
+  HealthDiagnosticResult,
+  ValidatorSyncResult,
+} from './diagnostic'
 
 export interface NextFetchRequestInit extends RequestInit {
   next?: {
-    revalidate?: number;
-  };
+    revalidate?: number
+  }
 }
 
 export enum StatusColor {
@@ -133,7 +138,6 @@ export type ProposerDuty = {
 
 export type OptionalString = string | undefined
 export type OptionalBoolean = boolean | undefined
-
 
 export interface SetupProps {
   beaconSpec: BeaconNodeSpecResults

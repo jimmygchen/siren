@@ -6,7 +6,9 @@ import { ValidatorModalView } from '../../../constants/enums'
 import useExitValidator from '../../../hooks/useExitValidator'
 import { activeDevice } from '../../../recoil/atoms'
 import { ValidatorInfo } from '../../../types/validator'
-import BasicValidatorMetrics, { BasicValidatorMetricsProps } from '../../BasicValidatorMetrics/BasicValidatorMetrics';
+import BasicValidatorMetrics, {
+  BasicValidatorMetricsProps,
+} from '../../BasicValidatorMetrics/BasicValidatorMetrics'
 import Button, { ButtonFace } from '../../Button/Button'
 import ExitDisclosure from '../../Disclosures/ExitDisclosure'
 import InfoBox, { InfoBoxType } from '../../InfoBox/InfoBox'

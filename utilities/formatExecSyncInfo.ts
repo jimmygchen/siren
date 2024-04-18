@@ -1,4 +1,4 @@
-import { ValidatorSyncInfo, ValidatorSyncResult } from '../src/types/diagnostic';
+import { ValidatorSyncInfo, ValidatorSyncResult } from '../src/types/diagnostic'
 
 const formatExecSyncInfo = (data: ValidatorSyncResult): ValidatorSyncInfo => {
   const {

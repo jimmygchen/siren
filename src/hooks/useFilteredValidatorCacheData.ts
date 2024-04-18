@@ -1,7 +1,10 @@
 import { useMemo } from 'react'
 import { ValidatorCache } from '../types/validator'
 
-const useFilteredValidatorCacheData = (validatorCacheData: ValidatorCache, indices?: string[]): ValidatorCache | undefined => {
+const useFilteredValidatorCacheData = (
+  validatorCacheData: ValidatorCache,
+  indices?: string[],
+): ValidatorCache | undefined => {
   return useMemo(() => {
     if (!validatorCacheData) return undefined
 

@@ -16,7 +16,7 @@ import { useRecoilValue } from 'recoil'
 import addClassString from '../../../utilities/addClassString'
 import { UiMode } from '../../constants/enums'
 import { uiMode } from '../../recoil/atoms'
-import Spinner from '../Spinner/Spinner';
+import Spinner from '../Spinner/Spinner'
 
 Chart.register(
   CategoryScale,

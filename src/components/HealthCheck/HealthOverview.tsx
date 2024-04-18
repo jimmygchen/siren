@@ -1,8 +1,8 @@
-import { FC } from 'react';
+import { FC } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import HealthSvg from '../../assets/images/health.svg'
 import { StatusColor } from '../../types'
-import { Diagnostics } from '../../types/diagnostic';
+import { Diagnostics } from '../../types/diagnostic'
 import DiagnosticOverviewText from '../DiagnosticOverviewText/DiagnosticOverviewText'
 import HealthDisclosure from '../Disclosures/HealthDisclosure'
 import Status from '../Status/Status'
@@ -13,9 +13,10 @@ export interface HealthOverviewProps {
   isSyncing: boolean
 }
 
-const HealthOverview:FC<HealthOverviewProps> = ({nodeHealth, isSyncing}) => {
+const HealthOverview: FC<HealthOverviewProps> = ({ nodeHealth, isSyncing }) => {
   const { t } = useTranslation()
-  const { totalDiskFree, uptime, healthCondition, overallHealthStatus, ramStatus, cpuStatus } = nodeHealth
+  const { totalDiskFree, uptime, healthCondition, overallHealthStatus, ramStatus, cpuStatus } =
+    nodeHealth
 
   const healthStatus = isSyncing ? overallHealthStatus.syncing : overallHealthStatus.synced
   const condition = isSyncing ? healthCondition.syncing : healthCondition.synced

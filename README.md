@@ -7,7 +7,7 @@ and Validator Client.
 
 [Chat Badge]: https://img.shields.io/badge/chat-discord-%237289da
 [Chat Link]: https://discord.gg/jpqcHXPRVJ
-[Book Status]:https://img.shields.io/badge/user--docs-unstable-informational
+[Book Status]: https://img.shields.io/badge/user--docs-unstable-informational
 [Book Link]: https://lighthouse-book.sigmaprime.io/lighthouse-ui.html
 [stable]: https://github.com/sigp/siren/tree/stable
 [unstable]: https://github.com/sigp/siren/tree/unstable
@@ -21,7 +21,7 @@ developers. Specifically the [Lighthouse UI](https://lighthouse-book.sigmaprime.
 
 ### Requirements
 
-Building from source requires `Node v18` and `yarn`. 
+Building from source requires `Node v18` and `yarn`.
 
 ### Building From Source
 
@@ -62,17 +62,20 @@ production-grade web-server to host the application.
 `docker` is required to be installed with the service running.
 
 The docker image can be built and run via the Makefile by running:
+
 ```
 $ make docker
 ```
 
 Alternatively, to run with Docker, the image needs to be built. From the repository directory
 run:
+
 ```
 $ docker build -t siren .
 ```
 
 Then to run the image:
+
 ```
 $ docker run --rm -ti --name siren -p 80:80 siren
 ```
@@ -104,6 +107,7 @@ $ make install-lcli
 note: you need a version of lcli that includes [these](https://github.com/sigp/lighthouse/pull/3807) changes
 
 `ganache` is also required to be installed. This can be installed via `npm` or via the OS. If using `npm` it can be installed as:
+
 ```
 $ npm install ganache --global
 ```
@@ -111,6 +115,7 @@ $ npm install ganache --global
 ## Starting the Testnet
 
 To start a local testnet, move into the `local-testnet` directory. Then run:
+
 ```bash
 ./start_local_testnet.sh genesis.json
 ```

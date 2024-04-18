@@ -25,7 +25,6 @@ export const SSEContext = createContext<{
 })
 
 const SSELogProvider: FC<SSELogWrapperProps> = React.memo(function ({ children, trigger = 10000 }) {
-
   const [, setTrigger] = useState(false)
   const setBeaconNetworkError = useSetRecoilState(beaconNetworkError)
   const setValidatorNetworkError = useSetRecoilState(validatorNetworkError)
@@ -33,7 +32,7 @@ const SSELogProvider: FC<SSELogWrapperProps> = React.memo(function ({ children, 
   const [isReady, setReady] = useState(false)
 
   useEffect(() => {
-    if(intervalId) {
+    if (intervalId) {
       setReady(true)
     }
   }, [intervalId, setReady])

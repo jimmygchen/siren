@@ -15,8 +15,8 @@ const DiagnosticSummaryCard: FC<DiagnosticSummaryCardProps> = ({ type, rate }) =
     rate === DiagnosticRate.POOR
       ? 'text-error'
       : rate === DiagnosticRate.FAIR
-      ? 'text-warning'
-      : 'text-success'
+        ? 'text-warning'
+        : 'text-success'
 
   return (
     <div className='bg-dark25 flex flex-col justify-between h-full p-4 w-full md:w-40 border border-dark400'>

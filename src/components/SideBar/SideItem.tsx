@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from 'next/link'
 import { FC, ReactElement } from 'react'
 import addClassString from '../../../utilities/addClassString'
 import { OptionalBoolean } from '../../types'
@@ -14,10 +14,13 @@ export interface SideItemProps {
 
 const SideItem: FC<SideItemProps> = ({ children, isActive, className, href, isDisabled }) => {
   const renderContent = () => (
-    <Link className={addClassString(
-      'cursor-pointer flex items-center justify-center group relative h-6',
-      [className, isActive ? 'text-primary' : 'hover:text-primary text-dark400'],
-    )} href={href}>
+    <Link
+      className={addClassString(
+        'cursor-pointer flex items-center justify-center group relative h-6',
+        [className, isActive ? 'text-primary' : 'hover:text-primary text-dark400'],
+      )}
+      href={href}
+    >
       <li>
         <div
           className={addClassString(

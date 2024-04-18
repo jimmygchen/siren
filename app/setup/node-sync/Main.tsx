@@ -1,34 +1,38 @@
-import { FC } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
-import BeaconSyncCard from '../../../src/components/BeaconSyncCard/BeaconSyncCard';
-import SyncDisclosure from '../../../src/components/Disclosures/SyncDisclosure';
-import Typography from '../../../src/components/Typography/Typography';
-import ValidatorSetupLayout from '../../../src/components/ValidatorSetupLayout/ValidatorSetupLayout';
-import ValidatorSyncCard from '../../../src/components/ValidatorSyncCard/ValidatorSyncCard';
-import useNetworkMonitor from '../../../src/hooks/useNetworkMonitor';
-import useSWRPolling from '../../../src/hooks/useSWRPolling';
-import { SetupProps } from '../../../src/types';
+import { FC } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import BeaconSyncCard from '../../../src/components/BeaconSyncCard/BeaconSyncCard'
+import SyncDisclosure from '../../../src/components/Disclosures/SyncDisclosure'
+import Typography from '../../../src/components/Typography/Typography'
+import ValidatorSetupLayout from '../../../src/components/ValidatorSetupLayout/ValidatorSetupLayout'
+import ValidatorSyncCard from '../../../src/components/ValidatorSyncCard/ValidatorSyncCard'
+import useNetworkMonitor from '../../../src/hooks/useNetworkMonitor'
+import useSWRPolling from '../../../src/hooks/useSWRPolling'
+import { SetupProps } from '../../../src/types'
 
 export interface MainProps extends Omit<SetupProps, 'initNodeHealth'> {}
 
-const Main:FC<MainProps> = ({ initSyncData, beaconSpec}) => {
-  const {t} = useTranslation()
+const Main: FC<MainProps> = ({ initSyncData, beaconSpec }) => {
+  const { t } = useTranslation()
 
-  const {SECONDS_PER_SLOT} = beaconSpec
+  const { SECONDS_PER_SLOT } = beaconSpec
   const slotInterval = Number(SECONDS_PER_SLOT) * 1000
 
   const { isValidatorError, isBeaconError } = useNetworkMonitor()
-  const networkError = isValidatorError || isBeaconError;
+  const networkError = isValidatorError || isBeaconError
 
-  const { data: syncData } = useSWRPolling('/api/node-sync', {refreshInterval: slotInterval, fallbackData: initSyncData, networkError})
+  const { data: syncData } = useSWRPolling('/api/node-sync', {
+    refreshInterval: slotInterval,
+    fallbackData: initSyncData,
+    networkError,
+  })
 
   const { beaconSync, executionSync } = syncData
 
   return (
     <div className='relative h-screen w-screen overflow-hidden flex'>
       <ValidatorSetupLayout
-        nextUrl="/dashboard"
-        prevUrl="/setup/health-check"
+        nextUrl='/dashboard'
+        prevUrl='/setup/health-check'
         previousStep={t('healthCheck')}
         currentStep={t('syncing')}
         title={t('syncing')}

@@ -8,8 +8,8 @@ import {
   secondsInHour,
   secondsInWeek,
 } from '../constants/constants'
-import { beaconNodeSpec } from '../recoil/atoms';
-import { FormattedValidatorCache, ValidatorBalanceInfo, ValidatorCache } from '../types/validator';
+import { beaconNodeSpec } from '../recoil/atoms'
+import { FormattedValidatorCache, ValidatorBalanceInfo, ValidatorCache } from '../types/validator'
 
 const useValidatorEarnings = (validatorData: ValidatorBalanceInfo) => {
   const spec = useRecoilValue(beaconNodeSpec)

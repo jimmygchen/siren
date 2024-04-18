@@ -1,61 +1,60 @@
-const express = require('express');
-const next = require('next');
-const EventSource = require('eventsource');
-const dev = process.env.NODE_ENV !== 'production';
-const app = next({ dev });
-const handle = app.getRequestHandler();
-const PORT = process.env.PORT || 3000;
-require('dotenv').config();
+const express = require('express')
+const next = require('next')
+const EventSource = require('eventsource')
+const dev = process.env.NODE_ENV !== 'production'
+const app = next({ dev })
+const handle = app.getRequestHandler()
+const PORT = process.env.PORT || 3000
+require('dotenv').config()
 
-const backendUrl = process.env.BACKEND_URL;
+const backendUrl = process.env.BACKEND_URL
 
 const handleSSe = (res, req, url) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive',
-    'X-Accel-Buffering': 'no'
-  });
-  res.flushHeaders();
+    Connection: 'keep-alive',
+    'X-Accel-Buffering': 'no',
+  })
+  res.flushHeaders()
 
-  const eventSource = new EventSource(url);
+  const eventSource = new EventSource(url)
   eventSource.onmessage = (e) => {
-    res.write(`data: ${e.data}\n\n`);
-  };
+    res.write(`data: ${e.data}\n\n`)
+  }
 
   // Heartbeat mechanism
   const heartbeatInterval = setInterval(() => {
-    res.write(': keep-alive\n\n');
-  }, 10000); // every 10 seconds
+    res.write(': keep-alive\n\n')
+  }, 10000) // every 10 seconds
 
   eventSource.onerror = (e) => {
-    console.error('EventSource failed:', e);
-    clearInterval(heartbeatInterval);
-    eventSource.close();
-    res.end();
-  };
+    console.error('EventSource failed:', e)
+    clearInterval(heartbeatInterval)
+    eventSource.close()
+    res.end()
+  }
 
   req.on('close', () => {
-    console.error('Request closed...');
-    clearInterval(heartbeatInterval);
-    eventSource.close();
-    res.end();
-  });
+    console.error('Request closed...')
+    clearInterval(heartbeatInterval)
+    eventSource.close()
+    res.end()
+  })
 }
 
-
 app.prepare().then(() => {
-  const server = express();
-  server.get('/validator-logs', (req, res) => handleSSe(res, req, `${backendUrl}/logs/validator`));
-  server.get('/beacon-logs', (req, res) => handleSSe(res, req, `${backendUrl}/logs/beacon`));
+  const server = express()
+  server.get('/validator-logs', (req, res) => handleSSe(res, req, `${backendUrl}/logs/validator`))
+  server.get('/beacon-logs', (req, res) => handleSSe(res, req, `${backendUrl}/logs/beacon`))
 
   // Handling all other requests with Next.js
   server.all('*', (req, res) => {
-    return handle(req, res);
-  });
+    return handle(req, res)
+  })
 
   server.listen(PORT, (err) => {
-    if (err) throw err;
-    console.log(`> Ready on http://localhost:${PORT}`);
-  });
-});
+    if (err) throw err
+    console.log(`> Ready on http://localhost:${PORT}`)
+  })
+})

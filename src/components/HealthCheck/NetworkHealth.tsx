@@ -1,10 +1,10 @@
-import { FC } from 'react';
+import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import secondsToShortHand from '../../../utilities/secondsToShortHand'
 import { DiagnosticRate, DiagnosticType } from '../../constants/enums'
 import { StatusColor } from '../../types'
-import { SyncData } from '../../types/beacon';
-import { Diagnostics } from '../../types/diagnostic';
+import { SyncData } from '../../types/beacon'
+import { Diagnostics } from '../../types/diagnostic'
 import DiagnosticCard from '../DiagnosticCard/DiagnosticCard'
 import DiagnosticSummaryCard from '../DiagnosticSummaryCard/DiagnosticSummaryCard'
 
@@ -13,8 +13,11 @@ export interface NetworkHealthProps {
   nodeHealth: Diagnostics
 }
 
-const NetworkHealth:FC<NetworkHealthProps> = ({syncData, nodeHealth}) => {
-  const { beaconSync: {beaconPercentage, beaconSyncTime}, executionSync: {isReady, syncPercentage} } = syncData
+const NetworkHealth: FC<NetworkHealthProps> = ({ syncData, nodeHealth }) => {
+  const {
+    beaconSync: { beaconPercentage, beaconSyncTime },
+    executionSync: { isReady, syncPercentage },
+  } = syncData
 
   const { t } = useTranslation()
   const { networkName, natOpen } = nodeHealth

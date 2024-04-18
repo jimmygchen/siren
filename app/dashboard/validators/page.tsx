@@ -1,9 +1,12 @@
 import '../../../src/global.css'
 import {
-  fetchBeaconSpec, fetchNodeHealth, fetchSyncData, fetchValidatorCountData
-} from '../../api/beacon';
-import { fetchValCaches, fetchValMetrics, fetchValStates } from '../../api/validator';
-import Wrapper from './Wrapper';
+  fetchBeaconSpec,
+  fetchNodeHealth,
+  fetchSyncData,
+  fetchValidatorCountData,
+} from '../../api/beacon'
+import { fetchValCaches, fetchValMetrics, fetchValStates } from '../../api/validator'
+import Wrapper from './Wrapper'
 
 export default async function Page() {
   const bnHealth = await fetchNodeHealth()

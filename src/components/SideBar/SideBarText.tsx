@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from 'next/link'
 import { FC } from 'react'
 import addClassString from '../../../utilities/addClassString'
 import { OptionalBoolean } from '../../types'
@@ -27,13 +27,18 @@ const SideBarText: FC<SideBarTextProps> = ({ text, isActive, href, isDisabled, c
     </li>
   )
   return href ? (
-    <Link className={addClassString('flex items-center h-6 w-full cursor-pointer', [
-      isDisabled && 'opacity-20 pointer-events-none',
-      className,
-    ])} href={href}>
+    <Link
+      className={addClassString('flex items-center h-6 w-full cursor-pointer', [
+        isDisabled && 'opacity-20 pointer-events-none',
+        className,
+      ])}
+      href={href}
+    >
       {renderText()}
     </Link>
-  ) : renderText()
+  ) : (
+    renderText()
+  )
 }
 
 export default SideBarText

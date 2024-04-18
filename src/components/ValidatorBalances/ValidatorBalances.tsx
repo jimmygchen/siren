@@ -1,16 +1,16 @@
-import { formatUnits } from 'ethers/lib/utils';
-import moment from 'moment/moment';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { formatUnits } from 'ethers/lib/utils'
+import moment from 'moment/moment'
+import { FC, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useRecoilValue } from 'recoil';
-import getAverageValue from '../../../utilities/getAverageValue';
-import { BALANCE_COLORS, slotsInEpoc } from '../../constants/constants';
+import { useRecoilValue } from 'recoil'
+import getAverageValue from '../../../utilities/getAverageValue'
+import { BALANCE_COLORS, slotsInEpoc } from '../../constants/constants'
 import useLocalStorage from '../../hooks/useLocalStorage'
 import useMediaQuery from '../../hooks/useMediaQuery'
 import useUiMode from '../../hooks/useUiMode'
-import { beaconNodeSpec } from '../../recoil/atoms';
+import { beaconNodeSpec } from '../../recoil/atoms'
 import { ValidatorIndicesStorage } from '../../types/storage'
-import { ValidatorCache, ValidatorInfo } from '../../types/validator';
+import { ValidatorCache, ValidatorInfo } from '../../types/validator'
 import CheckBox from '../CheckBox/CheckBox'
 import LoadingDots from '../LoadingDots/LoadingDots'
 import RodalModal from '../RodalModal/RodalModal'
@@ -24,7 +24,11 @@ export interface ValidatorBalancesProps {
   genesisTime: number
 }
 
-const ValidatorBalances:FC<ValidatorBalancesProps> = ({validatorCacheData, validatorStateInfo, genesisTime}) => {
+const ValidatorBalances: FC<ValidatorBalancesProps> = ({
+  validatorCacheData,
+  validatorStateInfo,
+  genesisTime,
+}) => {
   const { t } = useTranslation()
   const { mode } = useUiMode()
   const isTablet = useMediaQuery('(max-width: 1024px)')
@@ -32,7 +36,7 @@ const ValidatorBalances:FC<ValidatorBalancesProps> = ({validatorCacheData, valid
   const [isLegendModal, toggleModal] = useState(false)
 
   const spec = useRecoilValue(beaconNodeSpec)
-  const interval = Number(spec?.SECONDS_PER_SLOT) || 12;
+  const interval = Number(spec?.SECONDS_PER_SLOT) || 12
 
   const activeValidators = useMemo(() => {
     return validatorStateInfo
@@ -48,24 +52,26 @@ const ValidatorBalances:FC<ValidatorBalancesProps> = ({validatorCacheData, valid
         pubKey,
         index: String(index),
         name,
-      })).slice(0, 10)
+      }))
+      .slice(0, 10)
   }, [validatorStateInfo])
 
   const epochs = useMemo(() => {
     return validatorCacheData && activeValidators.length && Object.values(validatorCacheData).length
-      ? activeValidators.map(({ index, name }) => {
-          const data = validatorCacheData[index as any] || []
-          return {
-            index,
-            name,
-            data: data.map(({ total_balance }) => Number(formatUnits(total_balance, 'gwei'))),
-          }
-        })
-        .sort((a, b) => getAverageValue(a.data) - getAverageValue(b.data))
-        .map((data, index) => ({
-          ...data,
-          color: BALANCE_COLORS[index],
-        }))
+      ? activeValidators
+          .map(({ index, name }) => {
+            const data = validatorCacheData[index as any] || []
+            return {
+              index,
+              name,
+              data: data.map(({ total_balance }) => Number(formatUnits(total_balance, 'gwei'))),
+            }
+          })
+          .sort((a, b) => getAverageValue(a.data) - getAverageValue(b.data))
+          .map((data, index) => ({
+            ...data,
+            color: BALANCE_COLORS[index],
+          }))
       : []
   }, [activeValidators, validatorCacheData])
 
@@ -73,10 +79,10 @@ const ValidatorBalances:FC<ValidatorBalancesProps> = ({validatorCacheData, valid
     const data = validatorCacheData && Object.values(validatorCacheData)[0]
     return data && genesisTime
       ? data.map(({ epoch }) => {
-        const slot = epoch * slotsInEpoc
+          const slot = epoch * slotsInEpoc
 
-        return moment((genesisTime + slot * interval) * 1000).format('HH:mm')
-      })
+          return moment((genesisTime + slot * interval) * 1000).format('HH:mm')
+        })
       : []
   }, [validatorCacheData, interval, genesisTime])
 

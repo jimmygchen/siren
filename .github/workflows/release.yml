@@ -27,22 +27,22 @@ jobs:
     strategy:
       matrix:
         arch: [
-          aarch64-unknown-linux-gnu,
-          x86_64-unknown-linux-gnu,
-          # Requires apple signature secrets
-          # x86_64-apple-darwin,
-          x86_64-windows
-        ]
+            aarch64-unknown-linux-gnu,
+            x86_64-unknown-linux-gnu,
+            # Requires apple signature secrets
+            # x86_64-apple-darwin,
+            x86_64-windows,
+          ]
         include:
-          -   arch: aarch64-unknown-linux-gnu
-              platform: ubuntu-latest
-          -   arch: x86_64-unknown-linux-gnu
-              platform: ubuntu-latest
+          - arch: aarch64-unknown-linux-gnu
+            platform: ubuntu-latest
+          - arch: x86_64-unknown-linux-gnu
+            platform: ubuntu-latest
             # Requires apple signature secrets
             #-   arch: x86_64-apple-darwin
             # platform: macos-latest
-          -   arch: x86_64-windows
-              platform: windows-2019
+          - arch: x86_64-windows
+            platform: windows-2019
 
     runs-on: ${{ matrix.platform }}
     needs: extract-version
@@ -87,7 +87,6 @@ jobs:
           name: siren-${{ needs.extract-version.outputs.VERSION }}-${{ matrix.arch }}.zip
           path: ./siren-${{ needs.extract-version.outputs.VERSION }}-${{ matrix.arch }}.zip
 
-
   sign:
     name: Sign Release
     runs-on: ubuntu-latest
@@ -95,12 +94,12 @@ jobs:
     strategy:
       matrix:
         arch: [
-          aarch64-unknown-linux-gnu,
-          x86_64-unknown-linux-gnu,
-          # Requires apple signature secrets
-          # x86_64-apple-darwin,
-          x86_64-windows
-        ]
+            aarch64-unknown-linux-gnu,
+            x86_64-unknown-linux-gnu,
+            # Requires apple signature secrets
+            # x86_64-apple-darwin,
+            x86_64-windows,
+          ]
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v3
@@ -172,36 +171,36 @@ jobs:
         run: |
           body=$(cat <<- "ENDBODY"
           <Release Name>
-          
+
           ## Release Checklist (DELETE ME)
-          
+
           - [ ] Merge `unstable` -> `stable`.
           - [ ] Ensure docker images are published (check `latest` and the version tag).
           - [ ] Prepare Discord post.
-          
+
           ## Summary
-          
+
           Add a summary.
-          
+
           ## Update Priority
-          
+
           This table provides priorities for which classes of users should update particular components.
-          
+
           |User Class |Beacon Node  | Validator Client|
           --- | --- | ---
           |Staking Users| <TODO> | <TODO> |
           |Non-Staking Users| <TODO>|---|
-          
+
           ## All Changes
-          
+
           ${{ steps.changelog.outputs.CHANGELOG }}
-          
+
           ## Binaries
-          
+
           [See pre-built binaries documentation.](https://lighthouse-book.sigmaprime.io/installation-binaries.html)
-          
+
           The binaries are signed with Sigma Prime's PGP key: `15E66D941F697E28F49381F426416DC3F30674B0`
-          
+
           | System | Architecture | Binary | PGP Signature |
           |:---:|:---:|:---:|:---|
           | <img src="https://simpleicons.org/icons/apple.svg" style="width: 32px;"/> | x86_64 | [siren-${{ env.VERSION }}-x86_64-apple-darwin.zip](https://github.com/${{ env.REPO_NAME }}/releases/download/${{ env.VERSION }}/siren-${{ env.VERSION }}-x86_64-apple-darwin.zip) | [PGP Signature](https://github.com/${{ env.REPO_NAME }}/releases/download/${{ env.VERSION }}/siren-${{ env.VERSION }}-x86_64-apple-darwin.zip.asc) |

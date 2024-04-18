@@ -1,23 +1,23 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRecoilValue } from 'recoil'
 import { formatLocalCurrency } from '../../../utilities/formatLocalCurrency'
-import formatValidatorEpochData from '../../../utilities/formatValidatorEpochData';
+import formatValidatorEpochData from '../../../utilities/formatValidatorEpochData'
 import EthLogo from '../../assets/images/eth.svg'
 import LightHouseLogo from '../../assets/images/lightHouse.svg'
 import UsdcLogo from '../../assets/images/usdc.svg'
 import { EARNINGS_OPTIONS } from '../../constants/constants'
-import { CURRENCY_PREFIX } from '../../constants/currencies';
-import { Storage } from '../../constants/enums';
+import { CURRENCY_PREFIX } from '../../constants/currencies'
+import { Storage } from '../../constants/enums'
 import useEarningsEstimate from '../../hooks/useEarningsEstimate'
 import useEpochAprEstimate from '../../hooks/useEpochAprEstimate'
-import useLocalStorage from '../../hooks/useLocalStorage';
+import useLocalStorage from '../../hooks/useLocalStorage'
 import { exchangeRates } from '../../recoil/atoms'
-import { ActiveCurrencyStorage } from '../../types/storage';
-import { ValidatorBalanceInfo, ValidatorCache, ValidatorInfo } from '../../types/validator';
+import { ActiveCurrencyStorage } from '../../types/storage'
+import { ValidatorBalanceInfo, ValidatorCache, ValidatorInfo } from '../../types/validator'
 import Button, { ButtonFace } from '../Button/Button'
 import CurrencySelect from '../CurrencySelect/CurrencySelect'
-import { OptionType } from '../SelectDropDown/SelectDropDown';
+import { OptionType } from '../SelectDropDown/SelectDropDown'
 import Tooltip from '../ToolTip/Tooltip'
 import Typography from '../Typography/Typography'
 import EarningsLayout from './EarningsLayout'
@@ -27,7 +27,7 @@ export interface AccountEarningProps {
   validatorCacheData: ValidatorCache
 }
 
-const AccountEarning:FC<AccountEarningProps> = ({validatorStateInfo, validatorCacheData}) => {
+const AccountEarning: FC<AccountEarningProps> = ({ validatorStateInfo, validatorCacheData }) => {
   const { t } = useTranslation()
   const [activeCurrencyStorage, storeActiveCurrency] = useLocalStorage<ActiveCurrencyStorage>(
     Storage.CURRENCY,
@@ -37,10 +37,11 @@ const AccountEarning:FC<AccountEarningProps> = ({validatorStateInfo, validatorCa
   const [currency, setCurrency] = useState(activeCurrencyStorage)
 
   const validatorEpochData = useMemo<ValidatorBalanceInfo>(() => {
-    return formatValidatorEpochData(validatorStateInfo, validatorCacheData);
-  }, [validatorStateInfo, validatorCacheData]);
+    return formatValidatorEpochData(validatorStateInfo, validatorCacheData)
+  }, [validatorStateInfo, validatorCacheData])
 
-  const { estimate, totalEarnings, estimateSelection, selectEstimate } = useEarningsEstimate(validatorEpochData)
+  const { estimate, totalEarnings, estimateSelection, selectEstimate } =
+    useEarningsEstimate(validatorEpochData)
   const data = useRecoilValue(exchangeRates)
 
   const { estimatedApr, textColor } = useEpochAprEstimate(validatorCacheData)

@@ -1,17 +1,17 @@
-import Link from 'next/link';
-import { FC, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link'
+import { FC, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRecoilValue } from 'recoil'
 import formatBalanceColor from '../../../utilities/formatBalanceColor'
 import formatEthAddress from '../../../utilities/formatEthAddress'
-import formatValidatorEpochData from '../../../utilities/formatValidatorEpochData';
+import formatValidatorEpochData from '../../../utilities/formatValidatorEpochData'
 import isBlsAddress from '../../../utilities/isBlsAddress'
 import ValidatorLogo from '../../assets/images/validators.svg'
-import useLocalStorage from '../../hooks/useLocalStorage';
+import useLocalStorage from '../../hooks/useLocalStorage'
 import { processingBlsValidators } from '../../recoil/atoms'
 import { selectBeaconChaBaseUrl } from '../../recoil/selectors/selectBeaconChaBaseUrl'
-import { ValAliases } from '../../types';
-import { ValidatorBalanceInfo, ValidatorCache, ValidatorInfo } from '../../types/validator';
+import { ValAliases } from '../../types'
+import { ValidatorBalanceInfo, ValidatorCache, ValidatorInfo } from '../../types/validator'
 import DisabledTooltip from '../DisabledTooltip/DisabledTooltip'
 import EditValidator from '../EditValidator/EditValidator'
 import IdenticonIcon from '../IdenticonIcon/IdenticonIcon'
@@ -37,23 +37,21 @@ const ValidatorRow: FC<ValidatorRowProps> = ({ validator, view, validatorCacheDa
   const valHref = `/dashboard/validators?id=${index}`
   const [aliases] = useLocalStorage<ValAliases>('val-aliases', {})
 
-  const storedAliasIndex = Object.keys(aliases).find(index => Number(index) === validator.index)
+  const storedAliasIndex = Object.keys(aliases).find((index) => Number(index) === validator.index)
   const validatorName = storedAliasIndex && isReady ? aliases[storedAliasIndex] : name
-
 
   useEffect(() => {
     setReady(true)
   }, [])
-
 
   const isConversionRequired = isBlsAddress(withdrawalAddress)
   const isValidatorProcessing =
     processingValidators && processingValidators.includes(validator.index.toString())
 
   const validatorEpochData = useMemo<ValidatorBalanceInfo | undefined>(() => {
-    if (!validatorCacheData) return;
-    return formatValidatorEpochData([validator], validatorCacheData);
-  }, [validator, validatorCacheData]);
+    if (!validatorCacheData) return
+    return formatValidatorEpochData([validator], validatorCacheData)
+  }, [validator, validatorCacheData])
 
   const renderAvatar = () => {
     if (isConversionRequired) {

@@ -1,13 +1,13 @@
-import { FC } from 'react';
+import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ValidatorSyncInfo } from '../../types/diagnostic';
+import { ValidatorSyncInfo } from '../../types/diagnostic'
 import SyncMetric from '../SyncMetric/SyncMetric'
 
 export interface ValidatorMetricProps {
   data: ValidatorSyncInfo
 }
 
-const ValidatorMetric:FC<ValidatorMetricProps> = ({data}) => {
+const ValidatorMetric: FC<ValidatorMetricProps> = ({ data }) => {
   const { t } = useTranslation()
   const { headSlot, cachedHeadSlot, syncPercentage, isReady } = data
 

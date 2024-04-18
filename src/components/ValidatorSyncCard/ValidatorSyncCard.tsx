@@ -1,15 +1,15 @@
-import { FC } from 'react';
+import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-import formatExecSyncInfo from '../../../utilities/formatExecSyncInfo';
+import formatExecSyncInfo from '../../../utilities/formatExecSyncInfo'
 import { formatLocalCurrency } from '../../../utilities/formatLocalCurrency'
-import { ValidatorSyncInfo, ValidatorSyncResult } from '../../types/diagnostic';
+import { ValidatorSyncInfo, ValidatorSyncResult } from '../../types/diagnostic'
 import SyncCard from '../SyncCard/SyncCard'
 
 export interface ValidatorSyncCardProps {
   data: ValidatorSyncInfo
 }
 
-const ValidatorSyncCard:FC<ValidatorSyncCardProps> = ({data}) => {
+const ValidatorSyncCard: FC<ValidatorSyncCardProps> = ({ data }) => {
   const { t } = useTranslation()
 
   const { syncPercentage, headSlot, cachedHeadSlot } = data

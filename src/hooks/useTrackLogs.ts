@@ -1,6 +1,6 @@
-import { throttle } from 'lodash';
+import { throttle } from 'lodash'
 import moment from 'moment'
-import { MutableRefObject, useCallback, useEffect, useMemo, useRef } from 'react';
+import { MutableRefObject, useCallback, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ALERT_ID, MAX_PERSISTED_LOGS } from '../constants/constants'
 import { LogLevels, SSELog, StatusColor } from '../types'
@@ -54,28 +54,31 @@ const useTrackLogs = (url: string, onError: () => void, isReady: boolean): track
     }
   }
 
-  const trackLogs = useCallback((event: MessageEvent) => {
-    let newData
+  const trackLogs = useCallback(
+    (event: MessageEvent) => {
+      let newData
 
-    try {
-      newData = JSON.parse(JSON.parse(event.data))
-    } catch (e) {
-      newData = JSON.parse(event.data) as SSELog
-    }
-    const newDataString = JSON.stringify(newData)
-
-    const existingIndex = dataRef.current.findIndex(
-      (data) => JSON.stringify(data) === newDataString,
-    )
-
-    if (existingIndex === -1) {
-      incrementCounts(newData)
-      if (dataRef.current.length >= MAX_PERSISTED_LOGS) {
-        dataRef.current.shift()
+      try {
+        newData = JSON.parse(JSON.parse(event.data))
+      } catch (e) {
+        newData = JSON.parse(event.data) as SSELog
       }
-      dataRef.current.push(newData)
-    }
-  }, [dataRef])
+      const newDataString = JSON.stringify(newData)
+
+      const existingIndex = dataRef.current.findIndex(
+        (data) => JSON.stringify(data) === newDataString,
+      )
+
+      if (existingIndex === -1) {
+        incrementCounts(newData)
+        if (dataRef.current.length >= MAX_PERSISTED_LOGS) {
+          dataRef.current.shift()
+        }
+        dataRef.current.push(newData)
+      }
+    },
+    [dataRef],
+  )
 
   const pruneLogRef = (ref: MutableRefObject<number[]>) => {
     while (ref.current.length > 0) {

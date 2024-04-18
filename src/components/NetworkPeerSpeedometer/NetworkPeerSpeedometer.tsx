@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect } from 'react'
 import ReactSpeedometer, { CustomSegmentLabelPosition } from 'react-d3-speedometer'
 import { useTranslation } from 'react-i18next'
 import { useRecoilValue } from 'recoil'
@@ -7,7 +7,7 @@ import { UiMode } from '../../constants/enums'
 import useDiagnosticAlerts from '../../hooks/useDiagnosticAlerts'
 import { uiMode, validatorPeerCount } from '../../recoil/atoms'
 import { StatusColor } from '../../types'
-import { PeerDataResults } from '../../types/diagnostic';
+import { PeerDataResults } from '../../types/diagnostic'
 import Tooltip from '../ToolTip/Tooltip'
 import Typography from '../Typography/Typography'
 
@@ -15,7 +15,7 @@ export interface NetworkPeerSpeedometerProps {
   peerData: PeerDataResults
 }
 
-const NetworkPeerSpeedometer:FC<NetworkPeerSpeedometerProps> = ({peerData}) => {
+const NetworkPeerSpeedometer: FC<NetworkPeerSpeedometerProps> = ({ peerData }) => {
   const { t } = useTranslation()
   const mode = useRecoilValue(uiMode)
   const { connected } = peerData

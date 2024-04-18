@@ -2,7 +2,7 @@ import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import formatBalanceColor from '../../../utilities/formatBalanceColor'
 import useEpochAprEstimate from '../../hooks/useEpochAprEstimate'
-import { ValidatorCache, ValidatorInfo } from '../../types/validator';
+import { ValidatorCache, ValidatorInfo } from '../../types/validator'
 import Typography from '../Typography/Typography'
 
 export interface ValidatorDetailTableProps {
@@ -10,7 +10,10 @@ export interface ValidatorDetailTableProps {
   validatorCacheData: ValidatorCache
 }
 
-export const ValidatorDetailTable: FC<ValidatorDetailTableProps> = ({ validator, validatorCacheData }) => {
+export const ValidatorDetailTable: FC<ValidatorDetailTableProps> = ({
+  validator,
+  validatorCacheData,
+}) => {
   const { t } = useTranslation()
   const { balance, index } = validator
   const income = balance ? balance - 32 : 0

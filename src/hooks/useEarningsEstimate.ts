@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { ValidatorBalanceInfo } from '../types/validator';
+import { ValidatorBalanceInfo } from '../types/validator'
 import useValidatorEarnings from './useValidatorEarnings'
 
 const useEarningsEstimate = (validatorData: ValidatorBalanceInfo) => {
-
   const [estimateSelection, setEstimate] = useState<number | undefined>(undefined)
   const {
     annualizedEarningsPercent,

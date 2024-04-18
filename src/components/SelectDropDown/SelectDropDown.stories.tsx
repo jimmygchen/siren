@@ -8,10 +8,9 @@ const SelectDropDownStory = {
   component: SelectDropDown,
   title: 'Components/SelectDropDown',
   argTypes: {
-    onSelect: { action: 'selected' }
-  }
+    onSelect: { action: 'selected' },
+  },
 }
-
 
 const Template: Story<SelectDropDownProps> = (props) => {
   const [selection, makeSelection] = useState<OptionType>(0)

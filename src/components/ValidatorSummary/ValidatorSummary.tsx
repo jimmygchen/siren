@@ -1,13 +1,13 @@
-import { FC, useMemo } from 'react';
+import { FC, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import formatValidatorEpochData from '../../../utilities/formatValidatorEpochData';
-import { BeaconValidatorMetricResults } from '../../types/beacon';
+import formatValidatorEpochData from '../../../utilities/formatValidatorEpochData'
+import { BeaconValidatorMetricResults } from '../../types/beacon'
 import {
   ValidatorBalanceInfo,
   ValidatorCache,
   ValidatorCountResult,
-  ValidatorInfo
-} from '../../types/validator';
+  ValidatorInfo,
+} from '../../types/validator'
 import ActiveValidatorCount from '../ActiveValidatorCount/ActiveValidatorCount'
 import OverallEffectiveness from '../OveralEffectiveness/OverallEffectiveness'
 import Typography from '../Typography/Typography'
@@ -20,24 +20,29 @@ export interface ValidatorSummaryProps {
   validatorMetrics?: BeaconValidatorMetricResults[] | undefined
 }
 
-const ValidatorSummary:FC<ValidatorSummaryProps> = ({validators, validatorNetworkData, validatorCacheData, validatorMetrics}) => {
+const ValidatorSummary: FC<ValidatorSummaryProps> = ({
+  validators,
+  validatorNetworkData,
+  validatorCacheData,
+  validatorMetrics,
+}) => {
   const { t } = useTranslation()
   const activeValidators = useMemo(() => {
     return validators
       ? validators
-        .filter(
-          ({ status }) =>
-            status.includes('active') &&
-            !status.includes('slashed') &&
-            !status.includes('exiting') &&
-            !status.includes('exited'),
-        )
-        .map(({ status, pubKey, index, name }) => ({
-          status,
-          pubKey,
-          index: String(index),
-          name,
-        }))
+          .filter(
+            ({ status }) =>
+              status.includes('active') &&
+              !status.includes('slashed') &&
+              !status.includes('exiting') &&
+              !status.includes('exited'),
+          )
+          .map(({ status, pubKey, index, name }) => ({
+            status,
+            pubKey,
+            index: String(index),
+            name,
+          }))
       : []
   }, [validators])
   const totalBalance = useMemo(() => {
@@ -45,9 +50,9 @@ const ValidatorSummary:FC<ValidatorSummaryProps> = ({validators, validatorNetwor
   }, [validators])
 
   const validatorEpochData = useMemo<ValidatorBalanceInfo | undefined>(() => {
-    if (!validatorCacheData || !validators || validators.length === 0) return;
-    return formatValidatorEpochData(validators, validatorCacheData);
-  }, [validators, validatorCacheData]);
+    if (!validatorCacheData || !validators || validators.length === 0) return
+    return formatValidatorEpochData(validators, validatorCacheData)
+  }, [validators, validatorCacheData])
 
   return (
     <div className='w-full max-w-850 @1540:max-w-1068 flex flex-col lg:space-x-3 shadow lg:flex-row lg:divide-x divide-y lg:divide-y-0 dark:divide-dark600 dark:border dark:border-dark600'>

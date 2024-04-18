@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import useUiMode from '../../hooks/useUiMode'
 import Input from '../Input/Input'
@@ -8,7 +8,7 @@ export interface ValidatorSearchInputProps {
   value: string
 }
 
-const ValidatorSearchInput:FC<ValidatorSearchInputProps> = ({onChange, value}) => {
+const ValidatorSearchInput: FC<ValidatorSearchInputProps> = ({ onChange, value }) => {
   const { t } = useTranslation()
   const { mode } = useUiMode()
 

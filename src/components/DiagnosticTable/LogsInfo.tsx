@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from 'next/link'
 import { useContext, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import useMediaQuery from '../../hooks/useMediaQuery'
@@ -29,7 +29,7 @@ const LogsInfo = () => {
         <Typography type='text-caption1' color='text-primary' darkMode='dark:text-white' isBold>
           {t('logInfo.logs')}
         </Typography>
-        <Link href="/dashboard/logs">
+        <Link href='/dashboard/logs'>
           <div className='cursor-pointer'>
             <Typography
               type='text-tiny'

@@ -6,7 +6,7 @@ export interface BreadCrumbProps {
   current: string
 }
 
-const BreadCrumb: FC<BreadCrumbProps> = ({  previous, current }) => {
+const BreadCrumb: FC<BreadCrumbProps> = ({ previous, current }) => {
   return (
     <div className='cursor-pointer flex space-x-2 items-center'>
       <i className='text-caption2 bi-arrow-left' />

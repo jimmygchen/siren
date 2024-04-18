@@ -1,4 +1,4 @@
-import { BeaconSyncInfo, ValidatorSyncInfo } from './diagnostic';
+import { BeaconSyncInfo, ValidatorSyncInfo } from './diagnostic'
 
 export type BeaconValidatorInclusionResults = {
   current_epoch_active_gwei: number

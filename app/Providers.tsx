@@ -1,9 +1,9 @@
 'use client'
 
-import React, { FC, ReactElement } from 'react';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import React, { FC, ReactElement } from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { ToastContainer } from 'react-toastify'
-import { RecoilRoot } from 'recoil';
+import { RecoilRoot } from 'recoil'
 import 'react-tooltip/dist/react-tooltip.css'
 import 'react-toastify/dist/ReactToastify.min.css'
 import 'rodal/lib/rodal.css'
@@ -14,12 +14,12 @@ export interface ProviderProps {
   children: ReactElement | ReactElement[]
 }
 
-const Providers:FC<ProviderProps> = ({children}) => {
+const Providers: FC<ProviderProps> = ({ children }) => {
   return (
     <RecoilRoot>
       <QueryClientProvider client={queryClient}>
         {children}
-        <ToastContainer/>
+        <ToastContainer />
       </QueryClientProvider>
     </RecoilRoot>
   )
