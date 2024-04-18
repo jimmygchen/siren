@@ -1,11 +1,11 @@
 import { selector } from 'recoil'
 import { Network } from '../../constants/enums'
-import { selectBnSpec } from './selectBnSpec'
+import { beaconNodeSpec } from '../atoms';
 
 export const selectBnChain = selector({
   key: 'selectBnChain',
   get: ({ get }) => {
-    const specs = get(selectBnSpec)
+    const specs = get(beaconNodeSpec)
     if (!specs) return
 
     const { DEPOSIT_CHAIN_ID } = specs

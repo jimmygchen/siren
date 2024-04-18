@@ -9,7 +9,7 @@ import {
   ProposerDuty,
   ValAliases,
 } from '../types'
-import { BeaconValidatorMetricResults } from '../types/beacon'
+import { BeaconNodeSpecResults, BeaconValidatorMetricResults } from '../types/beacon';
 import { BeaconSyncResult, HealthDiagnosticResult, ValidatorSyncResult } from '../types/diagnostic'
 import { BeaconValidatorResult, ValidatorCache } from '../types/validator'
 
@@ -33,58 +33,13 @@ export const onBoardView = atom<OnboardView>({
   default: OnboardView.CONFIGURE,
 })
 
-export const setupStep = atom<SetupSteps | undefined>({
-  key: 'SetupStep',
-  default: undefined,
-})
-
-export const validatorSyncInfo = atom<ValidatorSyncResult>({
-  key: 'validatorSyncInfo',
-  default: undefined,
-})
-
-export const beaconSyncInfo = atom<BeaconSyncResult>({
-  key: 'beaconSyncInfos',
-  default: undefined,
-})
-
-export const validatorStateInfo = atom<BeaconValidatorResult[] | undefined>({
-  key: 'validatorStateInfo',
-  default: undefined,
-})
-
 export const userName = atom<string>({
   key: 'userName',
   default: undefined,
 })
 
-export const validatorVersionData = atom<OptionalString>({
-  key: 'validatorVersionData',
-  default: undefined,
-})
-
-export const beaconVersionData = atom<OptionalString>({
-  key: 'beaconVersionData',
-  default: undefined,
-})
-
-export const validatorHealthResult = atom<HealthDiagnosticResult | undefined>({
-  key: 'validatorHealthResult',
-  default: undefined,
-})
-
 export const beaconHealthResult = atom<HealthDiagnosticResult | undefined>({
   key: 'beaconHealthResult',
-  default: undefined,
-})
-
-export const validatorSearch = atom<string>({
-  key: 'validatorSearch',
-  default: '',
-})
-
-export const validatorIndex = atom<number | undefined>({
-  key: 'validatorIndex',
   default: undefined,
 })
 
@@ -148,11 +103,6 @@ export const validatorAliases = atom<ValAliases | undefined>({
   default: undefined,
 })
 
-export const deviceSettings = atom<DeviceList>({
-  key: 'deviceSettings',
-  default: undefined,
-})
-
 export const activeDevice = atom<ActiveDevice>({
   key: 'activeDevice',
   default: undefined,
@@ -166,4 +116,9 @@ export const alertLogs = atom<AlertMessage[]>({
 export const proposerDuties = atom<ProposerDuty[]>({
   key: 'proposerDuties',
   default: [],
+})
+
+export const beaconNodeSpec = atom<BeaconNodeSpecResults>({
+  key: 'beaconNodeSpec',
+  default: undefined,
 })
