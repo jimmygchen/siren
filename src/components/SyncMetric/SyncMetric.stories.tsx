@@ -1,7 +1,7 @@
 import { Story } from '@storybook/react'
 import SyncMetric, { SyncMetricProps } from './SyncMetric'
 
-export default {
+const SyncMetricStory = {
   key: 'SyncMetric',
   component: SyncMetric,
 }
@@ -25,3 +25,5 @@ CounterClock.args = {
   total: 212245,
   amount: 120435,
 }
+
+export default SyncMetricStory

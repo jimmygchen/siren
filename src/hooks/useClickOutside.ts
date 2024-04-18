@@ -28,7 +28,7 @@ const useClickOutside = <T extends HTMLElement>(
       document.removeEventListener('mousedown', listener)
       document.removeEventListener('touchstart', listener)
     }
-  }, [ref, handler])
+  }, [ref, handler, excludeRef])
 
   return {
     ref,

@@ -2,7 +2,7 @@ import { Story } from '@storybook/react'
 import { useState } from 'react'
 import Toggle, { ToggleProps } from './Toggle'
 
-export default {
+const ToggleStory = {
   key: 'Toggle',
   component: Toggle,
 }
@@ -22,3 +22,5 @@ ToggledOn.args = {
   value: true,
   id: 'toggle2',
 }
+
+export default ToggleStory
