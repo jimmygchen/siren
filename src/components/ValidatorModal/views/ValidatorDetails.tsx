@@ -1,13 +1,16 @@
+import { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next'
 import { useRecoilValue } from 'recoil'
 import { formatLocalCurrency } from '../../../../utilities/formatLocalCurrency'
+import formatValidatorEffectiveness from '../../../../utilities/formatValidatorEffectiveness';
+import formatValidatorEpochData from '../../../../utilities/formatValidatorEpochData';
 import getAvgEffectivenessStatus from '../../../../utilities/getAvgEffectivenessStatus'
 import isBlsAddress from '../../../../utilities/isBlsAddress'
 import toFixedIfNecessary from '../../../../utilities/toFixedIfNecessary'
-import useValidatorEffectiveness from '../../../hooks/useValidatorEffectiveness'
 import useValidatorGraffiti from '../../../hooks/useValidatorGraffiti'
 import { exchangeRates, processingBlsValidators } from '../../../recoil/atoms'
-import { selectValidatorDetail } from '../../../recoil/selectors/selectValidatorDetails'
+import { BeaconValidatorMetricResults } from '../../../types/beacon';
+import { ValidatorBalanceInfo, ValidatorCache, ValidatorInfo } from '../../../types/validator';
 import BeaconChaLink from '../../BeaconChaLink/BeaconChaLink'
 import ValidatorDisclosure from '../../Disclosures/ValidatorDisclosure'
 import EffectivenessBreakdown from '../../EffectivenessBreakdown/EffectivenessBreakdown'
@@ -21,13 +24,22 @@ import ValidatorInfoCard from '../../ValidatorInfoCard/ValidatorInfoCard'
 import ValidatorStatusProgress from '../../ValidatorStatusProgress/ValidatorStatusProgress'
 import ValidatorActions from '../ValidatorActions'
 
-const ValidatorDetails = () => {
+export interface ValidatorDetailsProps {
+  validator: ValidatorInfo | undefined
+  validatorMetrics: BeaconValidatorMetricResults[] | undefined
+  validatorCacheData: ValidatorCache
+}
+
+const ValidatorDetails:FC<ValidatorDetailsProps> = ({validator, validatorMetrics, validatorCacheData}) => {
   const { t } = useTranslation()
-  const validator = useRecoilValue(selectValidatorDetail)
   const processingValidators = useRecoilValue(processingBlsValidators)
   const { index, balance, status, withdrawalAddress } = validator || {}
   const data = useRecoilValue(exchangeRates)
-  const { avgTargetEffectiveness, avgHitEffectiveness } = useValidatorEffectiveness([String(index)])
+  const { avgTargetEffectiveness, avgHitEffectiveness } = formatValidatorEffectiveness(validatorMetrics, [index])
+  const validatorEpochData = useMemo<ValidatorBalanceInfo | undefined>(() => {
+    if (!validatorCacheData || !validator) return;
+    return formatValidatorEpochData([validator], validatorCacheData);
+  }, [validator, validatorCacheData]);
 
   const isProcessing = Boolean(
     processingValidators && index && processingValidators.includes(index.toString()),
@@ -91,7 +103,7 @@ const ValidatorDetails = () => {
               </div>
               <div className='space-y-4 border-t-style100 flex-1 lg:border-t-0 lg:border-r-style100 flex flex-col justify-between'>
                 <ValidatorIncomeSummary
-                  validators={[validator]}
+                  validatorData={validatorEpochData}
                   className='pt-4 px-2 space-y-2 w-42'
                 />
                 <div className='w-full flex border-t lg:border-none'>
@@ -132,7 +144,7 @@ const ValidatorDetails = () => {
         </div>
       </div>
       <ValidatorGraffitiInput isLoading={isLoading} onSubmit={updateGraffiti} value={graffiti} />
-      <ValidatorDetailTable validator={validator} />
+      <ValidatorDetailTable validator={validator} validatorCacheData={validatorCacheData} />
       <ValidatorActions
         isExitAction={!isExited}
         isProcessing={isProcessing}

@@ -1,22 +1,25 @@
-import { Suspense } from 'react'
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next'
 import { useSetRecoilState } from 'recoil'
-import { ReactComponent as LightHouseFullLogo } from '../../assets/images/lightHouseFull.svg'
-import { ReactComponent as SlasherLogo } from '../../assets/images/slasher.svg'
+import LightHouseFullLogo from '../../assets/images/lightHouseFull.svg'
+import SlasherLogo from '../../assets/images/slasher.svg'
 import { isSideBarOpen } from '../../recoil/atoms'
+import { SyncData } from '../../types/beacon';
 import BeaconNetwork from '../BeaconNetwork/BeaconNetwork'
 import Button, { ButtonFace } from '../Button/Button'
-import DeviceName from '../DeviceName/DeviceName'
-import { SyncMetricFallback } from '../SyncMetric/SyncMetric'
 import Typography from '../Typography/Typography'
 import Wallet from '../Wallet/Wallet'
 import BeaconMetric from './BeaconMetric'
 import ValidatorMetric from './ValidatorMetric'
 
-const TopBar = () => {
+export interface TopBarProps {
+  syncData: SyncData
+}
+
+const TopBar:FC<TopBarProps> = ({ syncData}) => {
   const { t } = useTranslation()
   const toggleSideBar = useSetRecoilState(isSideBarOpen)
-
+  const { beaconSync, executionSync } = syncData
   const openSideBar = () => toggleSideBar(true)
 
   return (
@@ -31,12 +34,8 @@ const TopBar = () => {
           </div>
           <LightHouseFullLogo className='hidden w-full md:flex text-black dark:text-white' />
         </div>
-        <Suspense fallback={<SyncMetricFallback />}>
-          <ValidatorMetric />
-        </Suspense>
-        <Suspense fallback={<SyncMetricFallback />}>
-          <BeaconMetric />
-        </Suspense>
+        <ValidatorMetric data={executionSync} />
+        <BeaconMetric data={beaconSync} />
         <div className='hidden w-24 border-r border-borderLight dark:border-dark800 p-2'>
           <div className='flex-1 space-y-2'>
             <Typography family='font-roboto' type='text-tiny'>
@@ -54,12 +53,7 @@ const TopBar = () => {
           </div>
           <SlasherLogo className='w-6 h-6 text-primary' />
         </div>
-        <Suspense fallback={<div />}>
-          <DeviceName />
-        </Suspense>
-        <Suspense fallback={<div />}>
-          <BeaconNetwork />
-        </Suspense>
+        <BeaconNetwork />
       </div>
       <div className='h-full flex'>
         <div className='h-full flex opacity-20'>

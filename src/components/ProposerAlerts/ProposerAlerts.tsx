@@ -1,21 +1,21 @@
 import { FC } from 'react'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { useSetRecoilState } from 'recoil'
 import getSlotTimeData from '../../../utilities/getSlotTimeData'
 import groupArray from '../../../utilities/groupArray'
 import { proposerDuties } from '../../recoil/atoms'
-import { selectBnSpec } from '../../recoil/selectors/selectBnSpec'
-import { selectGenesisBlock } from '../../recoil/selectors/selectGenesisBlock'
 import { ProposerDuty } from '../../types'
+import { BeaconNodeSpecResults } from '../../types/beacon';
 import AlertGroup from './AlertGroup'
 import ProposalAlert from './ProposalAlert'
 
 export interface ProposerAlertsProps {
   duties: ProposerDuty[]
+  bnSpec: BeaconNodeSpecResults
+  genesisTime: number
 }
 
-const ProposerAlerts: FC<ProposerAlertsProps> = ({ duties }) => {
-  const { SECONDS_PER_SLOT } = useRecoilValue(selectBnSpec)
-  const genesis = useRecoilValue(selectGenesisBlock) as number
+const ProposerAlerts: FC<ProposerAlertsProps> = ({ duties, bnSpec, genesisTime }) => {
+  const { SECONDS_PER_SLOT } = bnSpec
   const setProposers = useSetRecoilState(proposerDuties)
   const groups = groupArray(duties, 10)
 
@@ -29,7 +29,7 @@ const ProposerAlerts: FC<ProposerAlertsProps> = ({ duties }) => {
         ? groups.map((group, index) => (
             <AlertGroup
               onClick={removeAlert}
-              genesis={genesis}
+              genesis={genesisTime}
               secondsPerSlot={SECONDS_PER_SLOT}
               duties={group}
               key={index}
@@ -38,7 +38,7 @@ const ProposerAlerts: FC<ProposerAlertsProps> = ({ duties }) => {
         : duties.map((duty, index) => {
             const { isFuture, shortHand } = getSlotTimeData(
               Number(duty.slot),
-              genesis,
+              genesisTime,
               SECONDS_PER_SLOT,
             )
             return (

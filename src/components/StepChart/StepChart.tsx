@@ -16,6 +16,7 @@ import { useRecoilValue } from 'recoil'
 import addClassString from '../../../utilities/addClassString'
 import { UiMode } from '../../constants/enums'
 import { uiMode } from '../../recoil/atoms'
+import Spinner from '../Spinner/Spinner';
 
 Chart.register(
   CategoryScale,
@@ -137,7 +138,7 @@ const StepChart: FC<StepChartProps> = ({ data, stepSize, onClick, className }) =
       Chart.getChart('stepChart')?.destroy()
       window.removeEventListener('resize', createChart)
     }
-  }, [chartEl, data, hasAnimated, mode])
+  }, [chartEl, data, hasAnimated, mode, stepSize])
 
   useEffect(() => {
     return () => {
@@ -148,6 +149,11 @@ const StepChart: FC<StepChartProps> = ({ data, stepSize, onClick, className }) =
   return (
     <div onClick={onClick} className={addClassString('w-full h-full relative', [className])}>
       <canvas id='stepChart' ref={chartEl} />
+      {!chartEl.current && (
+        <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
+          <Spinner />
+        </div>
+      )}
     </div>
   )
 }

@@ -2,18 +2,17 @@ import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import { EARNINGS_OPTIONS } from '../../constants/constants'
 import useEarningsEstimate from '../../hooks/useEarningsEstimate'
-import { ValidatorInfo } from '../../types/validator'
+import { ValidatorBalanceInfo } from '../../types/validator';
 import Typography from '../Typography/Typography'
 
 export interface ValidatorIncomeSummaryProps {
   className?: string
-  validators: ValidatorInfo[]
+  validatorData: ValidatorBalanceInfo | undefined
 }
 
-const ValidatorIncomeSummary: FC<ValidatorIncomeSummaryProps> = ({ className, validators }) => {
+const ValidatorIncomeSummary: FC<ValidatorIncomeSummaryProps> = ({ className, validatorData }) => {
   const { t } = useTranslation()
-  const indices = validators.map(({ index }) => String(index))
-  const { estimate, estimateSelection, selectEstimate } = useEarningsEstimate(indices)
+  const { estimate, estimateSelection, selectEstimate } = useEarningsEstimate(validatorData)
 
   const activeIncomeTimeFrame = EARNINGS_OPTIONS.find(
     ({ value }) => value === estimateSelection,
@@ -59,13 +58,15 @@ const ValidatorIncomeSummary: FC<ValidatorIncomeSummaryProps> = ({ className, va
           {activeIncomeTimeFrame ? t(activeIncomeTimeFrame) : ''}
         </Typography>
         <div className='flex items-center space-x-1'>
-          <i
-            className={`text-sm ${
-              Number(estimate) > 0 ? 'bi-chevron-up text-success' : 'bi-chevron-down text-error'
-            }`}
-          />
+          {estimate ? (
+            <i
+              className={`text-sm ${
+                Number(estimate) > 0 ? 'bi-chevron-up text-success' : 'bi-chevron-down text-error'
+              }`}
+            />
+          ) : null}
           <Typography isBold type='text-caption1'>
-            {estimate.toFixed(4)} ETH
+            {estimate?.toFixed(4) || '-'} ETH
           </Typography>
         </div>
       </div>

@@ -1,22 +1,24 @@
 import { FC } from 'react';
 import { Trans, useTranslation } from 'react-i18next'
 import HealthSvg from '../../assets/images/health.svg'
-import useDeviceDiagnostics from '../../hooks/useDeviceDiagnostics'
 import { StatusColor } from '../../types'
-import { HealthDiagnosticResult } from '../../types/diagnostic';
+import { Diagnostics } from '../../types/diagnostic';
 import DiagnosticOverviewText from '../DiagnosticOverviewText/DiagnosticOverviewText'
 import HealthDisclosure from '../Disclosures/HealthDisclosure'
 import Status from '../Status/Status'
 import Typography from '../Typography/Typography'
 
 export interface HealthOverviewProps {
-  bnHealth: HealthDiagnosticResult
+  nodeHealth: Diagnostics
+  isSyncing: boolean
 }
 
-const HealthOverview:FC<HealthOverviewProps> = ({bnHealth}) => {
+const HealthOverview:FC<HealthOverviewProps> = ({nodeHealth, isSyncing}) => {
   const { t } = useTranslation()
-  const { totalDiskFree, uptime, healthCondition, overallHealthStatus, ramStatus, cpuStatus } =
-    useDeviceDiagnostics(bnHealth)
+  const { totalDiskFree, uptime, healthCondition, overallHealthStatus, ramStatus, cpuStatus } = nodeHealth
+
+  const healthStatus = isSyncing ? overallHealthStatus.syncing : overallHealthStatus.synced
+  const condition = isSyncing ? healthCondition.syncing : healthCondition.synced
 
   const isSufficientSpace = totalDiskFree > 240
   const isSufficientRam = ramStatus === StatusColor.SUCCESS
@@ -60,13 +62,13 @@ const HealthOverview:FC<HealthOverviewProps> = ({bnHealth}) => {
               </Trans>
             </Typography>
           </div>
-          <Typography type='text-subtitle2'>{uptime}</Typography>
+          <Typography type='text-subtitle2'>{uptime.beacon}</Typography>
         </div>
         <div className='self-stretch w-full flex items-center justify-between'>
           <Typography isBold type='text-tiny' color='text-primary' className='uppercase'>
-            {t('vcHealthCheck.healthCondition', { status: t(healthCondition.toLowerCase()) })}
+            {t('vcHealthCheck.healthCondition', { status: t(condition.toLowerCase()) })}
           </Typography>
-          <Status status={overallHealthStatus} />
+          <Status status={healthStatus} />
         </div>
       </div>
       <HealthSvg className='opacity-70 absolute right-2.5 bottom-0' />

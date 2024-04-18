@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ReactComponent as WalletDefault } from '../../assets/images/wallet.svg'
+import WalletDefault from '../../assets/images/wallet.svg'
 import Typography from '../Typography/Typography'
 
 export interface WalletProps {

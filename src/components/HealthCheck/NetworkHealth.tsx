@@ -1,26 +1,23 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next'
-import formatBnSyncInfo from '../../../utilities/formatBnSyncInfo';
-import formatExecSyncInfo from '../../../utilities/formatExecSyncInfo';
 import secondsToShortHand from '../../../utilities/secondsToShortHand'
 import { DiagnosticRate, DiagnosticType } from '../../constants/enums'
-import useDeviceDiagnostics from '../../hooks/useDeviceDiagnostics'
 import { StatusColor } from '../../types'
-import { BeaconSyncResult, HealthDiagnosticResult, ValidatorSyncResult } from '../../types/diagnostic';
+import { SyncData } from '../../types/beacon';
+import { Diagnostics } from '../../types/diagnostic';
 import DiagnosticCard from '../DiagnosticCard/DiagnosticCard'
 import DiagnosticSummaryCard from '../DiagnosticSummaryCard/DiagnosticSummaryCard'
 
 export interface NetworkHealthProps {
-  bnSyncInfo: BeaconSyncResult
-  bnHealth: HealthDiagnosticResult
-  exSyncInfo: ValidatorSyncResult
+  syncData: SyncData
+  nodeHealth: Diagnostics
 }
 
-const NetworkHealth:FC<NetworkHealthProps> = ({bnSyncInfo, exSyncInfo, bnHealth}) => {
+const NetworkHealth:FC<NetworkHealthProps> = ({syncData, nodeHealth}) => {
+  const { beaconSync: {beaconPercentage, beaconSyncTime}, executionSync: {isReady, syncPercentage} } = syncData
+
   const { t } = useTranslation()
-  const { beaconPercentage, beaconSyncTime } = formatBnSyncInfo(bnSyncInfo)
-  const { isReady, syncPercentage } = formatExecSyncInfo(exSyncInfo)
-  const { networkName, natOpen } = useDeviceDiagnostics(bnHealth)
+  const { networkName, natOpen } = nodeHealth
 
   const remainingBeaconTime = secondsToShortHand(beaconSyncTime || 0)
 

@@ -1,7 +1,7 @@
 import { FC } from 'react'
-import { ReactComponent as EthOutline } from '../../assets/images/eth-outline.svg'
-import { ReactComponent as LightEth } from '../../assets/images/lightEth.svg'
-import { ReactComponent as NotAvailable } from '../../assets/images/notAvalilable.svg'
+import EthOutline from '../../assets/images/eth-outline.svg'
+import LightEth from '../../assets/images/lightEth.svg'
+import NotAvailable from '../../assets/images/notAvalilable.svg'
 import ProgressCircle from '../ProgressCircle/ProgressCircle'
 import Typography from '../Typography/Typography'
 

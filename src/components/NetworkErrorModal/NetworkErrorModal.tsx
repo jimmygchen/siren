@@ -1,24 +1,16 @@
+import { FC } from 'react';
 import { Trans, useTranslation } from 'react-i18next'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { DiscordUrl } from '../../constants/constants'
-import { AppView, OnboardView } from '../../constants/enums'
-import { appView, beaconNetworkError, onBoardView, validatorNetworkError } from '../../recoil/atoms'
-import Button, { ButtonFace } from '../Button/Button'
 import RodalModal from '../RodalModal/RodalModal'
 import Typography from '../Typography/Typography'
 
-const NetworkErrorModal = () => {
+export interface NetworkErrorModalProps {
+  isBeaconNetworkError: boolean
+  isValidatorNetworkError: boolean
+}
+
+const NetworkErrorModal:FC<NetworkErrorModalProps> = ({isBeaconNetworkError, isValidatorNetworkError}) => {
   const { t } = useTranslation()
-  const isBeaconNetworkError = useRecoilValue(beaconNetworkError)
-  const isValidatorNetworkError = useRecoilValue(validatorNetworkError)
-
-  const setView = useSetRecoilState(onBoardView)
-  const setAppView = useSetRecoilState(appView)
-
-  const viewConfig = () => {
-    setView(OnboardView.CONFIGURE)
-    setAppView(AppView.ONBOARD)
-  }
 
   const effectedNetworkText = () => {
     if (isBeaconNetworkError && isValidatorNetworkError) {
@@ -53,10 +45,6 @@ const NetworkErrorModal = () => {
             </Trans>
           </Typography>
         </div>
-        <Button dataTestId='configure' onClick={viewConfig} type={ButtonFace.SECONDARY}>
-          <i className='bi-box-arrow-left mr-2' />
-          {t('configure')}
-        </Button>
       </div>
     </RodalModal>
   )

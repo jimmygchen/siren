@@ -1,7 +1,7 @@
 import { Story } from '@storybook/react'
 import ProviderCard, { ProviderCardProps } from './ProviderCard'
 
-export default {
+const ProviderCardStory = {
   key: 'ProviderCard',
   component: ProviderCard,
 }
@@ -30,3 +30,5 @@ Active.args = {
   language: 'Go',
   isActive: true,
 }
+
+export default ProviderCardStory

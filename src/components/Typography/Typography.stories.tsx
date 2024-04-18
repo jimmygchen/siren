@@ -3,7 +3,7 @@ import React from 'react'
 
 import Typography, { TypographyProps, TypographyType } from './Typography'
 
-export default {
+const TypographyStory = {
   title: 'Typography',
   component: Typography,
 }
@@ -79,3 +79,4 @@ BoldText.args = {
   children: 'Bold Text',
   isBold: true,
 }
+export default TypographyStory

@@ -1,30 +1,15 @@
-import { useEffect } from 'react'
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next'
-import { useRecoilValue } from 'recoil'
-import { ALERT_ID } from '../../constants/constants'
-import useDiagnosticAlerts from '../../hooks/useDiagnosticAlerts'
-import { selectBeaconSyncInfo } from '../../recoil/selectors/selectBeaconSyncInfo'
-import { StatusColor } from '../../types'
+import { BeaconSyncInfo } from '../../types/diagnostic';
 import SyncMetric from '../SyncMetric/SyncMetric'
 
-const BeaconMetric = () => {
-  const { t } = useTranslation()
-  const { headSlot, slotDistance, isSyncing, beaconPercentage } =
-    useRecoilValue(selectBeaconSyncInfo)
-  const { storeAlert, removeAlert } = useDiagnosticAlerts()
+export interface BeaconMetricProps {
+  data: BeaconSyncInfo
+}
 
-  useEffect(() => {
-    if (isSyncing) {
-      storeAlert({
-        id: ALERT_ID.BEACON_SYNC,
-        severity: StatusColor.WARNING,
-        subText: t('fair'),
-        message: t('alertMessages.beaconNotSync'),
-      })
-    } else {
-      removeAlert(ALERT_ID.BEACON_SYNC)
-    }
-  }, [isSyncing])
+const BeaconMetric:FC<BeaconMetricProps> = ({data}) => {
+  const { t } = useTranslation()
+  const { headSlot, slotDistance, isSyncing, beaconPercentage } = data
 
   return (
     <SyncMetric

@@ -1,7 +1,7 @@
 import { Story } from '@storybook/react'
 import ProgressCircle, { ProgressCircleProps } from './ProgressCircle'
 
-export default {
+const ProgressStory = {
   title: 'Progress Circle',
   component: ProgressCircle,
 }
@@ -46,3 +46,5 @@ CounterClock.args = {
   direction: 'counter',
   id: 'counterClock',
 }
+
+export default ProgressStory

@@ -1,13 +1,9 @@
 import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { ReactComponent as SatelliteLogo } from '../../assets/images/satellite.svg'
-import { ReactComponent as ValidatorLogo } from '../../assets/images/validators.svg'
-import { ContentView } from '../../constants/enums'
+import SatelliteLogo from '../../assets/images/satellite.svg'
+import ValidatorLogo from '../../assets/images/validators.svg'
 import useMediaQuery from '../../hooks/useMediaQuery'
-import { dashView, validatorIndex } from '../../recoil/atoms'
-import { selectFilteredValidators } from '../../recoil/selectors/selectFilteredValidators'
-import { selectValidatorInfos } from '../../recoil/selectors/selectValidatorInfos'
+import { ValidatorCache, ValidatorInfo } from '../../types/validator';
 import DisabledTooltip from '../DisabledTooltip/DisabledTooltip'
 import Spinner from '../Spinner/Spinner'
 import Typography from '../Typography/Typography'
@@ -18,8 +14,9 @@ export type TableView = 'partial' | 'full'
 
 export interface ValidatorTableProps {
   view?: TableView
-  isFilter?: boolean
   className?: string
+  validatorCacheData?: ValidatorCache | undefined
+  validators?: ValidatorInfo[] | undefined
 }
 
 export const TableFallback = () => (
@@ -28,44 +25,20 @@ export const TableFallback = () => (
   </div>
 )
 
-export const TableErrorFallback = () => {
-  const { t } = useTranslation()
-  return (
-    <div className='w-full flex items-center justify-center h-60 overflow-scroll mt-2 border-style500'>
-      <Typography type='text-caption2' color='text-error' className='uppercase'>
-        {t('error.validatorInfo')}
-      </Typography>
-    </div>
-  )
-}
-
-const ValidatorTable: FC<ValidatorTableProps> = ({ view = 'partial', isFilter, className }) => {
+const ValidatorTable: FC<ValidatorTableProps> = ({ view = 'partial', validators, validatorCacheData, className }) => {
   const { t } = useTranslation()
 
   const isTablet = useMediaQuery('(max-width: 768px)')
-  const validators = useRecoilValue(selectValidatorInfos)
-  const filteredValidators = useRecoilValue(selectFilteredValidators)
 
-  const setDashView = useSetRecoilState(dashView)
-  const setValidatorIndex = useSetRecoilState(validatorIndex)
-
-  const data = isFilter ? filteredValidators : validators
-
-  const viewValidator = (index: number) => {
-    setValidatorIndex(index)
-    setDashView(ContentView.VALIDATORS)
-  }
-
-  return data.length ? (
+  return validators ? validators?.length ? (
     <div
       className={`${className || ''} w-full ${view === 'partial' ? 'lg:max-h-60.5' : ''} ${
         isTablet ? 'flex flex-wrap space-y-4' : 'overflow-scroll mt-2 border-style500'
       }`}
     >
       {isTablet ? (
-        data.map((validator, index) => (
+        validators.map((validator, index) => (
           <ValidatorInfoCard
-            onClick={() => viewValidator(validator.index)}
             className='shadow cursor-pointer'
             key={index}
             validator={validator}
@@ -86,7 +59,7 @@ const ValidatorTable: FC<ValidatorTableProps> = ({ view = 'partial', isFilter, c
                 <Typography className='text-left capitalize'>{t('validators')}</Typography>
               </th>
               <th className='relative border-r-style500 pr-2'>
-                <Typography>{data.length}</Typography>
+                <Typography>{validators.length}</Typography>
                 <div className='absolute right-0 top-1/2 -translate-y-1/2 h-5 w-0.5 bg-primary' />
               </th>
               <th className='pl-2'>
@@ -217,18 +190,18 @@ const ValidatorTable: FC<ValidatorTableProps> = ({ view = 'partial', isFilter, c
             </tr>
           </thead>
           <tbody>
-            {data.map((validator, index) => (
-              <ValidatorRow view={view} validator={validator} key={index} />
+            {validators.map((validator, index) => (
+              <ValidatorRow view={view} validatorCacheData={validatorCacheData} validator={validator} key={index} />
             ))}
           </tbody>
         </table>
       )}
     </div>
-  ) : isFilter ? (
+  ) : (
     <div className='w-full p-8 flex items-center justify-center bg-dark10 dark:bg-dark700 min-h-60 opacity-70'>
       <Typography>{t('noResultsFound')}</Typography>
     </div>
-  ) : (
+    ) : (
     <TableFallback />
   )
 }

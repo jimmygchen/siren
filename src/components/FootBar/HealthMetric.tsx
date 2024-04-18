@@ -1,7 +1,6 @@
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next'
-import { useRecoilValue } from 'recoil'
-import useDeviceDiagnostics from '../../hooks/useDeviceDiagnostics'
-import { selectBeaconSyncInfo } from '../../recoil/selectors/selectBeaconSyncInfo'
+import {  Diagnostics } from '../../types/diagnostic';
 import DiagnosticCard from '../DiagnosticCard/DiagnosticCard'
 import Spinner from '../Spinner/Spinner'
 
@@ -11,18 +10,24 @@ export const HealthMetricFallback = () => (
   </div>
 )
 
-const HealthMetric = () => {
+export interface HealthMetricProps {
+  isSyncing: boolean
+  nodeHealth: Diagnostics
+}
+
+const HealthMetric:FC<HealthMetricProps> = ({ nodeHealth, isSyncing}) => {
   const { t } = useTranslation()
-  const { isSyncing } = useRecoilValue(selectBeaconSyncInfo)
-  const { healthCondition, overallHealthStatus, uptime } = useDeviceDiagnostics()
+  const { healthCondition, overallHealthStatus, uptime: {beacon} } = nodeHealth
+  const condition = isSyncing ? healthCondition.syncing : healthCondition.synced
+  const healthStatus = isSyncing ? overallHealthStatus.syncing : overallHealthStatus.synced
 
   return (
     <DiagnosticCard
       border='border-x border-dark200'
       title={t('healthCheck')}
-      metric={`${t('uptime')} ${uptime}`}
-      status={overallHealthStatus}
-      subTitle={`${t(healthCondition.toLowerCase()).toUpperCase()}, ${t('nodes')} ${
+      metric={`${t('uptime')} ${beacon}`}
+      status={healthStatus}
+      subTitle={`${t(condition.toLowerCase()).toUpperCase()}, ${t('nodes')} ${
         isSyncing ? t('syncing') : t('synced')
       }...`}
       maxWidth='w-fit'

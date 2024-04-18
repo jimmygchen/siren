@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { FC, ReactNode } from 'react'
 import BreadCrumb from '../BreadCrumb/BreadCrumb'
 import Button, { ButtonFace } from '../Button/Button'
@@ -6,8 +7,8 @@ import Typography from '../Typography/Typography'
 export interface ValidatorSetupLayoutProps {
   children: ReactNode | ReactNode[]
   title: string
-  onStepBack: () => void
-  onNext: () => void
+  nextUrl: string
+  prevUrl?: string
   onSecondaryAction?: () => void
   secondaryCtaText?: string
   secondaryCtaIcon?: string
@@ -22,8 +23,8 @@ export interface ValidatorSetupLayoutProps {
 const ValidatorSetupLayout: FC<ValidatorSetupLayoutProps> = ({
   children,
   title,
-  onStepBack,
-  onNext,
+  nextUrl,
+  prevUrl,
   currentStep,
   previousStep,
   ctaText,
@@ -37,7 +38,11 @@ const ValidatorSetupLayout: FC<ValidatorSetupLayoutProps> = ({
   return (
     <div className={`w-full h-full py-12 px-6 overflow-scroll ${mediaQuery}`}>
       <div className='w-full max-w-1142'>
-        {previousStep && <BreadCrumb onClick={onStepBack} current={currentStep} previous={previousStep} />}
+        {previousStep && prevUrl && (
+          <Link href={prevUrl}>
+            <BreadCrumb current={currentStep} previous={previousStep} />
+          </Link>
+        )}
         <Typography
           type='text-subtitle2'
           fontWeight='font-light'
@@ -51,14 +56,15 @@ const ValidatorSetupLayout: FC<ValidatorSetupLayoutProps> = ({
         {children}
 
         <div className='flex space-x-4'>
-          <Button
-            onClick={onNext}
-            className='mt-4 h-8 w-32 p-0 items-center justify-center capitalize'
-            type={ctaType}
-          >
-            {ctaText}
-            {ctaIcon && <i className={`ml-3 ${ctaIcon}`} />}
-          </Button>
+          <Link href={nextUrl}>
+            <Button
+              className='mt-4 h-8 w-32 p-0 items-center justify-center capitalize'
+              type={ctaType}
+            >
+              {ctaText}
+              {ctaIcon && <i className={`ml-3 ${ctaIcon}`} />}
+            </Button>
+          </Link>
           {secondaryCtaText && (
             <Button
               onClick={onSecondaryAction}

@@ -1,10 +1,16 @@
-import { useEffect, useMemo, useState } from 'react'
+import { formatUnits } from 'ethers/lib/utils';
+import moment from 'moment/moment';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next'
+import { useRecoilValue } from 'recoil';
+import getAverageValue from '../../../utilities/getAverageValue';
+import { BALANCE_COLORS, slotsInEpoc } from '../../constants/constants';
 import useLocalStorage from '../../hooks/useLocalStorage'
 import useMediaQuery from '../../hooks/useMediaQuery'
 import useUiMode from '../../hooks/useUiMode'
-import useValidatorEpochBalance from '../../hooks/useValidatorEpochBalance'
+import { beaconNodeSpec } from '../../recoil/atoms';
 import { ValidatorIndicesStorage } from '../../types/storage'
+import { ValidatorCache, ValidatorInfo } from '../../types/validator';
 import CheckBox from '../CheckBox/CheckBox'
 import LoadingDots from '../LoadingDots/LoadingDots'
 import RodalModal from '../RodalModal/RodalModal'
@@ -12,19 +18,70 @@ import Spinner from '../Spinner/Spinner'
 import StepChart from '../StepChart/StepChart'
 import Typography from '../Typography/Typography'
 
-export const ValidatorBalanceFallback = () => (
-  <div className='flex-1 flex h-24 w-full justify-center items-center'>
-    <Spinner />
-  </div>
-)
+export interface ValidatorBalancesProps {
+  validatorStateInfo: ValidatorInfo[]
+  validatorCacheData: ValidatorCache
+  genesisTime: number
+}
 
-const ValidatorBalances = () => {
+const ValidatorBalances:FC<ValidatorBalancesProps> = ({validatorCacheData, validatorStateInfo, genesisTime}) => {
   const { t } = useTranslation()
   const { mode } = useUiMode()
   const isTablet = useMediaQuery('(max-width: 1024px)')
   const [hiddenValidators, setHiddenValidators] = useState<string[]>([])
   const [isLegendModal, toggleModal] = useState(false)
-  const { epochs, timestamps, isSufficientData } = useValidatorEpochBalance()
+
+  const spec = useRecoilValue(beaconNodeSpec)
+  const interval = Number(spec?.SECONDS_PER_SLOT) || 12;
+
+  const activeValidators = useMemo(() => {
+    return validatorStateInfo
+      .filter(
+        ({ status }) =>
+          status.includes('active') &&
+          !status.includes('slashed') &&
+          !status.includes('exiting') &&
+          !status.includes('exited'),
+      )
+      .map(({ status, pubKey, index, name }) => ({
+        status,
+        pubKey,
+        index: String(index),
+        name,
+      })).slice(0, 10)
+  }, [validatorStateInfo])
+
+  const epochs = useMemo(() => {
+    return validatorCacheData && activeValidators.length && Object.values(validatorCacheData).length
+      ? activeValidators.map(({ index, name }) => {
+          const data = validatorCacheData[index as any] || []
+          return {
+            index,
+            name,
+            data: data.map(({ total_balance }) => Number(formatUnits(total_balance, 'gwei'))),
+          }
+        })
+        .sort((a, b) => getAverageValue(a.data) - getAverageValue(b.data))
+        .map((data, index) => ({
+          ...data,
+          color: BALANCE_COLORS[index],
+        }))
+      : []
+  }, [activeValidators, validatorCacheData])
+
+  const timestamps = useMemo(() => {
+    const data = validatorCacheData && Object.values(validatorCacheData)[0]
+    return data && genesisTime
+      ? data.map(({ epoch }) => {
+        const slot = epoch * slotsInEpoc
+
+        return moment((genesisTime + slot * interval) * 1000).format('HH:mm')
+      })
+      : []
+  }, [validatorCacheData, interval, genesisTime])
+
+  const isSufficientData = timestamps.length >= 3
+
   const [hiddenIndices, storeHiddenValidators] = useLocalStorage<ValidatorIndicesStorage>(
     'hiddenValidatorIndices',
     undefined,

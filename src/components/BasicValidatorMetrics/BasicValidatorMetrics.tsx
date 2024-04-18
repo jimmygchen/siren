@@ -1,17 +1,19 @@
-import { FC } from 'react'
+import { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next'
 import { useRecoilValue } from 'recoil'
 import { formatLocalCurrency } from '../../../utilities/formatLocalCurrency'
+import useFilteredValidatorCacheData from '../../hooks/useFilteredValidatorCacheData';
 import { exchangeRates } from '../../recoil/atoms'
-import { ValidatorInfo } from '../../types/validator'
+import { ValidatorBalanceInfo, ValidatorCache, ValidatorInfo } from '../../types/validator';
 import Typography from '../Typography/Typography'
 import ValidatorIncomeSummary from '../ValidatorIncomeSummary/ValidatorIncomeSummary'
 
 export interface BasicValidatorMetricsProps {
+  validatorEpochData: ValidatorBalanceInfo | undefined
   validator: ValidatorInfo
 }
 
-const BasicValidatorMetrics: FC<BasicValidatorMetricsProps> = ({ validator }) => {
+const BasicValidatorMetrics: FC<BasicValidatorMetricsProps> = ({ validatorEpochData, validator }) => {
   const { t } = useTranslation()
   const data = useRecoilValue(exchangeRates)
   const activeRate = data?.rates.USD
@@ -45,7 +47,7 @@ const BasicValidatorMetrics: FC<BasicValidatorMetricsProps> = ({ validator }) =>
           </Typography>
         </div>
       </div>
-      <ValidatorIncomeSummary validators={[validator]} className='p-3 space-y-1.5 w-42' />
+      <ValidatorIncomeSummary validatorData={validatorEpochData} className='p-3 space-y-1.5 w-42' />
     </div>
   )
 }

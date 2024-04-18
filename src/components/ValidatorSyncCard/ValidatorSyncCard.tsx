@@ -1,13 +1,18 @@
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next'
-import { useRecoilValue } from 'recoil'
+import formatExecSyncInfo from '../../../utilities/formatExecSyncInfo';
 import { formatLocalCurrency } from '../../../utilities/formatLocalCurrency'
-import { selectValidatorSyncInfo } from '../../recoil/selectors/selectValidatorSyncInfo'
+import { ValidatorSyncInfo, ValidatorSyncResult } from '../../types/diagnostic';
 import SyncCard from '../SyncCard/SyncCard'
 
-const ValidatorSyncCard = () => {
+export interface ValidatorSyncCardProps {
+  data: ValidatorSyncInfo
+}
+
+const ValidatorSyncCard:FC<ValidatorSyncCardProps> = ({data}) => {
   const { t } = useTranslation()
 
-  const { syncPercentage, headSlot, cachedHeadSlot } = useRecoilValue(selectValidatorSyncInfo)
+  const { syncPercentage, headSlot, cachedHeadSlot } = data
 
   return (
     <SyncCard

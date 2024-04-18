@@ -1,23 +1,23 @@
 
+import { usePathname } from 'next/navigation'
 import { createElement, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRecoilState } from 'recoil'
 import addClassString from '../../../utilities/addClassString'
-import { ReactComponent as LightHouseLogo } from '../../assets/images/lightHouse.svg'
-import { ReactComponent as LightHouseFullLogo } from '../../assets/images/lightHouseFull.svg'
+import LightHouseLogo from '../../assets/images/lightHouse.svg'
+import LightHouseFullLogo from '../../assets/images/lightHouseFull.svg'
 import { PRIMARY_VIEWS, SECONDARY_VIEWS } from '../../constants/constants'
-import { ContentView } from '../../constants/enums'
 import useClickOutside from '../../hooks/useClickOutside'
 import useMediaQuery from '../../hooks/useMediaQuery'
 import useUiMode from '../../hooks/useUiMode'
-import { dashView, isSideBarOpen } from '../../recoil/atoms'
+import { isSideBarOpen } from '../../recoil/atoms'
 import UiModeIcon from '../UiModeIcon/UiModeIcon'
 import SideBarText from './SideBarText'
 import SideItem from './SideItem'
 
 const SideBar = () => {
   const { t } = useTranslation()
-  const [view, setView] = useRecoilState(dashView)
+  const pathname = usePathname()
   const [showSideBar, toggleSideBar] = useRecoilState(isSideBarOpen)
   const { mode, toggleUiMode } = useUiMode()
   const isMobile = useMediaQuery('(max-width: 768px)')
@@ -34,14 +34,9 @@ const SideBar = () => {
     if (isMobile) {
       toggleSideBar(false)
     }
-  }, [isMobile])
+  }, [isMobile, toggleSideBar])
 
   const { ref } = useClickOutside<HTMLDivElement>(closeSideBar)
-
-  const changeView = (key: ContentView) => {
-    setView(key)
-    closeSideBar()
-  }
 
   const toggleUi = () => {
     toggleUiMode()
@@ -56,12 +51,12 @@ const SideBar = () => {
             <LightHouseLogo className='w-6 h-6 text-black dark:text-white' />
           </div>
           <ul className='space-y-4'>
-            {PRIMARY_VIEWS.map(({ logoComponent, key, isDisabled }) => (
+            {PRIMARY_VIEWS.map(({ logoComponent, key, isDisabled, href }) => (
               <SideItem
                 key={key}
-                onClick={() => changeView(key)}
+                href={href}
                 isDisabled={isDisabled}
-                isActive={view === key}
+                isActive={pathname === href}
               >
                 {createElement(logoComponent)}
               </SideItem>
@@ -70,12 +65,12 @@ const SideBar = () => {
         </div>
         <div className='w-full pb-4'>
           <ul className='space-y-4'>
-            {SECONDARY_VIEWS.map(({ logoComponent, key, isDisabled }) => (
+            {SECONDARY_VIEWS.map(({ logoComponent, key, isDisabled, href }) => (
               <SideItem
                 key={key}
-                onClick={() => changeView(key)}
+                href={href}
                 isDisabled={isDisabled}
-                isActive={view === key}
+                isActive={pathname === href}
               >
                 {createElement(logoComponent)}
               </SideItem>
@@ -92,12 +87,12 @@ const SideBar = () => {
             <LightHouseFullLogo className='w-34 text-black dark:text-white' />
           </div>
           <ul className='space-y-4 pl-4'>
-            {PRIMARY_VIEWS.map(({ title, key, isDisabled }) => (
+            {PRIMARY_VIEWS.map(({ title, key, isDisabled, href }) => (
               <SideBarText
                 key={key}
+                href={href}
                 isDisabled={isDisabled}
-                onClick={() => changeView(key)}
-                isActive={view === key}
+                isActive={pathname === href}
                 text={t(title)}
               />
             ))}
@@ -105,12 +100,12 @@ const SideBar = () => {
         </div>
         <div className='w-full py-4'>
           <ul className='space-y-4 pl-4'>
-            {SECONDARY_VIEWS.map(({ title, key, isDisabled }) => (
+            {SECONDARY_VIEWS.map(({ title, key, isDisabled, href }) => (
               <SideBarText
                 isDisabled={isDisabled}
                 key={key}
-                onClick={() => changeView(key)}
-                isActive={view === key}
+                href={href}
+                isActive={pathname === href}
                 text={t(title)}
               />
             ))}

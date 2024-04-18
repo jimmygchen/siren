@@ -1,38 +1,29 @@
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next'
-import { useRecoilValue } from 'recoil'
 import addClassString from '../../../utilities/addClassString'
 import formatAtHeadSlotStatus from '../../../utilities/formatAtHeadSlotStatus'
-import secondsToShortHand from '../../../utilities/secondsToShortHand'
-import useParticipationRate from '../../hooks/useParticipationRate'
-import { beaconHealthResult, beaconSyncInfo, validatorHealthResult } from '../../recoil/atoms'
-import { StatusColor } from '../../types'
+import { SyncData } from '../../types/beacon';
+import { Diagnostics, PeerDataResults } from '../../types/diagnostic';
+import { ValidatorInclusionData } from '../../types/validator';
 import NetworkPeerSpeedometer from '../NetworkPeerSpeedometer/NetworkPeerSpeedometer'
-import Spinner from '../Spinner/Spinner'
 import NetworkStatBlock from './NetworkStatBlock'
 
-export const NetworkStatsFallback = () => (
-  <div className='w-full h-18 lg:h-16 xl:h-14 border-style500 shadow flex items-center justify-center'>
-    <Spinner />
-  </div>
-)
+export interface NetworkStatsProps {
+  nodeHealth: Diagnostics
+  peerData: PeerDataResults
+  syncData: SyncData
+  valInclusionData: ValidatorInclusionData
+}
 
-const NetworkStats = () => {
+const NetworkStats:FC<NetworkStatsProps> = ({nodeHealth, syncData, peerData, valInclusionData}) => {
   const { t } = useTranslation()
-  const validatorHealth = useRecoilValue(validatorHealthResult)
-  const beaconHealth = useRecoilValue(beaconHealthResult)
-  const { sync_distance } = useRecoilValue(beaconSyncInfo) || {}
+  const { uptime: {beacon, validator} } = nodeHealth
+  const { beaconSync: { syncDistance } } = syncData
 
-  const { rate, isInsufficientData, status } = useParticipationRate()
+  const { rate, status } = valInclusionData
+  const headSlotStatus = formatAtHeadSlotStatus(-syncDistance)
 
-  const atHeadSlot = sync_distance !== undefined ? -sync_distance : undefined
-
-  const headSlotStatus = formatAtHeadSlotStatus(atHeadSlot)
-
-  const validatorUpTime = secondsToShortHand(validatorHealth?.app_uptime || 0)
-  const beaconUpTime = secondsToShortHand(beaconHealth?.app_uptime || 0)
-
-  const hasParticipation = !isInsufficientData && rate !== undefined
-  const participationClasses = addClassString('border-none', [!hasParticipation && 'opacity-20'])
+  const participationClasses = addClassString('border-none', [!rate && 'opacity-20'])
 
   return (
     <div className='w-full z-50 md:h-18 lg:h-16 xl:h-14 dark:border dark:border-dark500 shadow flex flex-col md:flex-row'>
@@ -41,14 +32,14 @@ const NetworkStats = () => {
         toolTipText={t('networkStats.toolTips.vcTime')}
         title={t('networkStats.processUptime')}
         subTitle='Validator'
-        metric={validatorUpTime}
+        metric={validator}
       />
       <NetworkStatBlock
         toolTipId='bnTime'
         toolTipText={t('networkStats.toolTips.bnTime')}
         title={t('networkStats.processUptime')}
         subTitle='Beacon Chain'
-        metric={beaconUpTime}
+        metric={beacon}
       />
       <NetworkStatBlock
         toolTipId='slotBehind'
@@ -57,22 +48,22 @@ const NetworkStats = () => {
         title={t('networkStats.blockBehind')}
         status={headSlotStatus}
         metricFontSize='text-subtitle3'
-        metric={atHeadSlot === undefined ? '---' : String(atHeadSlot)}
+        metric={String(-syncDistance)}
       />
-      <NetworkPeerSpeedometer />
+      <NetworkPeerSpeedometer peerData={peerData} />
       <NetworkStatBlock
-        status={hasParticipation ? status : StatusColor.DARK}
+        status={status}
         toolTipId='participationRate'
         toolTipWidth={200}
         toolTipText={
-          hasParticipation
+          rate
             ? t('networkStats.toolTips.participation')
             : t('networkStats.toolTips.noData')
         }
         className={participationClasses}
         title={t('networkStats.participationRate')}
         metricFontSize='text-subtitle3'
-        metric={hasParticipation ? `${rate}%` : '---'}
+        metric={rate ? `${rate}%` : '---'}
       />
     </div>
   )

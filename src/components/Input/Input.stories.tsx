@@ -1,7 +1,7 @@
 import { Story } from '@storybook/react'
 import Input, { InputProps } from './Input'
 
-export default {
+const InputStory = {
   key: 'Input',
   component: Input,
 }
@@ -39,3 +39,5 @@ ToolTipInput.args = {
   tooltip: 'hello world',
   placeholder: 'hover the tooltip',
 }
+
+export default InputStory

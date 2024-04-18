@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next'
 import { useRecoilValue } from 'recoil'
 import sortAlertMessagesBySeverity from '../../../utilities/sortAlerts'
@@ -9,10 +9,12 @@ import { proposerDuties } from '../../recoil/atoms'
 import { StatusColor } from '../../types'
 import AlertCard from '../AlertCard/AlertCard'
 import AlertFilterSettings, { FilterValue } from '../AlertFilterSettings/AlertFilterSettings'
-import ProposerAlerts from '../ProposerAlerts/ProposerAlerts'
+import ProposerAlerts, { ProposerAlertsProps } from '../ProposerAlerts/ProposerAlerts';
 import Typography from '../Typography/Typography'
 
-const AlertInfo = () => {
+export interface AlertInfoProps extends Omit<ProposerAlertsProps, 'duties'>{}
+
+const AlertInfo:FC<AlertInfoProps> = (props) => {
   const { t } = useTranslation()
   const { alerts, dismissAlert, resetDismissed } = useDiagnosticAlerts()
   const { ref, dimensions } = useDivDimensions()
@@ -44,7 +46,7 @@ const AlertInfo = () => {
     }, 60000)
 
     return () => clearInterval(intervalId)
-  }, [])
+  }, [resetDismissed])
 
   return (
     <div ref={ref} className='h-full w-full flex flex-col md:border-l-0 border-t-0 border-style500'>
@@ -85,7 +87,7 @@ const AlertInfo = () => {
                   />
                 )
               })}
-              {isProposerAlerts && <ProposerAlerts duties={duties} />}
+              {isProposerAlerts && <ProposerAlerts {...props} duties={duties} />}
             </div>
           )}
           {isFiller && (

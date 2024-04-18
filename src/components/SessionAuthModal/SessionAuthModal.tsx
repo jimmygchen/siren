@@ -44,7 +44,7 @@ const SessionAuthModal: FC<SessionAuthModalProps> = ({
     if (errorCount >= MAX_SESSION_UNLOCK_ATTEMPTS) {
       onFail?.()
     }
-  }, [errorCount])
+  }, [errorCount, onFail])
 
   const classes = addClassString('', [isError && 'animate-shake'])
 

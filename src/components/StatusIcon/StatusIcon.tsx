@@ -1,7 +1,7 @@
 import { FC } from 'react'
-import { ReactComponent as CheckIcon } from '../../assets/images/check.svg'
-import { ReactComponent as SlasherIcon } from '../../assets/images/slasher.svg'
-import { ReactComponent as UnknownIcon } from '../../assets/images/unknown.svg'
+import CheckIcon from '../../assets/images/check.svg'
+import SlasherIcon from '../../assets/images/slasher.svg'
+import UnknownIcon from '../../assets/images/unknown.svg'
 import { ValidatorStatus } from '../../types/validator'
 
 export interface StatusIconProps {

@@ -28,9 +28,12 @@ export interface RenderProps {
 
 const EditValidatorForm: FC<EditValidatorFormProps> = ({ children, validator }) => {
   const { t } = useTranslation()
-  const { index } = validator
+  const { index, name } = validator
   const setAlias = useSetRecoilState(validatorAliases)
   const [aliases, storeValAliases] = useLocalStorage<ValAliases>('val-aliases', {})
+
+  const storedAliasIndex = Object.keys(aliases).find(index => Number(index) === validator.index)
+  const validatorName = storedAliasIndex ? aliases[storedAliasIndex] : name
 
   const {
     control,
@@ -39,7 +42,7 @@ const EditValidatorForm: FC<EditValidatorFormProps> = ({ children, validator }) 
     formState: { isValid },
   } = useForm<EditValidatorForm>({
     defaultValues: {
-      nameString: '',
+      nameString: validatorName,
     },
     mode: 'onChange',
     resolver: yupResolver(editValidatorValidation),

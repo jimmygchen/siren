@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react'
+import { FC, ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next'
 import { PlacesType } from 'react-tooltip'
 import Tooltip from '../ToolTip/Tooltip'
@@ -11,7 +11,15 @@ export interface DisabledTooltipProps {
 
 const DisabledTooltip: FC<DisabledTooltipProps> = ({ children, place, className }) => {
   const { t } = useTranslation()
-  return (
+
+  const [isReady, setReady] = useState(false)
+
+  useEffect(() => {
+    setReady(true)
+  }, [isReady])
+
+
+  return isReady ? (
     <Tooltip
       className={className}
       place={place as PlacesType}
@@ -20,7 +28,7 @@ const DisabledTooltip: FC<DisabledTooltipProps> = ({ children, place, className 
     >
       <div className='opacity-20 pointer-events-none'>{children}</div>
     </Tooltip>
-  )
+  ) : children
 }
 
 export default DisabledTooltip

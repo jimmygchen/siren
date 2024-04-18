@@ -6,7 +6,7 @@ import { ValidatorModalView } from '../../../constants/enums'
 import useExitValidator from '../../../hooks/useExitValidator'
 import { activeDevice } from '../../../recoil/atoms'
 import { ValidatorInfo } from '../../../types/validator'
-import BasicValidatorMetrics from '../../BasicValidatorMetrics/BasicValidatorMetrics'
+import BasicValidatorMetrics, { BasicValidatorMetricsProps } from '../../BasicValidatorMetrics/BasicValidatorMetrics';
 import Button, { ButtonFace } from '../../Button/Button'
 import ExitDisclosure from '../../Disclosures/ExitDisclosure'
 import InfoBox, { InfoBoxType } from '../../InfoBox/InfoBox'
@@ -14,35 +14,33 @@ import Typography from '../../Typography/Typography'
 import ValidatorInfoHeader from '../../ValidatorInfoHeader/ValidatorInfoHeader'
 import { ValidatorModalContext } from '../ValidatorModal'
 
-export interface ValidatorExitProps {
-  validator: ValidatorInfo
-}
+export interface ValidatorExitProps extends BasicValidatorMetricsProps {}
 
-const ValidatorExit: FC<ValidatorExitProps> = ({ validator }) => {
+const ValidatorExit: FC<ValidatorExitProps> = ({ validator, validatorEpochData }) => {
   const { t } = useTranslation()
-  const { pubKey } = validator
-  const { rawValidatorUrl, apiToken, beaconUrl } = useRecoilValue(activeDevice)
+  // const { pubKey } = validator
+  // const { rawValidatorUrl, apiToken, beaconUrl } = useRecoilValue(activeDevice)
   const [isAccept, setIsAccept] = useState(false)
   const { moveToView, closeModal } = useContext(ValidatorModalContext)
   const viewDetails = () => moveToView(ValidatorModalView.DETAILS)
-  const { isLoading, setLoading, getSignedExit, submitSignedMessage } = useExitValidator(
-    apiToken,
-    pubKey,
-    beaconUrl,
-  )
+  // const { isLoading, setLoading, getSignedExit, submitSignedMessage } = useExitValidator(
+  //   apiToken,
+  //   pubKey,
+  //   beaconUrl,
+  // )
 
   const acceptBtnClasses = addClassString('', [isAccept && 'border-success !text-success'])
   const checkMarkClasses = addClassString('bi bi-check-circle ml-4', [isAccept && 'text-success'])
 
   const confirmExit = async () => {
-    setLoading(true)
-
-    const message = await getSignedExit(rawValidatorUrl)
-
-    if (message) {
-      await submitSignedMessage(message)
-      closeModal()
-    }
+    // setLoading(true)
+    //
+    // const message = await getSignedExit(rawValidatorUrl)
+    //
+    // if (message) {
+    //   await submitSignedMessage(message)
+    //   closeModal()
+    // }
   }
   const toggleAccept = () => setIsAccept((prev) => !prev)
 
@@ -55,7 +53,7 @@ const ValidatorExit: FC<ValidatorExitProps> = ({ validator }) => {
             {t('validatorExit.exit')}
           </Typography>
         </div>
-        <BasicValidatorMetrics validator={validator} />
+        <BasicValidatorMetrics validatorEpochData={validatorEpochData} validator={validator} />
       </div>
       <ValidatorInfoHeader validator={validator} />
       <div className='p-6 space-y-6'>
@@ -85,7 +83,7 @@ const ValidatorExit: FC<ValidatorExitProps> = ({ validator }) => {
       <div className='p-3 border-t-style100'>
         <ExitDisclosure
           isSensitive
-          isLoading={isLoading}
+          // isLoading={isLoading}
           isDisabled={!isAccept}
           onAccept={confirmExit}
           ctaType={ButtonFace.SECONDARY}

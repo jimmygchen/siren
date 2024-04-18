@@ -2,19 +2,20 @@ import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import formatBalanceColor from '../../../utilities/formatBalanceColor'
 import useEpochAprEstimate from '../../hooks/useEpochAprEstimate'
-import { ValidatorInfo } from '../../types/validator'
+import { ValidatorCache, ValidatorInfo } from '../../types/validator';
 import Typography from '../Typography/Typography'
 
 export interface ValidatorDetailTableProps {
   validator: ValidatorInfo
+  validatorCacheData: ValidatorCache
 }
 
-export const ValidatorDetailTable: FC<ValidatorDetailTableProps> = ({ validator }) => {
+export const ValidatorDetailTable: FC<ValidatorDetailTableProps> = ({ validator, validatorCacheData }) => {
   const { t } = useTranslation()
   const { balance, index } = validator
   const income = balance ? balance - 32 : 0
   const incomeColor = formatBalanceColor(income)
-  const { estimatedApr, textColor } = useEpochAprEstimate([String(index)])
+  const { estimatedApr, textColor } = useEpochAprEstimate(validatorCacheData, [String(index)])
   return (
     <>
       <div className='w-full lg:hidden'>

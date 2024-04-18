@@ -1,14 +1,20 @@
+import { FC } from 'react';
 import { useTranslation } from 'react-i18next'
+import formatValidatorEffectiveness from '../../../utilities/formatValidatorEffectiveness';
 import getAvgEffectivenessStatus from '../../../utilities/getAvgEffectivenessStatus'
 import toFixedIfNecessary from '../../../utilities/toFixedIfNecessary'
-import useValidatorEffectiveness from '../../hooks/useValidatorEffectiveness'
+import { BeaconValidatorMetricResults } from '../../types/beacon';
 import EffectivenessBreakdown from '../EffectivenessBreakdown/EffectivenessBreakdown'
 import Status from '../Status/Status'
 import Typography from '../Typography/Typography'
 
-const OverallEffectiveness = () => {
+export interface OverallEffectivenessProps {
+  validatorMetrics?: BeaconValidatorMetricResults[] | undefined
+}
+
+const OverallEffectiveness:FC<OverallEffectivenessProps> = ({validatorMetrics}) => {
   const { t } = useTranslation()
-  const { avgTargetEffectiveness, avgHitEffectiveness } = useValidatorEffectiveness()
+  const { avgTargetEffectiveness, avgHitEffectiveness } = formatValidatorEffectiveness(validatorMetrics)
 
   const combinedEffectiveness =
     avgTargetEffectiveness &&

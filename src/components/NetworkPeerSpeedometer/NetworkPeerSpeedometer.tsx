@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { FC, useEffect } from 'react';
 import ReactSpeedometer, { CustomSegmentLabelPosition } from 'react-d3-speedometer'
 import { useTranslation } from 'react-i18next'
 import { useRecoilValue } from 'recoil'
@@ -7,36 +7,18 @@ import { UiMode } from '../../constants/enums'
 import useDiagnosticAlerts from '../../hooks/useDiagnosticAlerts'
 import { uiMode, validatorPeerCount } from '../../recoil/atoms'
 import { StatusColor } from '../../types'
+import { PeerDataResults } from '../../types/diagnostic';
 import Tooltip from '../ToolTip/Tooltip'
 import Typography from '../Typography/Typography'
 
-const NetworkPeerSpeedometer = () => {
+export interface NetworkPeerSpeedometerProps {
+  peerData: PeerDataResults
+}
+
+const NetworkPeerSpeedometer:FC<NetworkPeerSpeedometerProps> = ({peerData}) => {
   const { t } = useTranslation()
   const mode = useRecoilValue(uiMode)
-  const peers = useRecoilValue(validatorPeerCount)
-  const { updateAlert } = useDiagnosticAlerts()
-
-  useEffect(() => {
-    if (!peers) return
-
-    if (peers <= 50) {
-      if (peers <= 20) {
-        updateAlert({
-          message: t('alert.peerCountLow', { type: t('alert.type.nodeValidator') }),
-          subText: t('poor'),
-          severity: StatusColor.ERROR,
-          id: ALERT_ID.PEER_COUNT,
-        })
-        return
-      }
-      updateAlert({
-        message: t('alert.peerCountMedium', { type: t('alert.type.nodeValidator') }),
-        subText: t('fair'),
-        severity: StatusColor.WARNING,
-        id: ALERT_ID.PEER_COUNT,
-      })
-    }
-  }, [peers])
+  const { connected } = peerData
 
   return (
     <Tooltip
@@ -61,7 +43,7 @@ const NetworkPeerSpeedometer = () => {
             darkMode='dark:text-white'
             type='text-caption2'
           >
-            {peers}
+            {connected}
           </Typography>
           <ReactSpeedometer
             width={90}
@@ -84,7 +66,7 @@ const NetworkPeerSpeedometer = () => {
             labelFontSize='6px'
             valueTextFontSize='9px'
             segmentColors={['tomato', 'gold', 'limegreen']}
-            value={peers || 0}
+            value={connected}
             maxValue={100}
             textColor={'transparent'}
           />

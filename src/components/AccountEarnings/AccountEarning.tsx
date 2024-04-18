@@ -1,37 +1,49 @@
+import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next'
 import { useRecoilValue } from 'recoil'
 import { formatLocalCurrency } from '../../../utilities/formatLocalCurrency'
-import { ReactComponent as EthLogo } from '../../assets/images/eth.svg'
-import { ReactComponent as LightHouseLogo } from '../../assets/images/lightHouse.svg'
-import { ReactComponent as UsdcLogo } from '../../assets/images/usdc.svg'
+import formatValidatorEpochData from '../../../utilities/formatValidatorEpochData';
+import EthLogo from '../../assets/images/eth.svg'
+import LightHouseLogo from '../../assets/images/lightHouse.svg'
+import UsdcLogo from '../../assets/images/usdc.svg'
 import { EARNINGS_OPTIONS } from '../../constants/constants'
+import { CURRENCY_PREFIX } from '../../constants/currencies';
+import { Storage } from '../../constants/enums';
 import useEarningsEstimate from '../../hooks/useEarningsEstimate'
 import useEpochAprEstimate from '../../hooks/useEpochAprEstimate'
-import { activeCurrency, exchangeRates } from '../../recoil/atoms'
-import { selectCurrencyPrefix } from '../../recoil/selectors/selectCurrencyPrefix'
+import useLocalStorage from '../../hooks/useLocalStorage';
+import { exchangeRates } from '../../recoil/atoms'
+import { ActiveCurrencyStorage } from '../../types/storage';
+import { ValidatorBalanceInfo, ValidatorCache, ValidatorInfo } from '../../types/validator';
 import Button, { ButtonFace } from '../Button/Button'
 import CurrencySelect from '../CurrencySelect/CurrencySelect'
-import Spinner from '../Spinner/Spinner'
+import { OptionType } from '../SelectDropDown/SelectDropDown';
 import Tooltip from '../ToolTip/Tooltip'
 import Typography from '../Typography/Typography'
 import EarningsLayout from './EarningsLayout'
 
-export const AccountEarningFallback = () => {
-  return (
-    <EarningsLayout className='h-full flex items-center justify-center max-h-396'>
-      <Spinner />
-    </EarningsLayout>
-  )
+export interface AccountEarningProps {
+  validatorStateInfo: ValidatorInfo[]
+  validatorCacheData: ValidatorCache
 }
 
-const AccountEarning = () => {
+const AccountEarning:FC<AccountEarningProps> = ({validatorStateInfo, validatorCacheData}) => {
   const { t } = useTranslation()
-  const currency = useRecoilValue(activeCurrency)
-  const { estimate, totalEarnings, estimateSelection, selectEstimate } = useEarningsEstimate()
-  const { formattedPrefix } = useRecoilValue(selectCurrencyPrefix)
+  const [activeCurrencyStorage, storeActiveCurrency] = useLocalStorage<ActiveCurrencyStorage>(
+    Storage.CURRENCY,
+    'USD',
+  )
+
+  const [currency, setCurrency] = useState(activeCurrencyStorage)
+
+  const validatorEpochData = useMemo<ValidatorBalanceInfo>(() => {
+    return formatValidatorEpochData(validatorStateInfo, validatorCacheData);
+  }, [validatorStateInfo, validatorCacheData]);
+
+  const { estimate, totalEarnings, estimateSelection, selectEstimate } = useEarningsEstimate(validatorEpochData)
   const data = useRecoilValue(exchangeRates)
 
-  const { estimatedApr, textColor } = useEpochAprEstimate()
+  const { estimatedApr, textColor } = useEpochAprEstimate(validatorCacheData)
 
   const activeRate = data?.rates[currency]
   const formattedRate = activeRate ? Number(activeRate) : 0
@@ -39,8 +51,21 @@ const AccountEarning = () => {
   const estimatedRateConversion = formattedRate * estimate
   const isEstimate = estimateSelection !== undefined
   const timeFrame = isEstimate ? EARNINGS_OPTIONS[estimateSelection]?.title : undefined
-
   const viewEarnings = async (value: number) => selectEstimate(value)
+
+  const { formattedPrefix } = useMemo(() => {
+    const prefix = CURRENCY_PREFIX[currency]
+
+    return {
+      prefix,
+      formattedPrefix: prefix && prefix.length === 1 ? prefix : '',
+    }
+  }, [currency])
+
+  const selectCurrency = (option: OptionType) => {
+    storeActiveCurrency(option as string)
+    setCurrency(option as string)
+  }
 
   return (
     <EarningsLayout>
@@ -77,7 +102,7 @@ const AccountEarning = () => {
           <div className='w-full mt-6 flex items-center'>
             <LightHouseLogo className='hidden md:block text-white w-16 h-16' />
             <div className='flex-1 ml-2 md:ml-6 md:ml-12 flex items-center space-x-2 justify-between'>
-              <CurrencySelect />
+              <CurrencySelect selection={currency} onSelect={selectCurrency} />
               <div className='flex items-center flex-wrap justify-end md:justify-start md:text-left text-right space-y-4 md:space-y-0 md:space-x-4'>
                 <div>
                   <Typography type='text-tiny' color='text-dark300' className='uppercase' isBold>

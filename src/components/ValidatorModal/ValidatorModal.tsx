@@ -1,13 +1,13 @@
+import { useRouter } from 'next/navigation';
 import Carousel from 'nuka-carousel'
-import { createContext, useEffect, useState } from 'react'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { createContext, FC, useEffect, useMemo, useState } from 'react';
+import formatValidatorEpochData from '../../../utilities/formatValidatorEpochData';
 import { ValidatorModalView } from '../../constants/enums'
 import useMediaQuery from '../../hooks/useMediaQuery'
-import { validatorIndex } from '../../recoil/atoms'
-import { selectValidatorDetail } from '../../recoil/selectors/selectValidatorDetails'
+import { ValidatorBalanceInfo } from '../../types/validator';
 import RodalModal from '../RodalModal/RodalModal'
 import Spinner from '../Spinner/Spinner'
-import ValidatorDetails from './views/ValidatorDetails'
+import ValidatorDetails, { ValidatorDetailsProps } from './views/ValidatorDetails';
 import ValidatorExit from './views/ValidatorExit'
 
 export interface ValidatorModalContextProps {
@@ -20,21 +20,27 @@ export const ValidatorModalContext = createContext<ValidatorModalContextProps>({
   closeModal: () => {},
 })
 
-const ValidatorModal = () => {
+export interface ValidatorModalProps extends ValidatorDetailsProps {}
+
+const ValidatorModal:FC<ValidatorModalProps> = ({validator, validatorMetrics, validatorCacheData}) => {
   const [isReady, setReady] = useState(false)
-  const setValidatorIndex = useSetRecoilState(validatorIndex)
-  const validator = useRecoilValue(selectValidatorDetail)
+  const router = useRouter()
   const [activeIndex, setIndex] = useState(0)
   const [view, setView] = useState<ValidatorModalView>(ValidatorModalView.EXIT)
   const isTablet = useMediaQuery('(max-width: 768px)')
   const isLargeScreen = useMediaQuery('(min-width: 1540px)')
+
+  const validatorEpochData = useMemo<ValidatorBalanceInfo | undefined>(() => {
+    if (!validatorCacheData || !validator) return;
+    return formatValidatorEpochData([validator], validatorCacheData);
+  }, [validator, validatorCacheData]);
 
   useEffect(() => {
     setReady(true)
   }, [])
 
   const closeModal = () => {
-    setValidatorIndex(undefined)
+    router.push('/dashboard/validators')
     setTimeout(() => {
       setView(ValidatorModalView.DETAILS)
       setIndex(0)
@@ -45,7 +51,7 @@ const ValidatorModal = () => {
 
     switch (view) {
       case ValidatorModalView.EXIT:
-        return <ValidatorExit validator={validator} />
+        return <ValidatorExit validatorEpochData={validatorEpochData} validator={validator} />
       default:
         return <div />
     }
@@ -76,10 +82,10 @@ const ValidatorModal = () => {
       }}
       onClose={closeModal}
     >
-      {validator ? (
+      {validator && validatorMetrics ? (
         <ValidatorModalContext.Provider value={{ moveToView, closeModal }}>
           <Carousel swiping={false} slideIndex={activeIndex} dragging={false} withoutControls>
-            <ValidatorDetails />
+            <ValidatorDetails validator={validator} validatorCacheData={validatorCacheData} validatorMetrics={validatorMetrics} />
             {renderContent()}
           </Carousel>
         </ValidatorModalContext.Provider>

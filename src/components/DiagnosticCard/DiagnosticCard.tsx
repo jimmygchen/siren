@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react';
 import { PlacesType } from 'react-tooltip'
 import addClassString from '../../../utilities/addClassString'
 import generateId from '../../../utilities/generateId'
@@ -48,6 +48,7 @@ const DiagnosticCard: FC<DiagnosticCardProps> = ({
   toolTipPosition,
   isDisabled,
 }) => {
+  const [isReady, setReady] = useState(false)
   const toolTipId = Math.random().toString()
   const isSmall = size === 'sm'
   const getContainerSize = () => {
@@ -66,6 +67,11 @@ const DiagnosticCard: FC<DiagnosticCardProps> = ({
         } py-2 px-3 xl:py-3 xl:px-4 dark:border-dark500`
     }
   }
+
+  useEffect(() => {
+    setReady(true)
+  }, [])
+
   const contentClass = addClassString('flex flex-col justify-between h-full', [
     isDisabled && 'opacity-20',
   ])
@@ -118,7 +124,7 @@ const DiagnosticCard: FC<DiagnosticCardProps> = ({
 
   return (
     <div className={`w-full h-full ${getContainerSize()} ${border} relative`}>
-      {toolTipText ? (
+      {toolTipText && isReady ? (
         <Tooltip
           className='h-full'
           maxWidth={250}
