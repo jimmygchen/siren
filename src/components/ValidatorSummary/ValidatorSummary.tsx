@@ -14,10 +14,10 @@ import Typography from '../Typography/Typography'
 import ValidatorIncomeSummary from '../ValidatorIncomeSummary/ValidatorIncomeSummary'
 
 export interface ValidatorSummaryProps {
-  validators?: ValidatorInfo[] | undefined
+  validators: ValidatorInfo[]
   validatorNetworkData: ValidatorCountResult
-  validatorCacheData?: ValidatorCache
-  validatorMetrics?: BeaconValidatorMetricResults[] | undefined
+  validatorCacheData: ValidatorCache
+  validatorMetrics: BeaconValidatorMetricResults[]
 }
 
 const ValidatorSummary: FC<ValidatorSummaryProps> = ({
@@ -48,9 +48,7 @@ const ValidatorSummary: FC<ValidatorSummaryProps> = ({
   const totalBalance = useMemo(() => {
     return validators?.map((validator) => validator.balance).reduce((a, b) => a + b, 0)
   }, [validators])
-
-  const validatorEpochData = useMemo<ValidatorBalanceInfo | undefined>(() => {
-    if (!validatorCacheData || !validators || validators.length === 0) return
+  const validatorEpochData = useMemo<ValidatorBalanceInfo>(() => {
     return formatValidatorEpochData(validators, validatorCacheData)
   }, [validators, validatorCacheData])
 

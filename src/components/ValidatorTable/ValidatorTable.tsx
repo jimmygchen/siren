@@ -15,8 +15,8 @@ export type TableView = 'partial' | 'full'
 export interface ValidatorTableProps {
   view?: TableView
   className?: string
-  validatorCacheData?: ValidatorCache | undefined
-  validators?: ValidatorInfo[] | undefined
+  validatorCacheData: ValidatorCache
+  validators: ValidatorInfo[]
 }
 
 export const TableFallback = () => (

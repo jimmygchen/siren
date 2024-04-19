@@ -7,7 +7,7 @@ import Typography from '../Typography/Typography'
 
 export interface ValidatorIncomeSummaryProps {
   className?: string
-  validatorData: ValidatorBalanceInfo | undefined
+  validatorData: ValidatorBalanceInfo
 }
 
 const ValidatorIncomeSummary: FC<ValidatorIncomeSummaryProps> = ({ className, validatorData }) => {

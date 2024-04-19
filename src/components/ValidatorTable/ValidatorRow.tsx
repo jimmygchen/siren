@@ -24,7 +24,7 @@ import { TableView } from './ValidatorTable'
 export interface ValidatorRowProps {
   validator: ValidatorInfo
   view?: TableView | undefined
-  validatorCacheData?: ValidatorCache | undefined
+  validatorCacheData: ValidatorCache
 }
 
 const ValidatorRow: FC<ValidatorRowProps> = ({ validator, view, validatorCacheData }) => {
@@ -48,8 +48,7 @@ const ValidatorRow: FC<ValidatorRowProps> = ({ validator, view, validatorCacheDa
   const isValidatorProcessing =
     processingValidators && processingValidators.includes(validator.index.toString())
 
-  const validatorEpochData = useMemo<ValidatorBalanceInfo | undefined>(() => {
-    if (!validatorCacheData) return
+  const validatorEpochData = useMemo<ValidatorBalanceInfo>(() => {
     return formatValidatorEpochData([validator], validatorCacheData)
   }, [validator, validatorCacheData])
 

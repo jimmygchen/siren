@@ -1,6 +1,5 @@
 'use client'
 
-import { node } from 'prop-types'
 import React, { FC, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSetRecoilState } from 'recoil'
@@ -22,14 +21,13 @@ import { exchangeRates } from '../../src/recoil/atoms'
 import { StatusColor } from '../../src/types'
 import { BeaconNodeSpecResults, SyncData } from '../../src/types/beacon'
 import { Diagnostics, PeerDataResults } from '../../src/types/diagnostic'
-import { UsernameStorage } from '../../src/types/storage'
 import { ValidatorCache, ValidatorInclusionData, ValidatorInfo } from '../../src/types/validator'
 
 export interface MainProps {
   initNodeHealth: Diagnostics
   initSyncData: SyncData
   bnVersion: string
-  lighthouseVersion?: string
+  lighthouseVersion: string
   beaconSpec: BeaconNodeSpecResults
   initValStates: ValidatorInfo[]
   genesisTime: number
@@ -57,7 +55,7 @@ const Main: FC<MainProps> = (props) => {
   const { SECONDS_PER_SLOT } = beaconSpec
   const { version } = pckJson
   const { updateAlert, storeAlert, removeAlert } = useDiagnosticAlerts()
-  const [username] = useLocalStorage<UsernameStorage>('username', 'Keeper')
+  const [username] = useLocalStorage<string>('username', 'Keeper')
   const setExchangeRate = useSetRecoilState(exchangeRates)
 
   const { isValidatorError, isBeaconError } = useNetworkMonitor()
@@ -213,7 +211,7 @@ const Main: FC<MainProps> = (props) => {
               nodeHealth={nodeHealth}
               valInclusionData={valInclusion}
             />
-            <ValidatorTable validators={validatorStates} className='mt-8 lg:mt-2' />
+            <ValidatorTable validators={validatorStates} validatorCacheData={validatorCache} className='mt-8 lg:mt-2' />
             <DiagnosticTable
               bnSpec={beaconSpec}
               genesisTime={genesisTime}

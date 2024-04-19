@@ -1,9 +1,8 @@
 import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-import formatBnSyncInfo from '../../../utilities/formatBnSyncInfo'
 import { formatLocalCurrency } from '../../../utilities/formatLocalCurrency'
 import secondsToShortHand from '../../../utilities/secondsToShortHand'
-import { BeaconSyncInfo, BeaconSyncResult } from '../../types/diagnostic'
+import { BeaconSyncInfo } from '../../types/diagnostic'
 import SyncCard from '../SyncCard/SyncCard'
 
 export interface BeaconSyncCardProps {

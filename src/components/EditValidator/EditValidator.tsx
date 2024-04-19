@@ -5,7 +5,7 @@ import formatDefaultValName from '../../../utilities/formatDefaultValName'
 import EditValidatorForm from '../../forms/EditValidatorForm'
 import useMediaQuery from '../../hooks/useMediaQuery'
 import useUiMode from '../../hooks/useUiMode'
-import { ValidatorBalanceInfo, ValidatorCache, ValidatorInfo } from '../../types/validator'
+import { ValidatorBalanceInfo, ValidatorInfo } from '../../types/validator'
 import BasicValidatorMetrics from '../BasicValidatorMetrics/BasicValidatorMetrics'
 import Button, { ButtonFace } from '../Button/Button'
 import Input from '../Input/Input'
@@ -16,7 +16,7 @@ import ValidatorInfoHeader from '../ValidatorInfoHeader/ValidatorInfoHeader'
 
 export interface EditValidatorProps {
   validator: ValidatorInfo
-  validatorEpochData?: ValidatorBalanceInfo | undefined
+  validatorEpochData: ValidatorBalanceInfo
 }
 
 const EditValidator: FC<EditValidatorProps> = ({ validatorEpochData, validator }) => {

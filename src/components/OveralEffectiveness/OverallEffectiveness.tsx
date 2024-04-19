@@ -9,7 +9,7 @@ import Status from '../Status/Status'
 import Typography from '../Typography/Typography'
 
 export interface OverallEffectivenessProps {
-  validatorMetrics?: BeaconValidatorMetricResults[] | undefined
+  validatorMetrics: BeaconValidatorMetricResults[]
 }
 
 const OverallEffectiveness: FC<OverallEffectivenessProps> = ({ validatorMetrics }) => {

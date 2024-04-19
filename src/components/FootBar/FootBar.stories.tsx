@@ -1,4 +1,5 @@
 import { Story } from '@storybook/react'
+import { mockDiagnostics } from '../../mocks/beaconSpec';
 import FootBar from './FootBar'
 
 const FootBarStory = {
@@ -6,7 +7,7 @@ const FootBarStory = {
   component: FootBar,
 }
 
-const Template: Story = () => <FootBar />
+const Template: Story = () => <FootBar isSyncing nodeHealth={mockDiagnostics} />
 
 export const Base = Template.bind({})
 Base.args = {}

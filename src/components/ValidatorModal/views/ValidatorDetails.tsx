@@ -25,8 +25,8 @@ import ValidatorStatusProgress from '../../ValidatorStatusProgress/ValidatorStat
 import ValidatorActions from '../ValidatorActions'
 
 export interface ValidatorDetailsProps {
-  validator: ValidatorInfo | undefined
-  validatorMetrics: BeaconValidatorMetricResults[] | undefined
+  validator: ValidatorInfo
+  validatorMetrics: BeaconValidatorMetricResults[]
   validatorCacheData: ValidatorCache
 }
 
@@ -43,8 +43,7 @@ const ValidatorDetails: FC<ValidatorDetailsProps> = ({
     validatorMetrics,
     [index],
   )
-  const validatorEpochData = useMemo<ValidatorBalanceInfo | undefined>(() => {
-    if (!validatorCacheData || !validator) return
+  const validatorEpochData = useMemo<ValidatorBalanceInfo>(() => {
     return formatValidatorEpochData([validator], validatorCacheData)
   }, [validator, validatorCacheData])
 

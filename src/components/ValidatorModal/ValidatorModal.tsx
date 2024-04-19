@@ -34,8 +34,7 @@ const ValidatorModal: FC<ValidatorModalProps> = ({
   const isTablet = useMediaQuery('(max-width: 768px)')
   const isLargeScreen = useMediaQuery('(min-width: 1540px)')
 
-  const validatorEpochData = useMemo<ValidatorBalanceInfo | undefined>(() => {
-    if (!validatorCacheData || !validator) return
+  const validatorEpochData = useMemo<ValidatorBalanceInfo>(() => {
     return formatValidatorEpochData([validator], validatorCacheData)
   }, [validator, validatorCacheData])
 

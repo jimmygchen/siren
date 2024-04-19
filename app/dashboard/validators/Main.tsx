@@ -49,7 +49,7 @@ const Main: FC<MainProps> = (props) => {
 
   const { SECONDS_PER_SLOT } = beaconSpec
   const setExchangeRate = useSetRecoilState(exchangeRates)
-  const [timedMetrics, storeMetric] = useState<BeaconValidatorMetricResults[]>()
+  const [timedMetrics, storeMetric] = useState<BeaconValidatorMetricResults[]>([])
   const [search, setSearch] = useState('')
 
   const { isValidatorError, isBeaconError } = useNetworkMonitor()
@@ -119,7 +119,7 @@ const Main: FC<MainProps> = (props) => {
     const MAX_LENGTH = 10
 
     if (validatorMetrics) {
-      storeMetric((prevState) => {
+      storeMetric((prevState: any) => {
         const newTimestamp = moment().unix().toString()
         const updatedState = { ...prevState, [newTimestamp]: validatorMetrics }
         const entries = Object.entries(updatedState)
@@ -198,14 +198,15 @@ const Main: FC<MainProps> = (props) => {
           <ValidatorTable
             validatorCacheData={validatorCache}
             validators={filteredValidators}
-            isFilter
             view='full'
           />
-          <ValidatorModal
-            validator={activeValidator}
-            validatorCacheData={validatorCache}
-            validatorMetrics={timedMetrics}
-          />
+          {activeValidator && (
+            <ValidatorModal
+              validator={activeValidator}
+              validatorCacheData={validatorCache}
+              validatorMetrics={timedMetrics}
+            />
+          )}
         </div>
       </>
     </DashboardWrapper>

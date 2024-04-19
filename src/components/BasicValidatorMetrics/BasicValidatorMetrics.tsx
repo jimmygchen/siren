@@ -1,15 +1,14 @@
-import { FC, useMemo } from 'react'
+import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRecoilValue } from 'recoil'
 import { formatLocalCurrency } from '../../../utilities/formatLocalCurrency'
-import useFilteredValidatorCacheData from '../../hooks/useFilteredValidatorCacheData'
 import { exchangeRates } from '../../recoil/atoms'
-import { ValidatorBalanceInfo, ValidatorCache, ValidatorInfo } from '../../types/validator'
+import { ValidatorBalanceInfo, ValidatorInfo } from '../../types/validator'
 import Typography from '../Typography/Typography'
 import ValidatorIncomeSummary from '../ValidatorIncomeSummary/ValidatorIncomeSummary'
 
 export interface BasicValidatorMetricsProps {
-  validatorEpochData: ValidatorBalanceInfo | undefined
+  validatorEpochData: ValidatorBalanceInfo
   validator: ValidatorInfo
 }
 

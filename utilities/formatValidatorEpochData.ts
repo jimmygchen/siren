@@ -16,7 +16,7 @@ const formatValidatorEpochData = (
       validators.some((validator) => parseInt(key, 10) === validator.index),
     )
     .flatMap(([, value]) => value)
-    .reduce((acc, { epoch, total_balance }) => {
+    .reduce((acc: any, { epoch, total_balance }) => {
       acc[epoch] = acc[epoch] || []
       acc[epoch].push(total_balance)
       return acc

@@ -1,15 +1,12 @@
 import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilValue } from 'recoil'
 import { CURRENCIES } from '../../constants/constants'
-import { Storage } from '../../constants/enums'
-import useLocalStorage from '../../hooks/useLocalStorage'
-import { activeCurrency, exchangeRates } from '../../recoil/atoms'
-import { ActiveCurrencyStorage } from '../../types/storage'
-import SelectDropDown, { OptionType } from '../SelectDropDown/SelectDropDown'
+import { exchangeRates } from '../../recoil/atoms'
+import SelectDropDown, { OptionType } from '../SelectDropDown/SelectDropDown';
 
 export interface CurrencySelectProps {
-  onSelect: (selection: string) => void
+  onSelect: (selection: OptionType) => void
   selection: string
 }
 

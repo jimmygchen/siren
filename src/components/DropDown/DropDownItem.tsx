@@ -1,8 +1,10 @@
 import Link, { LinkProps } from 'next/link'
 import React, { FC, ReactNode } from 'react'
 
-export interface DropDownItemProps extends LinkProps {
+export interface DropDownItemProps {
   children: ReactNode | ReactNode[]
+  href: string
+  target?:  "_self" | "_blank" | "_parent" | "_top" | string | undefined
 }
 
 const DropDownItem: FC<DropDownItemProps> = ({ children, href, target }) => {

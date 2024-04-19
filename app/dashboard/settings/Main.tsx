@@ -2,7 +2,6 @@
 
 import React, { FC, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useRecoilState, useRecoilValue } from 'recoil'
 import LighthouseSvg from '../../../src/assets/images/lighthouse-black.svg'
 import AppDescription from '../../../src/components/AppDescription/AppDescription'
 import AppVersion from '../../../src/components/AppVersion/AppVersion'
@@ -35,7 +34,7 @@ export interface MainProps {
   initSyncData: SyncData
   beaconSpec: BeaconNodeSpecResults
   bnVersion: string
-  lighthouseVersion?: string
+  lighthouseVersion: string
 }
 
 const Main: FC<MainProps> = (props) => {
