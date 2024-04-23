@@ -1,6 +1,6 @@
 'use client'
 
-import React, { FC, useEffect } from 'react'
+import React, { FC, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next'
 import { useSetRecoilState } from 'recoil'
 import pckJson from '../../package.json'
@@ -17,11 +17,12 @@ import useDiagnosticAlerts from '../../src/hooks/useDiagnosticAlerts'
 import useLocalStorage from '../../src/hooks/useLocalStorage'
 import useNetworkMonitor from '../../src/hooks/useNetworkMonitor'
 import useSWRPolling from '../../src/hooks/useSWRPolling'
-import { exchangeRates } from '../../src/recoil/atoms'
-import { StatusColor } from '../../src/types'
+import { exchangeRates, proposerDuties } from '../../src/recoil/atoms';
+import { ProposerDuty, StatusColor } from '../../src/types';
 import { BeaconNodeSpecResults, SyncData } from '../../src/types/beacon'
 import { Diagnostics, PeerDataResults } from '../../src/types/diagnostic'
 import { ValidatorCache, ValidatorInclusionData, ValidatorInfo } from '../../src/types/validator'
+import formatUniqueObjectArray from '../../utilities/formatUniqueObjectArray';
 
 export interface MainProps {
   initNodeHealth: Diagnostics
@@ -34,6 +35,7 @@ export interface MainProps {
   initPeerData: PeerDataResults
   initValCaches: ValidatorCache
   initInclusionRate: ValidatorInclusionData
+  initProposerDuties: ProposerDuty[]
 }
 
 const Main: FC<MainProps> = (props) => {
@@ -48,20 +50,23 @@ const Main: FC<MainProps> = (props) => {
     bnVersion,
     lighthouseVersion,
     genesisTime,
+    initProposerDuties
   } = props
 
   const { t } = useTranslation()
 
-  const { SECONDS_PER_SLOT } = beaconSpec
+  const { SECONDS_PER_SLOT, SLOTS_PER_EPOCH } = beaconSpec
   const { version } = pckJson
   const { updateAlert, storeAlert, removeAlert } = useDiagnosticAlerts()
   const [username] = useLocalStorage<string>('username', 'Keeper')
   const setExchangeRate = useSetRecoilState(exchangeRates)
+  const setDuties = useSetRecoilState(proposerDuties)
 
   const { isValidatorError, isBeaconError } = useNetworkMonitor()
 
   const networkError = isValidatorError || isBeaconError
   const slotInterval = SECONDS_PER_SLOT * 1000
+  const halfEpochInterval = ((Number(SECONDS_PER_SLOT) * Number(SLOTS_PER_EPOCH)) / 2) * 1000
 
   const { data: exchangeData } = useSWRPolling(CoinbaseExchangeRateUrl, {
     refreshInterval: 60 * 1000,
@@ -98,6 +103,29 @@ const Main: FC<MainProps> = (props) => {
     fallbackData: initInclusionRate,
     networkError,
   })
+
+  const { data: valDuties } = useSWRPolling('/api/validator-duties', {
+    refreshInterval: halfEpochInterval,
+    fallbackData: initProposerDuties,
+    networkError,
+  })
+
+  const activeValidators = useMemo(() => {
+    return validatorStates
+      .filter(
+        ({ status }) =>
+          status.includes('active') &&
+          !status.includes('slashed') &&
+          !status.includes('exiting') &&
+          !status.includes('exited'),
+      ).map(({index}) => index)
+  }, [validatorStates])
+
+  useEffect(() => {
+    if(activeValidators.length) {
+      setDuties(prev => formatUniqueObjectArray([...prev, ...valDuties.filter((duty: ProposerDuty) => activeValidators.includes(Number(duty.validator_index)))]))
+    }
+  }, [valDuties, activeValidators])
 
   const { beaconSync, executionSync } = syncData
   const { isSyncing } = beaconSync

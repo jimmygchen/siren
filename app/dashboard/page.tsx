@@ -3,9 +3,9 @@ import {
   fetchBeaconSpec,
   fetchInclusionRate,
   fetchNodeHealth,
-  fetchPeerData,
-  fetchSyncData,
-} from '../api/beacon'
+  fetchPeerData, fetchProposerDuties,
+  fetchSyncData
+} from '../api/beacon';
 import { fetchBeaconNodeVersion, fetchGenesisData, fetchValidatorVersion } from '../api/config'
 import { fetchValCaches, fetchValStates } from '../api/validator'
 import Wrapper from './Wrapper'
@@ -22,9 +22,11 @@ export default async function Page() {
   const inclusion = await fetchInclusionRate()
   const bnVersion = await fetchBeaconNodeVersion()
   const lighthouseVersion = await fetchValidatorVersion()
+  const proposerDuties = await fetchProposerDuties()
 
   return (
     <Wrapper
+      initProposerDuties={proposerDuties}
       initValCaches={caches}
       initValStates={states}
       initNodeHealth={nodeHealth}

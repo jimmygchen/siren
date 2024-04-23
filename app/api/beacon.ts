@@ -15,3 +15,4 @@ export const fetchPeerData = async () =>
 export const fetchBeaconSpec = async () => await fetchFromApi(`${backendUrl}/beacon/spec`)
 export const fetchValidatorCountData = async () =>
   await fetchFromApi(`${backendUrl}/beacon/validator-count`, { next: { revalidate: 60 } })
+export const fetchProposerDuties = async () => fetchFromApi(`${backendUrl}/beacon/proposer-duties`, { cache: 'no-store' })

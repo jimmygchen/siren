@@ -39,4 +39,9 @@ export class BeaconController {
   async getValidatorCount() {
     return this.beaconService.fetchValidatorCount();
   }
+
+  @Get('proposer-duties')
+  async getProposerDuties() {
+    return this.beaconService.fetchProposerDuties();
+  }
 }

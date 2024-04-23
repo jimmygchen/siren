@@ -164,4 +164,31 @@ export class BeaconService {
       throwServerError('Unable to fetch validator count data');
     }
   }
+
+  async fetchProposerDuties() {
+    try {
+      const [beaconSpec, beaconResponse] = await Promise.all(
+        [
+          this.utilsService.sendHttpRequest({
+            url: `${this.beaconUrl}/eth/v1/config/spec`,
+          }),
+          this.utilsService.sendHttpRequest({
+            url: `${this.beaconUrl}/eth/v1/node/syncing`,
+          })
+        ],
+      );
+
+      const { SLOTS_PER_EPOCH } = beaconSpec.data.data;
+      const { head_slot } = beaconResponse.data.data;
+      const closestEpoch = Math.floor(Number(head_slot) / Number(SLOTS_PER_EPOCH)) + 1
+
+      const { data } = await this.utilsService.sendHttpRequest({ url: `${this.beaconUrl}/eth/v1/validator/duties/proposer/${closestEpoch}` })
+
+      return data.data.map(duty => ({...duty, uuid: `${duty.slot}${duty.validator_index}`}))
+    }
+     catch (e) {
+      console.error(e);
+      throwServerError('Unable to fetch proposer data');
+    }
+  }
 }
