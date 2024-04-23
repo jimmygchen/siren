@@ -2,10 +2,10 @@ import { FC, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import getSlotTimeData from '../../../utilities/getSlotTimeData'
 import { ProposerDuty, StatusColor } from '../../types'
+import { BeaconSyncInfo } from '../../types/diagnostic';
 import StatusBar from '../StatusBar/StatusBar'
 import Typography from '../Typography/Typography'
 import ProposalAlert from './ProposalAlert'
-import { BeaconSyncInfo } from '../../types/diagnostic';
 
 export interface AlertGroupProps {
   duties: ProposerDuty[]
