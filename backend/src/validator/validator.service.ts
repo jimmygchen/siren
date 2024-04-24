@@ -3,14 +3,14 @@ import { throwServerError } from '../utilities';
 import { UtilsService } from '../utils/utils.service';
 import {
   BeaconValidatorResult,
-  LighthouseValidatorResult,
 } from '../../../src/types/validator';
 import formatDefaultValName from '../../../utilities/formatDefaultValName';
 import { formatUnits } from 'ethers/lib/utils';
+import { ValidatorDetailService } from './validator-detail.service';
 
 @Injectable()
 export class ValidatorService {
-  constructor(private utilsService: UtilsService) {}
+  constructor(private utilsService: UtilsService, private validatorDetailService: ValidatorDetailService) {}
   private validatorUrl = process.env.VALIDATOR_URL;
   private apiToken = process.env.API_TOKEN;
   private beaconUrl = process.env.BEACON_URL;
@@ -46,15 +46,9 @@ export class ValidatorService {
 
   async fetchValidatorStates() {
     try {
-      const { data } = await this.utilsService.sendHttpRequest({
-        url: `${this.validatorUrl}/lighthouse/validators`,
-        config: this.config,
-      });
-      const validatorKeys = data.data
-        .map((validator: LighthouseValidatorResult) => validator.voting_pubkey)
-        .join(',');
+      const validatorDetails = await this.validatorDetailService.findOrFetch();
       const { data: states } = await this.utilsService.sendHttpRequest({
-        url: `${this.beaconUrl}/eth/v1/beacon/states/head/validators?id=${validatorKeys}`,
+        url: `${this.beaconUrl}/eth/v1/beacon/states/head/validators?id=${validatorDetails.map(({pubkey}) => pubkey)}`,
       });
 
       const sortedStates = [...states.data].sort(
@@ -87,25 +81,10 @@ export class ValidatorService {
 
   async fetchValidatorCaches() {
     try {
-      const { data } = await this.utilsService.sendHttpRequest({
-        url: `${this.validatorUrl}/lighthouse/validators`,
-        config: this.config,
-      });
-      const validatorKeys = data.data
-        .map((validator: LighthouseValidatorResult) => validator.voting_pubkey)
-        .join(',');
-
-      // console.log(validatorKeys, 'keys')
-
-      const { data: states } = await this.utilsService.sendHttpRequest({
-        url: `${this.beaconUrl}/eth/v1/beacon/states/head/validators?id=${validatorKeys}`,
-      });
-
-      // console.log(states, 'states')
-
+      const validatorDetails = await this.validatorDetailService.findOrFetch();
       const requestData = {
         data: JSON.stringify({
-          indices: states.data.map(({ index }) => String(index)),
+          indices: validatorDetails.map(({index}) => String(index)),
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -117,8 +96,6 @@ export class ValidatorService {
         method: 'POST',
         config: requestData,
       });
-
-      // console.log(caches, 'caches')
 
       return Object.fromEntries(
         Object.entries(
@@ -136,20 +113,10 @@ export class ValidatorService {
 
   async fetchMetrics() {
     try {
-      const { data } = await this.utilsService.sendHttpRequest({
-        url: `${this.validatorUrl}/lighthouse/validators`,
-        config: this.config,
-      });
-      const validatorKeys = data.data
-        .map((validator: LighthouseValidatorResult) => validator.voting_pubkey)
-        .join(',');
-      const { data: states } = await this.utilsService.sendHttpRequest({
-        url: `${this.beaconUrl}/eth/v1/beacon/states/head/validators?id=${validatorKeys}`,
-      });
-
+      const validatorDetails = await this.validatorDetailService.findOrFetch();
       const requestData = {
         data: JSON.stringify({
-          indices: states.data.map(({ index }) => Number(index)),
+          indices: validatorDetails.map(({index}) => index),
         }),
         headers: {
           'Content-Type': 'application/json',
