@@ -6,11 +6,14 @@ import { ConfigModule } from '@nestjs/config';
 import { ValidatorModule } from './validator/validator.module';
 import { NodeModule } from './node/node.module';
 import { LogsModule } from './logs/logs.module';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { dataBaseConfig } from './database/database.config';
 
 @Module({
   imports: [
     BeaconModule,
     ValidatorModule,
+    SequelizeModule.forRoot(dataBaseConfig),
     ConfigModule.forRoot({
       envFilePath: '../.env',
     }),
