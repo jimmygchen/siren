@@ -3,23 +3,12 @@ import { UtilsService } from '../utils/utils.service';
 import { throwServerError } from '../utilities';
 import getPercentage from '../../../utilities/getPercentage';
 import getStatus from '../../../utilities/getInclusionRateStatus';
+import { SpecsService } from '../specs/specs.service';
 
 @Injectable()
 export class BeaconService {
-  constructor(private utilsService: UtilsService) {}
+  constructor(private utilsService: UtilsService, private readonly specsService: SpecsService) {}
   private beaconUrl = process.env.BEACON_URL;
-
-  async fetchBeaconSpec() {
-    try {
-      const { data } = await this.utilsService.sendHttpRequest({
-        url: `${this.beaconUrl}/eth/v1/config/spec`,
-      });
-      return data.data;
-    } catch (e) {
-      console.error(e);
-      throwServerError('Unable to fetch beacon spec');
-    }
-  }
 
   async fetchBeaconNodeVersion() {
     try {
@@ -47,11 +36,9 @@ export class BeaconService {
 
   async fetchSyncData() {
     try {
-      const [beaconSpec, beaconResponse, executionResponse] = await Promise.all(
+      const { SECONDS_PER_SLOT } = await this.specsService.findOrFetch()
+      const [ beaconResponse, executionResponse] = await Promise.all(
         [
-          this.utilsService.sendHttpRequest({
-            url: `${this.beaconUrl}/eth/v1/config/spec`,
-          }),
           this.utilsService.sendHttpRequest({
             url: `${this.beaconUrl}/eth/v1/node/syncing`,
           }),
@@ -61,7 +48,6 @@ export class BeaconService {
         ],
       );
 
-      const { SECONDS_PER_SLOT } = beaconSpec.data.data;
       const { head_slot, sync_distance, is_syncing } = beaconResponse.data.data;
       const {
         head_block_number,
@@ -101,16 +87,12 @@ export class BeaconService {
 
   async fetchInclusionRate() {
     try {
-      const [beaconSpec, beaconResponse] = await Promise.all([
-        this.utilsService.sendHttpRequest({
-          url: `${this.beaconUrl}/eth/v1/config/spec`,
-        }),
-        this.utilsService.sendHttpRequest({
-          url: `${this.beaconUrl}/eth/v1/node/syncing`,
-        }),
-      ]);
+      const { SLOTS_PER_EPOCH } = await this.specsService.findOrFetch()
 
-      const { SLOTS_PER_EPOCH } = beaconSpec.data.data;
+      const beaconResponse = await this.utilsService.sendHttpRequest({
+        url: `${this.beaconUrl}/eth/v1/node/syncing`,
+      });
+
       const { head_slot } = beaconResponse.data.data;
 
       const epoch = Math.floor(Number(head_slot) / Number(SLOTS_PER_EPOCH)) - 1;
@@ -167,18 +149,12 @@ export class BeaconService {
 
   async fetchProposerDuties() {
     try {
-      const [beaconSpec, beaconResponse] = await Promise.all(
-        [
-          this.utilsService.sendHttpRequest({
-            url: `${this.beaconUrl}/eth/v1/config/spec`,
-          }),
-          this.utilsService.sendHttpRequest({
-            url: `${this.beaconUrl}/eth/v1/node/syncing`,
-          })
-        ],
-      );
+      const { SLOTS_PER_EPOCH } = await this.specsService.findOrFetch()
 
-      const { SLOTS_PER_EPOCH } = beaconSpec.data.data;
+      const beaconResponse = await this.utilsService.sendHttpRequest({
+        url: `${this.beaconUrl}/eth/v1/node/syncing`,
+      })
+
       const { head_slot } = beaconResponse.data.data;
       const closestEpoch = Math.floor(Number(head_slot) / Number(SLOTS_PER_EPOCH)) + 1
 
