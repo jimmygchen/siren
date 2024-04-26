@@ -3,11 +3,11 @@ import { UtilsService } from '../utils/utils.service';
 import { throwServerError } from '../utilities';
 import getPercentage from '../../../utilities/getPercentage';
 import getStatus from '../../../utilities/getInclusionRateStatus';
-import { SpecsService } from '../specs/specs.service';
+import { Spec } from './entities/spec.entity';
 
 @Injectable()
 export class BeaconService {
-  constructor(private utilsService: UtilsService, private readonly specsService: SpecsService) {}
+  constructor(private utilsService: UtilsService) {}
   private beaconUrl = process.env.BEACON_URL;
 
   async fetchBeaconNodeVersion() {
@@ -34,9 +34,16 @@ export class BeaconService {
     }
   }
 
+  async fetchSpecData() {
+    const spec = await this.utilsService.fetchOne(Spec)
+    return JSON.parse(spec.data)
+  }
+
   async fetchSyncData() {
     try {
-      const { SECONDS_PER_SLOT } = await this.specsService.findOrFetch()
+      const spec = await this.utilsService.fetchOne(Spec)
+      const { SECONDS_PER_SLOT } = JSON.parse(spec.data)
+
       const [ beaconResponse, executionResponse] = await Promise.all(
         [
           this.utilsService.sendHttpRequest({
@@ -87,7 +94,8 @@ export class BeaconService {
 
   async fetchInclusionRate() {
     try {
-      const { SLOTS_PER_EPOCH } = await this.specsService.findOrFetch()
+      const spec = await this.utilsService.fetchOne(Spec)
+      const { SLOTS_PER_EPOCH } = JSON.parse(spec.data)
 
       const beaconResponse = await this.utilsService.sendHttpRequest({
         url: `${this.beaconUrl}/eth/v1/node/syncing`,
@@ -149,7 +157,8 @@ export class BeaconService {
 
   async fetchProposerDuties() {
     try {
-      const { SLOTS_PER_EPOCH } = await this.specsService.findOrFetch()
+      const spec = await this.utilsService.fetchOne(Spec)
+      const { SLOTS_PER_EPOCH } = JSON.parse(spec.data)
 
       const beaconResponse = await this.utilsService.sendHttpRequest({
         url: `${this.beaconUrl}/eth/v1/node/syncing`,

@@ -1,17 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
 import { BeaconService } from './beacon.service';
-import { SpecsService } from '../specs/specs.service';
 
 @Controller('beacon')
 export class BeaconController {
-  constructor(
-    private beaconService: BeaconService,
-    private readonly specsService: SpecsService
-  ) {}
+  constructor(private beaconService: BeaconService) {}
 
   @Get('spec')
   async getBeaconSpec() {
-    return this.specsService.findOrFetch();
+    return this.beaconService.fetchSpecData()
   }
 
   @Get('node-version')
