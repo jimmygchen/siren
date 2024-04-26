@@ -1,7 +1,7 @@
 import { FC, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import formatValidatorEpochData from '../../../utilities/formatValidatorEpochData'
-import { BeaconValidatorMetricResults } from '../../types/beacon'
+import { BeaconValidatorMetricResults, ValidatorMetricResult } from '../../types/beacon';
 import {
   ValidatorBalanceInfo,
   ValidatorCache,
@@ -9,22 +9,21 @@ import {
   ValidatorInfo,
 } from '../../types/validator'
 import ActiveValidatorCount from '../ActiveValidatorCount/ActiveValidatorCount'
-import OverallEffectiveness from '../OveralEffectiveness/OverallEffectiveness'
+import OverallEffectiveness, { OverallEffectivenessProps } from '../OveralEffectiveness/OverallEffectiveness';
 import Typography from '../Typography/Typography'
 import ValidatorIncomeSummary from '../ValidatorIncomeSummary/ValidatorIncomeSummary'
 
-export interface ValidatorSummaryProps {
+export interface ValidatorSummaryProps extends OverallEffectivenessProps {
   validators: ValidatorInfo[]
   validatorNetworkData: ValidatorCountResult
   validatorCacheData: ValidatorCache
-  validatorMetrics: BeaconValidatorMetricResults[]
 }
 
 const ValidatorSummary: FC<ValidatorSummaryProps> = ({
   validators,
   validatorNetworkData,
   validatorCacheData,
-  validatorMetrics,
+  validatorMetricResult
 }) => {
   const { t } = useTranslation()
   const activeValidators = useMemo(() => {
@@ -84,7 +83,7 @@ const ValidatorSummary: FC<ValidatorSummaryProps> = ({
         validatorData={validatorEpochData}
         className='p-3 space-y-2 w-full lg:w-42 @1540:w-52'
       />
-      <OverallEffectiveness validatorMetrics={validatorMetrics} />
+      <OverallEffectiveness validatorMetricResult={validatorMetricResult} />
       <div className='p-3 space-y-2'>
         <Typography type='text-caption2' isBold isUpperCase>
           {t('validatorManagement.summary.networkValidators')}

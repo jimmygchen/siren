@@ -9,7 +9,7 @@ import isBlsAddress from '../../../../utilities/isBlsAddress'
 import toFixedIfNecessary from '../../../../utilities/toFixedIfNecessary'
 import useValidatorGraffiti from '../../../hooks/useValidatorGraffiti'
 import { exchangeRates, processingBlsValidators } from '../../../recoil/atoms'
-import { BeaconValidatorMetricResults } from '../../../types/beacon'
+import { BeaconValidatorMetricResults, ValidatorMetricResult } from '../../../types/beacon';
 import { ValidatorBalanceInfo, ValidatorCache, ValidatorInfo } from '../../../types/validator'
 import BeaconChaLink from '../../BeaconChaLink/BeaconChaLink'
 import ValidatorDisclosure from '../../Disclosures/ValidatorDisclosure'
@@ -26,7 +26,7 @@ import ValidatorActions from '../ValidatorActions'
 
 export interface ValidatorDetailsProps {
   validator: ValidatorInfo
-  validatorMetrics: BeaconValidatorMetricResults[]
+  validatorMetrics: ValidatorMetricResult
   validatorCacheData: ValidatorCache
 }
 
@@ -39,10 +39,7 @@ const ValidatorDetails: FC<ValidatorDetailsProps> = ({
   const processingValidators = useRecoilValue(processingBlsValidators)
   const { index, balance, status, withdrawalAddress } = validator || {}
   const data = useRecoilValue(exchangeRates)
-  const { avgTargetEffectiveness, avgHitEffectiveness } = formatValidatorEffectiveness(
-    validatorMetrics,
-    [index],
-  )
+  const { targetEffectiveness, hitEffectiveness, totalEffectiveness } = validatorMetrics
   const validatorEpochData = useMemo<ValidatorBalanceInfo>(() => {
     return formatValidatorEpochData([validator], validatorCacheData)
   }, [validator, validatorCacheData])
@@ -53,13 +50,7 @@ const ValidatorDetails: FC<ValidatorDetailsProps> = ({
 
   const isBls = Boolean(withdrawalAddress && isBlsAddress(withdrawalAddress))
   const isExited = validator?.status.includes('exit') || validator?.status.includes('withdrawal')
-
-  const combinedEffectiveness =
-    avgHitEffectiveness &&
-    avgTargetEffectiveness &&
-    (avgHitEffectiveness + avgTargetEffectiveness) / 2
-
-  const combinedStatus = getAvgEffectivenessStatus(combinedEffectiveness)
+  const combinedStatus = getAvgEffectivenessStatus(totalEffectiveness)
 
   const { isLoading, graffiti, updateGraffiti } = useValidatorGraffiti(validator)
 
@@ -93,15 +84,15 @@ const ValidatorDetails: FC<ValidatorDetailsProps> = ({
                   <div className='flex space-x-8'>
                     <Status status={combinedStatus} />
                     <Typography isBold type='text-caption1'>
-                      {combinedEffectiveness
-                        ? `${toFixedIfNecessary(combinedEffectiveness, 2)} %`
+                      {totalEffectiveness
+                        ? `${toFixedIfNecessary(totalEffectiveness, 2)} %`
                         : '---'}
                     </Typography>
                   </div>
                   <EffectivenessBreakdown
                     className='group-hover:block @1540:w-80'
-                    target={avgTargetEffectiveness}
-                    head={avgHitEffectiveness}
+                    target={targetEffectiveness}
+                    head={hitEffectiveness}
                     targetDescription={t('validatorManagement.effectiveness.targetDescription')}
                     headDescription={t('validatorManagement.effectiveness.headHitDescription')}
                   />

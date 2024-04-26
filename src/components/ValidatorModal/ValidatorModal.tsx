@@ -4,6 +4,8 @@ import { createContext, FC, useEffect, useMemo, useState } from 'react'
 import formatValidatorEpochData from '../../../utilities/formatValidatorEpochData'
 import { ValidatorModalView } from '../../constants/enums'
 import useMediaQuery from '../../hooks/useMediaQuery'
+import useSWRPolling from '../../hooks/useSWRPolling';
+import { BeaconValidatorMetricResults, SyncData, ValidatorMetricResult } from '../../types/beacon';
 import { ValidatorBalanceInfo } from '../../types/validator'
 import RodalModal from '../RodalModal/RodalModal'
 import Spinner from '../Spinner/Spinner'
@@ -20,11 +22,10 @@ export const ValidatorModalContext = createContext<ValidatorModalContextProps>({
   closeModal: () => {},
 })
 
-export interface ValidatorModalProps extends ValidatorDetailsProps {}
+export interface ValidatorModalProps extends Omit<ValidatorDetailsProps, 'validatorMetrics'> {}
 
 const ValidatorModal: FC<ValidatorModalProps> = ({
   validator,
-  validatorMetrics,
   validatorCacheData,
 }) => {
   const [isReady, setReady] = useState(false)
@@ -33,6 +34,12 @@ const ValidatorModal: FC<ValidatorModalProps> = ({
   const [view, setView] = useState<ValidatorModalView>(ValidatorModalView.EXIT)
   const isTablet = useMediaQuery('(max-width: 768px)')
   const isLargeScreen = useMediaQuery('(min-width: 1540px)')
+  const { index } = validator
+
+  const { data: validatorMetric } = useSWRPolling<ValidatorMetricResult>(
+    `/api/validator-metrics?index=${index}`,
+    { refreshInterval: 5 * 1000 },
+  )
 
   const validatorEpochData = useMemo<ValidatorBalanceInfo>(() => {
     return formatValidatorEpochData([validator], validatorCacheData)
@@ -85,13 +92,13 @@ const ValidatorModal: FC<ValidatorModalProps> = ({
       }}
       onClose={closeModal}
     >
-      {validator && validatorMetrics ? (
+      {validator && validatorMetric ? (
         <ValidatorModalContext.Provider value={{ moveToView, closeModal }}>
           <Carousel swiping={false} slideIndex={activeIndex} dragging={false} withoutControls>
             <ValidatorDetails
               validator={validator}
               validatorCacheData={validatorCacheData}
-              validatorMetrics={validatorMetrics}
+              validatorMetrics={validatorMetric}
             />
             {renderContent()}
           </Carousel>

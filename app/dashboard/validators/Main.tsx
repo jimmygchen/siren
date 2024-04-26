@@ -1,6 +1,5 @@
 'use client'
 
-import moment from 'moment'
 import { useSearchParams } from 'next/navigation'
 import React, { FC, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -19,9 +18,8 @@ import useSWRPolling from '../../../src/hooks/useSWRPolling'
 import { exchangeRates } from '../../../src/recoil/atoms'
 import {
   BeaconNodeSpecResults,
-  BeaconValidatorMetricResults,
-  SyncData,
-} from '../../../src/types/beacon'
+  SyncData, ValidatorMetricResult
+} from '../../../src/types/beacon';
 import { Diagnostics } from '../../../src/types/diagnostic'
 import { ValidatorCache, ValidatorCountResult, ValidatorInfo } from '../../../src/types/validator'
 
@@ -31,7 +29,7 @@ export interface MainProps {
   initValidatorCountData: ValidatorCountResult
   initSyncData: SyncData
   initValCaches: ValidatorCache
-  initValMetrics: BeaconValidatorMetricResults
+  initValMetrics: ValidatorMetricResult
   beaconSpec: BeaconNodeSpecResults
 }
 
@@ -41,15 +39,14 @@ const Main: FC<MainProps> = (props) => {
     initNodeHealth,
     initSyncData,
     beaconSpec,
-    initValMetrics,
     initValidatorCountData,
     initValStates,
     initValCaches,
+    initValMetrics,
   } = props
 
-  const { SECONDS_PER_SLOT } = beaconSpec
+  const { SECONDS_PER_SLOT, SLOTS_PER_EPOCH } = beaconSpec
   const setExchangeRate = useSetRecoilState(exchangeRates)
-  const [timedMetrics, storeMetric] = useState<BeaconValidatorMetricResults[]>([])
   const [search, setSearch] = useState('')
 
   const { isValidatorError, isBeaconError } = useNetworkMonitor()
@@ -57,6 +54,7 @@ const Main: FC<MainProps> = (props) => {
   const networkError = isValidatorError || isBeaconError
 
   const slotInterval = SECONDS_PER_SLOT * 1000
+  const epochInterval = slotInterval * Number(SLOTS_PER_EPOCH)
   const searchParams = useSearchParams()
   const validatorId = searchParams.get('id')
   const { data: exchangeData } = useSWRPolling(CoinbaseExchangeRateUrl, {
@@ -89,11 +87,7 @@ const Main: FC<MainProps> = (props) => {
     fallbackData: initSyncData,
     networkError,
   })
-
-  const { data: validatorMetrics } = useSWRPolling<BeaconValidatorMetricResults>(
-    '/api/validator-metrics',
-    { refreshInterval: slotInterval, fallbackData: initValMetrics, networkError },
-  )
+  const { data: validatorMetrics } = useSWRPolling<ValidatorMetricResult>('/api/validator-metrics', { refreshInterval: epochInterval / 2, fallbackData: initValMetrics, networkError })
 
   const filteredValidators = useMemo(() => {
     return validatorStates.filter((validator) => {
@@ -114,25 +108,6 @@ const Main: FC<MainProps> = (props) => {
 
     return validatorStates.find(({ index }) => Number(validatorId) === index)
   }, [validatorId, validatorStates])
-
-  useEffect(() => {
-    const MAX_LENGTH = 10
-
-    if (validatorMetrics) {
-      storeMetric((prevState: any) => {
-        const newTimestamp = moment().unix().toString()
-        const updatedState = { ...prevState, [newTimestamp]: validatorMetrics }
-        const entries = Object.entries(updatedState)
-
-        if (entries.length > MAX_LENGTH) {
-          const excessEntries = entries.length - MAX_LENGTH
-          return Object.fromEntries(entries.slice(excessEntries))
-        }
-
-        return updatedState
-      })
-    }
-  }, [validatorMetrics, storeMetric])
 
   useEffect(() => {
     if (rates) {
@@ -160,8 +135,8 @@ const Main: FC<MainProps> = (props) => {
                 {t('validatorManagement.title')}
               </Typography>
               <ValidatorSummary
+                validatorMetricResult={validatorMetrics}
                 validators={validatorStates}
-                validatorMetrics={timedMetrics}
                 validatorNetworkData={valNetworkData}
                 validatorCacheData={validatorCache}
               />
@@ -204,7 +179,6 @@ const Main: FC<MainProps> = (props) => {
             <ValidatorModal
               validator={activeValidator}
               validatorCacheData={validatorCache}
-              validatorMetrics={timedMetrics}
             />
           )}
         </div>
