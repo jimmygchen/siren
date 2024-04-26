@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { ValidatorService } from './validator.service';
 
 @Controller('validator')
@@ -28,5 +28,10 @@ export class ValidatorController {
   @Get('metrics')
   async getValidatorMetrics() {
     return this.validatorService.fetchMetrics();
+  }
+
+  @Get('metrics/:index')
+  async getValidatorMetricsById(@Param('index') index: number) {
+    return this.validatorService.fetchMetrics(index);
   }
 }

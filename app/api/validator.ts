@@ -8,5 +8,5 @@ export const fetchValStates = async () =>
   await fetchFromApi(`${backendUrl}/validator/states`, { next: { revalidate: slotInterval } })
 export const fetchValCaches = async () =>
   await fetchFromApi(`${backendUrl}/validator/caches`, { next: { revalidate: slotInterval } })
-export const fetchValMetrics = async () =>
-  await fetchFromApi(`${backendUrl}/validator/metrics`, { cache: 'no-store' })
+export const fetchValMetrics = async (index?: string) =>
+  await fetchFromApi(`${backendUrl}/validator/metrics${index ? `/${index}` : ''}`, { cache: 'no-store' })

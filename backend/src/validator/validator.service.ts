@@ -7,6 +7,8 @@ import {
 import formatDefaultValName from '../../../utilities/formatDefaultValName';
 import { formatUnits } from 'ethers/lib/utils';
 import { Validator } from './entities/validator.entity';
+import { Metric } from './entities/metric.entity';
+import getAverageKeyValue from '../../../utilities/getAverageKeyValue';
 
 @Injectable()
 export class ValidatorService {
@@ -48,7 +50,7 @@ export class ValidatorService {
     try {
       const validatorData = await this.utilsService.fetchAll(Validator)
       const { data: states } = await this.utilsService.sendHttpRequest({
-        url: `${this.beaconUrl}/eth/v1/beacon/states/head/validators?id=${validatorDetails.map(({pubkey}) => pubkey)}`,
+        url: `${this.beaconUrl}/eth/v1/beacon/states/head/validators?id=${validatorData.map(({pubkey}) => pubkey)}`,
       });
 
       const sortedStates = [...states.data].sort(
@@ -111,28 +113,26 @@ export class ValidatorService {
     }
   }
 
-  async fetchMetrics() {
+  async fetchMetrics(index?: number) {
     try {
-      const validatorDetails = await this.validatorDetailService.findOrFetch();
-      const requestData = {
-        data: JSON.stringify({
-          indices: validatorDetails.map(({index}) => index),
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      };
+      const options = index ? {where: {index}} : undefined
+      const metrics = await this.utilsService.fetchAll(Metric, options)
+      const metricsData = metrics.map(metric => JSON.parse(metric.data))
 
-      const { data: metrics } = await this.utilsService.sendHttpRequest({
-        url: `${this.beaconUrl}/lighthouse/ui/validator_metrics`,
-        method: 'POST',
-        config: requestData,
-      });
+      const targetEffectiveness = getAverageKeyValue(metricsData, 'attestation_target_hit_percentage')
+      const hitEffectiveness = getAverageKeyValue(metricsData, 'attestation_hit_percentage')
 
-      return metrics.data.validators;
-    } catch (e) {
-      console.error(e);
-      throwServerError('Unable to fetch validator metrics');
+      const totalEffectiveness = (targetEffectiveness + hitEffectiveness) / 2
+
+      return {
+        targetEffectiveness,
+        hitEffectiveness,
+        totalEffectiveness
+      }
+    }
+     catch (e) {
+      console.error(e)
+      throwServerError('Unable to fetch validator validator-metrics')
     }
   }
 }
