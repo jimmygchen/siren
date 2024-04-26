@@ -8,7 +8,8 @@ import { NodeModule } from './node/node.module';
 import { LogsModule } from './logs/logs.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { dataBaseConfig } from './database/database.config';
-import { SpecsModule } from './specs/specs.module';
+import {ScheduleModule} from '@nestjs/schedule'
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { SpecsModule } from './specs/specs.module';
     ConfigModule.forRoot({
       envFilePath: '../.env',
     }),
-    SpecsModule,
+    ScheduleModule.forRoot(),
+    TasksModule,
     BeaconModule,
     ValidatorModule,
     NodeModule,
