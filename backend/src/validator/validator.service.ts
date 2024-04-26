@@ -6,11 +6,11 @@ import {
 } from '../../../src/types/validator';
 import formatDefaultValName from '../../../utilities/formatDefaultValName';
 import { formatUnits } from 'ethers/lib/utils';
-import { ValidatorDetailService } from './validator-detail.service';
+import { Validator } from './entities/validator.entity';
 
 @Injectable()
 export class ValidatorService {
-  constructor(private utilsService: UtilsService, private validatorDetailService: ValidatorDetailService) {}
+  constructor(private utilsService: UtilsService) {}
   private validatorUrl = process.env.VALIDATOR_URL;
   private apiToken = process.env.API_TOKEN;
   private beaconUrl = process.env.BEACON_URL;
@@ -46,7 +46,7 @@ export class ValidatorService {
 
   async fetchValidatorStates() {
     try {
-      const validatorDetails = await this.validatorDetailService.findOrFetch();
+      const validatorData = await this.utilsService.fetchAll(Validator)
       const { data: states } = await this.utilsService.sendHttpRequest({
         url: `${this.beaconUrl}/eth/v1/beacon/states/head/validators?id=${validatorDetails.map(({pubkey}) => pubkey)}`,
       });
@@ -81,10 +81,10 @@ export class ValidatorService {
 
   async fetchValidatorCaches() {
     try {
-      const validatorDetails = await this.validatorDetailService.findOrFetch();
+      const validatorData = await this.utilsService.fetchAll(Validator)
       const requestData = {
         data: JSON.stringify({
-          indices: validatorDetails.map(({index}) => String(index)),
+          indices: validatorData.map(({index}) => String(index)),
         }),
         headers: {
           'Content-Type': 'application/json',
