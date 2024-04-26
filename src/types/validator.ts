@@ -20,6 +20,12 @@ export type Validator = {
   pubKey: string
 }
 
+export type ValidatorDetail = {
+  index: string
+  pubkey: string
+  withdrawal_credentials: string
+}
+
 export type ValidatorInfo = {
   name: string
   balance: number

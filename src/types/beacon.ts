@@ -41,3 +41,9 @@ export type ValidatorMetricEpoch = {
 export type BeaconValidatorMetricResults = {
   [key: string]: BeaconValidatorMetric
 }
+
+export type ValidatorMetricResult = {
+  targetEffectiveness: number,
+  hitEffectiveness: number,
+  totalEffectiveness: number
+}
