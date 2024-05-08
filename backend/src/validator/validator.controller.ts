@@ -1,7 +1,9 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { ValidatorService } from './validator.service';
+import { AuthGuard } from '../auth.guard';
 
 @Controller('validator')
+@UseGuards(AuthGuard)
 export class ValidatorController {
   constructor(private validatorService: ValidatorService) {}
 
@@ -25,6 +27,7 @@ export class ValidatorController {
     return this.validatorService.fetchValidatorCaches();
   }
 
+  @UseGuards(AuthGuard)
   @Get('metrics')
   async getValidatorMetrics() {
     return this.validatorService.fetchMetrics();

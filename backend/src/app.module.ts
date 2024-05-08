@@ -10,6 +10,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { dataBaseConfig } from './database/database.config';
 import {ScheduleModule} from '@nestjs/schedule'
 import { TasksModule } from './tasks/tasks.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -17,12 +18,17 @@ import { TasksModule } from './tasks/tasks.module';
     ConfigModule.forRoot({
       envFilePath: '../.env',
     }),
+    JwtModule.register({
+      global: true,
+      secret: process.env.API_TOKEN,
+      // signOptions: { expiresIn: '60s' },
+    }),
     ScheduleModule.forRoot(),
+    LogsModule,
     TasksModule,
     BeaconModule,
     ValidatorModule,
     NodeModule,
-    LogsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,7 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { BeaconService } from './beacon.service';
+import { AuthGuard } from '../auth.guard';
 
 @Controller('beacon')
+@UseGuards(AuthGuard)
 export class BeaconController {
   constructor(private beaconService: BeaconService) {}
 
@@ -10,7 +12,7 @@ export class BeaconController {
     return this.beaconService.fetchSpecData()
   }
 
-  @Get('node-version')
+  @Get('version')
   async getBeaconNodeVersion() {
     return this.beaconService.fetchBeaconNodeVersion();
   }
