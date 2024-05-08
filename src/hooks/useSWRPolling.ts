@@ -1,5 +1,6 @@
+import Cookies from 'js-cookie';
 import { useState } from 'react'
-import useSWR, { SWRResponse } from 'swr'
+import useSWR from 'swr'
 import swrGetFetcher from '../../utilities/swrGetFetcher'
 
 const useSWRPolling = <T = any>(
@@ -24,7 +25,7 @@ const useSWRPolling = <T = any>(
     callBack?.(api)
   }
 
-  const { data } = useSWR<T>(errorCount <= errorRetryCount && !networkError ? api : null, swrGetFetcher, {
+  const { data } = useSWR<T>([errorCount <= errorRetryCount && !networkError ? api : null, Cookies.get('session-token')], swrGetFetcher, {
     refreshInterval,
     fallbackData,
     errorRetryCount,

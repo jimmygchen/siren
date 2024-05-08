@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { fetchBeaconNodeVersion, fetchValidatorVersion } from './app/api/config'
+import { cookies } from 'next/headers';
 
 const restrictedEndpoints = [
   '/setup/health-check',
@@ -11,23 +11,21 @@ const restrictedEndpoints = [
 ] as any
 
 export async function middleware(request) {
-  const { pathname } = request.nextUrl
-  if (!restrictedEndpoints.includes(pathname)) {
+  try {
+    const { pathname } = request.nextUrl
+    if (!restrictedEndpoints.includes(pathname)) {
+      return NextResponse.next()
+    }
+
+    const cookieStore = cookies()
+    const token = cookieStore.get('session-token').value
+
+    if(!token) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+
     return NextResponse.next()
-  }
-
-  const responses = await Promise.all([fetchBeaconNodeVersion(), fetchValidatorVersion()])
-
-  if (!responses.length) {
+  } catch (e) {
     return NextResponse.redirect(new URL('/', request.url))
   }
-
-  const beaconData = responses[0]?.version
-  const validatorData = responses[1]?.version
-
-  if (!beaconData || !validatorData) {
-    return NextResponse.redirect(new URL('/', request.url))
-  }
-
-  return NextResponse.next()
 }

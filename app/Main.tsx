@@ -1,8 +1,13 @@
+'use client'
+
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation'
 import { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import AlertIcon from '../src/components/AlertIcon/AlertIcon'
 import AppDescription from '../src/components/AppDescription/AppDescription'
+import AuthModal from '../src/components/AuthModal/AuthModal';
 import Button, { ButtonFace } from '../src/components/Button/Button'
 import LoadingSpinner from '../src/components/LoadingSpinner/LoadingSpinner'
 import RodalModal from '../src/components/RodalModal/RodalModal'
@@ -11,15 +16,56 @@ import { REQUIRED_VALIDATOR_VERSION } from '../src/constants/constants'
 import formatSemanticVersion from '../utilities/formatSemanticVersion'
 import isRequiredVersion from '../utilities/isRequiredVersion'
 
-export interface InitProps {
-  beaconNodeVersion?: string | undefined
-  lighthouseVersion?: string | undefined
-}
-
-const Main: FC<InitProps> = ({ beaconNodeVersion, lighthouseVersion }) => {
+const Main = () => {
   const { t } = useTranslation()
   const router = useRouter()
+  const [step, setStep] = useState<number>(1)
+  const [isReady, setReady] = useState(false)
   const [isVersionError, setVersionError] = useState(false)
+  const [sessionToken, setToken] = useState(Cookies.get('session-token'))
+
+  const [beaconNodeVersion, setBeaconVersion] = useState('')
+  const [lighthouseVersion, setLighthouseVersion] = useState('')
+
+  useEffect(() => {
+    if(sessionToken) {
+      (async () => {
+        try {
+          const config = {
+            headers: {
+              Authorization: `Bearer ${sessionToken}`
+            }
+          }
+
+          const [beaconResults, lightResults] = await Promise.all([
+            axios.get('/api/beacon-version', config),
+            axios.get('/api/lighthouse-version', config)
+          ])
+
+          setBeaconVersion(beaconResults.data.version)
+          setLighthouseVersion(lightResults.data.version)
+
+          setReady(true)
+
+        } catch (e) {
+          setReady(true)
+          console.error(e)
+        }
+      })()
+    }
+  }, [sessionToken])
+
+  useEffect(() => {
+    if(beaconNodeVersion && lighthouseVersion) {
+
+      if (!isRequiredVersion(lighthouseVersion, REQUIRED_VALIDATOR_VERSION)) {
+        setVersionError(true)
+        return
+      }
+
+      router.push('/setup/health-check')
+    }
+  }, [beaconNodeVersion, lighthouseVersion, router])
 
   const configError = !beaconNodeVersion || !lighthouseVersion
   const { major, minor, patch } = REQUIRED_VALIDATOR_VERSION
@@ -27,24 +73,14 @@ const Main: FC<InitProps> = ({ beaconNodeVersion, lighthouseVersion }) => {
     ? formatSemanticVersion(beaconNodeVersion as string)
     : undefined
 
-  const [step, setStep] = useState<number>(1)
-
-  useEffect(() => {
-    if (lighthouseVersion) {
-      setStep(2)
-      if (!isRequiredVersion(lighthouseVersion, REQUIRED_VALIDATOR_VERSION)) {
-        setVersionError(true)
-        return
-      }
-
-      router.push('/setup/health-check')
-      return
-    }
-  }, [lighthouseVersion, router])
+  const storeSessionCookie = (token: string) => {
+    setToken(token)
+    Cookies.set('session-token', token)
+  }
 
   return (
     <div className='relative w-screen h-screen bg-gradient-to-r from-primary to-tertiary'>
-      <RodalModal styles={{ maxWidth: '500px' }} isVisible={configError}>
+      <RodalModal styles={{ maxWidth: '500px' }} isVisible={isReady && configError && !!sessionToken}>
         <div className='p-6'>
           <div className='pb-2 border-b mb-6 flex items-center space-x-4'>
             <AlertIcon className='h-12 w-12' type='error' />
@@ -80,7 +116,7 @@ const Main: FC<InitProps> = ({ beaconNodeVersion, lighthouseVersion }) => {
         </div>
       </RodalModal>
       {vcVersion && (
-        <RodalModal styles={{ maxWidth: '500px' }} isVisible={isVersionError}>
+        <RodalModal styles={{ maxWidth: '500px' }} isVisible={isReady && isVersionError}>
           <div className='p-6'>
             <div className='pb-2 border-b mb-6 flex items-center space-x-4'>
               <AlertIcon className='h-8 w-8' type='warning' />
@@ -120,6 +156,7 @@ const Main: FC<InitProps> = ({ beaconNodeVersion, lighthouseVersion }) => {
           </div>
         </RodalModal>
       )}
+      <AuthModal isVisible={!sessionToken} onSuccess={storeSessionCookie}/>
       <div className='absolute top-0 left-0 w-full h-full bg-cover bg-lighthouse' />
       <div className='absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2'>
         <LoadingSpinner />
