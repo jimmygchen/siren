@@ -2,12 +2,10 @@ import { Module } from '@nestjs/common';
 import { ValidatorController } from './validator.controller';
 import { ValidatorService } from './validator.service';
 import { UtilsModule } from '../utils/utils.module';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { Validator } from './entities/validator.entity';
-import { Spec } from '../beacon/entities/spec.entity';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
-  imports: [UtilsModule, SequelizeModule.forFeature([Validator, Spec])],
+  imports: [UtilsModule, CacheModule.register()],
   controllers: [ValidatorController],
   providers: [ValidatorService],
 })

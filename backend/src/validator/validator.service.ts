@@ -1,18 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { throwServerError } from '../utilities';
 import { UtilsService } from '../utils/utils.service';
 import {
-  BeaconValidatorResult,
+  BeaconValidatorResult, ValidatorDetail
 } from '../../../src/types/validator';
 import formatDefaultValName from '../../../utilities/formatDefaultValName';
 import { formatUnits } from 'ethers/lib/utils';
-import { Validator } from './entities/validator.entity';
 import { Metric } from './entities/metric.entity';
 import getAverageKeyValue from '../../../utilities/getAverageKeyValue';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class ValidatorService {
-  constructor(private utilsService: UtilsService) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private utilsService: UtilsService
+  ) {}
   private validatorUrl = process.env.VALIDATOR_URL;
   private apiToken = process.env.API_TOKEN;
   private beaconUrl = process.env.BEACON_URL;
@@ -48,7 +52,7 @@ export class ValidatorService {
 
   async fetchValidatorStates() {
     try {
-      const validatorData = await this.utilsService.fetchAll(Validator)
+      const validatorData = await this.cacheManager.get('validators') as ValidatorDetail[]
       const { data: states } = await this.utilsService.sendHttpRequest({
         url: `${this.beaconUrl}/eth/v1/beacon/states/head/validators?id=${validatorData.map(({pubkey}) => pubkey)}`,
       });
@@ -83,10 +87,10 @@ export class ValidatorService {
 
   async fetchValidatorCaches() {
     try {
-      const validatorData = await this.utilsService.fetchAll(Validator)
+      const validatorData = await this.cacheManager.get('validators') as ValidatorDetail[]
       const requestData = {
         data: JSON.stringify({
-          indices: validatorData.map(({index}) => String(index)),
+          indices: validatorData.map(({index}) => index),
         }),
         headers: {
           'Content-Type': 'application/json',

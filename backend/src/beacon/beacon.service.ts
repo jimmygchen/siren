@@ -1,21 +1,31 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { UtilsService } from '../utils/utils.service';
 import { throwServerError } from '../utilities';
 import getPercentage from '../../../utilities/getPercentage';
 import getStatus from '../../../utilities/getInclusionRateStatus';
-import { Spec } from './entities/spec.entity';
+import { ProposerDuty } from '../../../src/types';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+import { BeaconNodeSpecResults } from '../../../src/types/beacon';
+import { ValidatorDetail } from '../../../src/types/validator';
 
 @Injectable()
 export class BeaconService {
-  constructor(private utilsService: UtilsService) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private utilsService: UtilsService
+  ) {}
   private beaconUrl = process.env.BEACON_URL;
 
   async fetchBeaconNodeVersion() {
     try {
-      const { data } = await this.utilsService.sendHttpRequest({
-        url: `${this.beaconUrl}/eth/v1/node/version`,
-      });
-      return data.data;
+      return await this.utilsService.fetchFromCache('bnVersion', 0, async () => {
+        const { data } = await this.utilsService.sendHttpRequest({
+          url: `${this.beaconUrl}/eth/v1/node/version`,
+        });
+
+        return data.data;
+      })
     } catch (e) {
       console.error(e);
       throwServerError('Unable to fetch beacon node version');
@@ -24,10 +34,13 @@ export class BeaconService {
 
   async fetchGenesisData() {
     try {
-      const { data } = await this.utilsService.sendHttpRequest({
-        url: `${this.beaconUrl}/eth/v1/beacon/genesis`,
-      });
-      return data.data;
+      return await this.utilsService.fetchFromCache('genesis', 0, async () => {
+        const { data } = await this.utilsService.sendHttpRequest({
+          url: `${this.beaconUrl}/eth/v1/beacon/genesis`,
+        });
+
+        return data.data
+      })
     } catch (e) {
       console.error(e);
       throwServerError('Unable to fetch beacon node version');
@@ -35,96 +48,115 @@ export class BeaconService {
   }
 
   async fetchSpecData() {
-    const spec = await this.utilsService.fetchOne(Spec)
-    return JSON.parse(spec.data)
+    return await this.cacheManager.get('specs') as BeaconNodeSpecResults
   }
 
   async fetchSyncData() {
     try {
-      const spec = await this.utilsService.fetchOne(Spec)
-      const { SECONDS_PER_SLOT } = JSON.parse(spec.data)
+      const { SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
 
-      const [ beaconResponse, executionResponse] = await Promise.all(
-        [
-          this.utilsService.sendHttpRequest({
-            url: `${this.beaconUrl}/eth/v1/node/syncing`,
-          }),
-          this.utilsService.sendHttpRequest({
-            url: `${this.beaconUrl}/lighthouse/eth1/syncing`,
-          }),
-        ],
-      );
+      return await this.utilsService.fetchFromCache('syncData', SECONDS_PER_SLOT * 1000, async () => {
+        const [ beaconResponse, executionResponse] = await Promise.all(
+          [
+            this.utilsService.sendHttpRequest({
+              url: `${this.beaconUrl}/eth/v1/node/syncing`,
+            }),
+            this.utilsService.sendHttpRequest({
+              url: `${this.beaconUrl}/lighthouse/eth1/syncing`,
+            }),
+          ],
+        );
 
-      const { head_slot, sync_distance, is_syncing } = beaconResponse.data.data;
-      const {
-        head_block_number,
-        head_block_timestamp,
-        latest_cached_block_number,
-        latest_cached_block_timestamp,
-        voting_target_timestamp,
-        eth1_node_sync_status_percentage,
-      } = executionResponse.data.data;
+        const { head_slot, sync_distance, is_syncing } = beaconResponse.data.data;
+        const {
+          head_block_number,
+          head_block_timestamp,
+          latest_cached_block_number,
+          latest_cached_block_timestamp,
+          voting_target_timestamp,
+          eth1_node_sync_status_percentage,
+        } = executionResponse.data.data;
 
-      const distance = Number(head_slot) + Number(sync_distance);
+        const distance = Number(head_slot) + Number(sync_distance);
 
-      return {
-        beaconSync: {
-          headSlot: Number(head_slot),
-          slotDistance: distance,
-          beaconPercentage: getPercentage(head_slot, distance),
-          beaconSyncTime: Number(sync_distance) * Number(SECONDS_PER_SLOT),
-          syncDistance: Number(sync_distance),
-          isSyncing: is_syncing,
-        },
-        executionSync: {
-          headSlot: Number(head_block_number || 0),
-          headTimestamp: head_block_timestamp,
-          cachedHeadSlot: Number(latest_cached_block_number || 0),
-          cachedHeadTimestamp: latest_cached_block_timestamp,
-          votingTimestamp: voting_target_timestamp,
-          syncPercentage: Number(eth1_node_sync_status_percentage || 0),
-          isReady: eth1_node_sync_status_percentage === 100,
-        },
-      };
+        return {
+          beaconSync: {
+            headSlot: Number(head_slot),
+            slotDistance: distance,
+            beaconPercentage: getPercentage(head_slot, distance),
+            beaconSyncTime: Number(sync_distance) * Number(SECONDS_PER_SLOT),
+            syncDistance: Number(sync_distance),
+            isSyncing: is_syncing,
+          },
+          executionSync: {
+            headSlot: Number(head_block_number || 0),
+            headTimestamp: head_block_timestamp,
+            cachedHeadSlot: Number(latest_cached_block_number || 0),
+            cachedHeadTimestamp: latest_cached_block_timestamp,
+            votingTimestamp: voting_target_timestamp,
+            syncPercentage: Number(eth1_node_sync_status_percentage || 0),
+            isReady: eth1_node_sync_status_percentage === 100,
+          },
+        }
+      })
     } catch (e) {
       console.error(e);
       throw new Error('Unable to fetch sync data');
     }
   }
 
-  async fetchInclusionRate() {
-    try {
-      const spec = await this.utilsService.fetchOne(Spec)
-      const { SLOTS_PER_EPOCH } = JSON.parse(spec.data)
+  async fetchCachedHeadSlot(api) {
+    let syncData = await this.cacheManager.get('syncData') as any
 
+    if(!syncData) {
       const beaconResponse = await this.utilsService.sendHttpRequest({
         url: `${this.beaconUrl}/eth/v1/node/syncing`,
       });
 
-      const { head_slot } = beaconResponse.data.data;
+      console.log(`fetching 2nd syncData from node for ${api}.....`)
 
-      const epoch = Math.floor(Number(head_slot) / Number(SLOTS_PER_EPOCH)) - 1;
+      syncData = {
+        beaconSync: {
+          headSlot: beaconResponse.data.data.head_slot
+        }
+      }
+    } else {
+      console.log(`fetching cached syncData for ${api}.....`)
+    }
 
-      const { data } = await this.utilsService.sendHttpRequest({
-        url: `${this.beaconUrl}/lighthouse/validator_inclusion/${epoch}/global`,
-      });
+    return  syncData.beaconSync.headSlot;
+  }
 
-      const {
-        previous_epoch_target_attesting_gwei,
-        previous_epoch_active_gwei,
-      } = data.data;
+  async fetchInclusionRate() {
+    try {
+      const { SLOTS_PER_EPOCH, SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
 
-      const rate = Math.round(
-        (previous_epoch_target_attesting_gwei / previous_epoch_active_gwei) *
+      return await this.utilsService.fetchFromCache('inclusionRate', SECONDS_PER_SLOT * 1000, async () => {
+        const headSlot = await this.fetchCachedHeadSlot('inclusionRate')
+
+        const epoch = Math.floor(Number(headSlot) / Number(SLOTS_PER_EPOCH)) - 1;
+
+        const { data } = await this.utilsService.sendHttpRequest({
+          url: `${this.beaconUrl}/lighthouse/validator_inclusion/${epoch}/global`,
+        });
+
+        const {
+          previous_epoch_target_attesting_gwei,
+          previous_epoch_active_gwei,
+        } = data.data;
+
+        const rate = Math.round(
+          (previous_epoch_target_attesting_gwei / previous_epoch_active_gwei) *
           100,
-      );
+        );
 
-      const status = getStatus(rate);
+        const status = getStatus(rate);
 
-      return {
-        rate,
-        status,
-      };
+        return {
+          rate,
+          status,
+        }
+      })
     } catch (e) {
       console.error(e);
       throw new Error('Unable to fetch inclusion data');
@@ -157,19 +189,28 @@ export class BeaconService {
 
   async fetchProposerDuties() {
     try {
-      const spec = await this.utilsService.fetchOne(Spec)
-      const { SLOTS_PER_EPOCH } = JSON.parse(spec.data)
+      const { SLOTS_PER_EPOCH, SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
+      const halfEpochInterval = ((Number(SECONDS_PER_SLOT) * Number(SLOTS_PER_EPOCH)) / 2) * 1000
 
-      const beaconResponse = await this.utilsService.sendHttpRequest({
-        url: `${this.beaconUrl}/eth/v1/node/syncing`,
+      return await this.utilsService.fetchFromCache('proposerDuties', halfEpochInterval, async () => {
+        const states = await this.cacheManager.get('validators') as ValidatorDetail[]
+
+        const activeValidators = states
+          .filter(
+            ({ status }) =>
+              status.includes('active') &&
+              !status.includes('slashed') &&
+              !status.includes('exiting') &&
+              !status.includes('exited'),
+          ).map(({index}) => index)
+
+        const headSlot = await this.fetchCachedHeadSlot('proposerDuties')
+        const closestEpoch = Math.floor(Number(headSlot) / Number(SLOTS_PER_EPOCH)) + 1
+
+        const { data } = await this.utilsService.sendHttpRequest({ url: `${this.beaconUrl}/eth/v1/validator/duties/proposer/${closestEpoch}` })
+
+        return data.data.map(duty => ({...duty, uuid: `${duty.slot}${duty.validator_index}`})).filter((duty: ProposerDuty) => activeValidators.includes(duty.validator_index))
       })
-
-      const { head_slot } = beaconResponse.data.data;
-      const closestEpoch = Math.floor(Number(head_slot) / Number(SLOTS_PER_EPOCH)) + 1
-
-      const { data } = await this.utilsService.sendHttpRequest({ url: `${this.beaconUrl}/eth/v1/validator/duties/proposer/${closestEpoch}` })
-
-      return data.data.map(duty => ({...duty, uuid: `${duty.slot}${duty.validator_index}`}))
     }
      catch (e) {
       console.error(e);

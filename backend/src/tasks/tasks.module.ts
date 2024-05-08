@@ -2,12 +2,13 @@ import { Module } from '@nestjs/common';
 import { UtilsModule } from '../utils/utils.module';
 import { TasksService } from './tasks.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Spec } from '../beacon/entities/spec.entity';
-import { Validator } from '../validator/entities/validator.entity';
 import { Metric } from '../validator/entities/metric.entity';
+import { CacheModule } from '@nestjs/cache-manager';
+import { LogsModule } from '../logs/logs.module';
+import { Log } from '../logs/entities/log.entity';
 
 @Module({
-  imports: [UtilsModule, SequelizeModule.forFeature([Spec, Validator, Metric])],
+  imports: [UtilsModule, LogsModule, CacheModule.register(), SequelizeModule.forFeature([Metric, Log])],
   providers: [TasksService],
 })
 export class TasksModule {}

@@ -1,18 +1,21 @@
 // utils.service.ts
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { firstValueFrom, Observable } from 'rxjs';
+import { Injectable, HttpException, HttpStatus, Inject } from '@nestjs/common';
+import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { AxiosRequestConfig, AxiosResponse, Method } from 'axios';
 import { StatusColor } from '../../../src/types';
 import { DiagnosticRate } from '../../../src/constants/enums';
-import { Request, Response } from 'express';
-import * as EventSource from 'eventsource';
 import { ModelCtor, Model } from 'sequelize-typescript';
 import { FindOptions } from 'sequelize';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UtilsService {
-  constructor(private httpService: HttpService) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private httpService: HttpService
+  ) {}
 
   async sendHttpRequest<T>(data: {
     url: string;
@@ -44,41 +47,21 @@ export class UtilsService {
         : DiagnosticRate.GOOD;
   }
 
-  handleSse(req: Request, res: Response, url: string) {
-    res.writeHead(200, {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      Connection: 'keep-alive',
-      'X-Accel-Buffering': 'no',
-    });
-    res.flushHeaders();
+  async fetchFromCache(key: string, ttl: number, callback: () => any) {
+    const cachedData = await this.cacheManager.get(key)
 
-    const eventSource = new EventSource(url);
-    eventSource.onmessage = (event) => {
-      res.write(`data: ${event.data}\n\n`);
-    };
+    if(cachedData) {
+      console.log(`fetching from CACHE, key: ${key}....`)
+      return cachedData
+    }
 
-    const heartbeatInterval = setInterval(() => {
-      res.write(': keep-alive\n\n');
-    }, 10000);
+    const data = await callback()
 
-    eventSource.onerror = () => {
-      console.error('EventSource failed');
-      clearInterval(heartbeatInterval);
-      eventSource.close();
-      res.end();
-    };
+    await this.cacheManager.set(key, data, ttl)
 
-    req.on('close', () => {
-      console.error('Request closed...');
-      clearInterval(heartbeatInterval);
-      eventSource.close();
-      res.end();
-    });
-  }
+    console.log(`fetching from NODE, key: ${key} ......`)
 
-  fetchOne<T extends Model>(model: ModelCtor<T>): Promise<T> {
-    return this.fetchDataWithRetry(() => model.findOne()) as Promise<T>
+    return data
   }
 
   async fetchAll<T extends Model>(model: ModelCtor<T>, options?: FindOptions): Promise<T[]> {
