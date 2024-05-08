@@ -1,4 +1,5 @@
 import '../../../src/global.css'
+import { cookies } from 'next/headers'
 import {
   fetchBeaconSpec,
   fetchNodeHealth,
@@ -9,13 +10,16 @@ import { fetchValCaches, fetchValMetrics, fetchValStates } from '../../api/valid
 import Wrapper from './Wrapper'
 
 export default async function Page() {
-  const bnHealth = await fetchNodeHealth()
-  const beaconSpec = await fetchBeaconSpec()
-  const validatorCount = await fetchValidatorCountData()
-  const syncData = await fetchSyncData()
-  const states = await fetchValStates()
-  const caches = await fetchValCaches()
-  const metrics = await fetchValMetrics()
+  const cookieStore = cookies()
+  const token = cookieStore.get('session-token').value
+
+  const bnHealth = await fetchNodeHealth(token)
+  const beaconSpec = await fetchBeaconSpec(token)
+  const validatorCount = await fetchValidatorCountData(token)
+  const syncData = await fetchSyncData(token)
+  const states = await fetchValStates(token)
+  const caches = await fetchValCaches(token)
+  const metrics = await fetchValMetrics(token)
 
   return (
     <Wrapper

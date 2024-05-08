@@ -1,4 +1,5 @@
 import '../../src/global.css'
+import { cookies } from 'next/headers';
 import {
   fetchBeaconSpec,
   fetchInclusionRate,
@@ -11,18 +12,21 @@ import { fetchValCaches, fetchValStates } from '../api/validator'
 import Wrapper from './Wrapper'
 
 export default async function Page() {
-  const beaconSpec = await fetchBeaconSpec()
+  const cookieStore = cookies()
+  const token = cookieStore.get('session-token').value
 
-  const genesisBlock = await fetchGenesisData()
-  const peerData = await fetchPeerData()
-  const syncData = await fetchSyncData()
-  const nodeHealth = await fetchNodeHealth()
-  const states = await fetchValStates()
-  const caches = await fetchValCaches()
-  const inclusion = await fetchInclusionRate()
-  const bnVersion = await fetchBeaconNodeVersion()
-  const lighthouseVersion = await fetchValidatorVersion()
-  const proposerDuties = await fetchProposerDuties()
+  const beaconSpec = await fetchBeaconSpec(token)
+
+  const genesisBlock = await fetchGenesisData(token)
+  const peerData = await fetchPeerData(token)
+  const syncData = await fetchSyncData(token)
+  const nodeHealth = await fetchNodeHealth(token)
+  const states = await fetchValStates(token)
+  const caches = await fetchValCaches(token)
+  const inclusion = await fetchInclusionRate(token)
+  const bnVersion = await fetchBeaconNodeVersion(token)
+  const lighthouseVersion = await fetchValidatorVersion(token)
+  const proposerDuties = await fetchProposerDuties(token)
 
   return (
     <Wrapper

@@ -10,6 +10,18 @@ require('dotenv').config()
 const backendUrl = process.env.BACKEND_URL
 
 const handleSSe = (res, req, url) => {
+  const cookies = req.headers.cookie;
+  let authToken = '';
+
+  if (cookies) {
+    cookies.split(';').forEach(cookie => {
+      const [name, value] = cookie.split('=').map(c => c.trim());
+      if (name === 'session-token') {
+        authToken = value;
+      }
+    });
+  }
+
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -18,7 +30,11 @@ const handleSSe = (res, req, url) => {
   })
   res.flushHeaders()
 
-  const eventSource = new EventSource(url)
+  const eventSource = new EventSource(url, {
+    headers: {
+      'Authorization': `Bearer ${authToken}`
+    }
+  })
   eventSource.onmessage = (e) => {
     res.write(`data: ${e.data}\n\n`)
   }

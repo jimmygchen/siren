@@ -1,8 +1,11 @@
 import { NextFetchRequestInit } from '../src/types'
 
-const fetchFromApi = async (url: string, options: NextFetchRequestInit = {}) => {
+const fetchFromApi = async (url: string, token: string, options?: NextFetchRequestInit) => {
   const defaultOptions: RequestInit = {
     method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
   }
 
   const finalOptions: RequestInit = { ...defaultOptions, ...options }

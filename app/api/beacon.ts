@@ -4,15 +4,15 @@ const backendUrl = process.env.BACKEND_URL
 const secondsInSlot = Number(process.env.SECONDS_IN_SLOT) || 12
 const slotInterval = secondsInSlot - 1
 
-export const fetchNodeHealth = async () =>
-  await fetchFromApi(`${backendUrl}/node/health`, { next: { revalidate: slotInterval / 2 } })
-export const fetchSyncData = async () =>
-  await fetchFromApi(`${backendUrl}/beacon/sync`, { next: { revalidate: slotInterval } })
-export const fetchInclusionRate = async () =>
-  await fetchFromApi(`${backendUrl}/beacon/inclusion`, { next: { revalidate: slotInterval } })
-export const fetchPeerData = async () =>
-  await fetchFromApi(`${backendUrl}/beacon/peer`, { next: { revalidate: slotInterval } })
-export const fetchBeaconSpec = async () => await fetchFromApi(`${backendUrl}/beacon/spec`)
-export const fetchValidatorCountData = async () =>
-  await fetchFromApi(`${backendUrl}/beacon/validator-count`, { next: { revalidate: 60 } })
-export const fetchProposerDuties = async () => fetchFromApi(`${backendUrl}/beacon/proposer-duties`, { cache: 'no-store' })
+export const fetchNodeHealth = async (token: string) =>
+  await fetchFromApi(`${backendUrl}/node/health`, token, { next: { revalidate: slotInterval / 2 } })
+export const fetchSyncData = async (token: string) =>
+  await fetchFromApi(`${backendUrl}/beacon/sync`, token, { next: { revalidate: slotInterval } })
+export const fetchInclusionRate = async (token: string) =>
+  await fetchFromApi(`${backendUrl}/beacon/inclusion`, token, { next: { revalidate: slotInterval } })
+export const fetchPeerData = async (token: string) =>
+  await fetchFromApi(`${backendUrl}/beacon/peer`, token, { next: { revalidate: slotInterval } })
+export const fetchBeaconSpec = async (token: string) => await fetchFromApi(`${backendUrl}/beacon/spec`, token)
+export const fetchValidatorCountData = async (token: string) =>
+  await fetchFromApi(`${backendUrl}/beacon/validator-count`, token, { next: { revalidate: 60 } })
+export const fetchProposerDuties = async (token: string) => fetchFromApi(`${backendUrl}/beacon/proposer-duties`, token,{ cache: 'no-store' })
