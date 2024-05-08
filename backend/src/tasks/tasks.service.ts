@@ -1,26 +1,30 @@
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { Inject, Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { UtilsService } from '../utils/utils.service';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { InjectModel } from '@nestjs/sequelize';
-import { Spec } from '../beacon/entities/spec.entity';
 import { BeaconNodeSpecResults } from '../../../src/types/beacon';
-import { Validator } from '../validator/entities/validator.entity';
 import { LighthouseValidatorResult, ValidatorDetail } from '../../../src/types/validator';
 import { Metric } from '../validator/entities/metric.entity';
 import {Op} from 'sequelize'
 import * as moment from 'moment';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+import { LogsService } from '../logs/logs.service';
+import { LogType } from '../../../src/types';
+import { Log } from '../logs/entities/log.entity';
 
 @Injectable()
 export class TasksService implements OnApplicationBootstrap {
   constructor(
-    @InjectModel(Spec)
-    private specRepository: typeof Spec,
-    @InjectModel(Validator)
-    private validatorRepository: typeof Validator,
+    @Inject(CACHE_MANAGER)
+    private cacheManager: Cache,
     @InjectModel(Metric)
     private metricRepository: typeof Metric,
+    @InjectModel(Log)
+    private logRepository: typeof Log,
     private utilsService: UtilsService,
-    private schedulerRegistry: SchedulerRegistry
+    private schedulerRegistry: SchedulerRegistry,
+    private logsService: LogsService
   ) {}
 
   private beaconUrl = process.env.BEACON_URL;
@@ -30,44 +34,67 @@ export class TasksService implements OnApplicationBootstrap {
   async onApplicationBootstrap(): Promise<void> {
     try {
       console.log('Application Bootstrapping....')
-      await this.specRepository.destroy({truncate: true})
-      await this.validatorRepository.destroy({truncate: true})
       await this.metricRepository.destroy({truncate: true})
+      await this.logRepository.destroy({truncate: true})
 
-      const specs = await this.syncBeaconSpecs()
-      await this.initValidatorDataScheduler(specs)
-      await this.initMetricDataScheduler(specs)
+      await this.syncBeaconSpecs()
+      await this.initValidatorDataScheduler()
+      await this.initMetricDataScheduler()
+
+      await this.logsService.startSse(`${this.validatorUrl}/lighthouse/logs`, LogType.VALIDATOR)
+      await this.logsService.startSse(`${this.beaconUrl}/lighthouse/logs`, LogType.BEACON)
+
+      this.initLogCleaningScheduler()
 
     } catch (e) {
       console.error('Unable to bootstrap application repositories...')
     }
   }
 
-  private async initMetricDataScheduler(specs: BeaconNodeSpecResults) {
-    const secondsPerEpoch = (Number(specs.SLOTS_PER_EPOCH) * Number(specs.SECONDS_PER_SLOT))
+  private initLogCleaningScheduler() {
+    this.setDynamicInterval('clean-logs', 60000, async () => {
+      console.log('cleaning logs database....')
+      const thresholdDate = moment().subtract(24, 'hours').toDate();
 
-    await this.syncMetricData(secondsPerEpoch)
-
-    this.setDynamicInterval('metricTask', (secondsPerEpoch + 1) * 1000, async () => {
-      await this.syncMetricData(secondsPerEpoch)
+      await this.logRepository.destroy({
+        where: {
+          createdAt: {
+            [Op.lt]: thresholdDate
+          }
+        }
+      });
     })
   }
 
-  private async syncMetricData(secondsPerEpoch: number) {
-    const thresholdDate = moment().subtract(secondsPerEpoch * 10, 'seconds').toDate();
+  private async initMetricDataScheduler() {
+    const { SLOTS_PER_EPOCH, SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
+    const secondsPerEpoch = (Number(SLOTS_PER_EPOCH) * Number(SECONDS_PER_SLOT))
+    await this.syncMetricData()
+    const interval = (secondsPerEpoch + 1) * 1000
 
-    await this.metricRepository.destroy({
-      where: {
-        createdAt: {
-          [Op.lt]: thresholdDate
+    this.setDynamicInterval('clean-metrics', interval / 2, async () => {
+      console.log('cleaning metric database....')
+      const thresholdDate = moment().subtract(secondsPerEpoch * 10, 'seconds').toDate();
+
+      await this.metricRepository.destroy({
+        where: {
+          createdAt: {
+            [Op.lt]: thresholdDate
+          }
         }
-      }
-    });
+      });
+    })
 
-    const validatorData = await this.utilsService.fetchAll(Validator)
+    this.setDynamicInterval('metricTask', interval, async () => {
+      await this.syncMetricData()
+    })
+  }
+
+  private async syncMetricData() {
+    const validatorData = await this.cacheManager.get('validators') as ValidatorDetail[]
     const requestData = {
       data: JSON.stringify({
-        indices: validatorData.map(({index}) => index),
+        indices: validatorData.map(({index}) => Number(index)),
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -86,30 +113,16 @@ export class TasksService implements OnApplicationBootstrap {
     await this.metricRepository.bulkCreate(indices.map(index => ({index, data: JSON.stringify(metricData[index])})))
   }
 
-  private async syncBeaconSpecs(): Promise<BeaconNodeSpecResults> {
-    const specs = await this.fetchSpecs();
-    await this.storeSpecs(specs)
-
-    return specs
+  private async syncBeaconSpecs() {
+    const { data } = await this.utilsService.sendHttpRequest({
+      url: `${this.beaconUrl}/eth/v1/config/spec`,
+    });
+    await this.cacheManager.set('specs', data.data, 0)
   }
 
   private async syncValidatorData() {
     console.log('Syncing validator data...')
-    const validators = await this.fetchValidators()
-    await this.storeValidators(validators)
-  }
 
-  private async initValidatorDataScheduler(specs: BeaconNodeSpecResults) {
-    const secondsPerEpoch = Number(specs.SLOTS_PER_EPOCH) * Number(specs.SECONDS_PER_SLOT)
-
-    await this.syncValidatorData()
-
-    this.setDynamicInterval('validatorTask', secondsPerEpoch * 1000, async () => {
-      await this.syncValidatorData()
-    })
-  }
-
-  private async fetchValidators(): Promise<ValidatorDetail[]> {
     const { data } = await this.utilsService.sendHttpRequest({
       url: `${this.validatorUrl}/lighthouse/validators`,
       config: {
@@ -125,28 +138,22 @@ export class TasksService implements OnApplicationBootstrap {
       url: `${this.beaconUrl}/eth/v1/beacon/states/head/validators?id=${validatorKeys}`,
     });
 
-    return states.data.map(({index, validator: {pubkey, withdrawal_credentials}}) => ({index, pubkey, withdrawal_credentials }))
+    const validators = states.data.map(({index, status, validator: {pubkey, withdrawal_credentials}}) => ({index, pubkey, withdrawal_credentials, status }))
+
+    await this.cacheManager.set('validators', validators, 0)
   }
 
-  private async storeValidators(validators: ValidatorDetail[]) {
-    await this.validatorRepository.sequelize.transaction(async t => {
-      await this.validatorRepository.destroy({truncate: true, transaction: t})
-      await this.validatorRepository.bulkCreate(validators, {ignoreDuplicates: true, transaction: t})
+  private async initValidatorDataScheduler() {
+    const { SLOTS_PER_EPOCH, SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
+    const secondsPerEpoch = Number(SLOTS_PER_EPOCH) * Number(SECONDS_PER_SLOT)
+
+    console.log(secondsPerEpoch, 'init validator scheduler....')
+
+    await this.syncValidatorData()
+
+    this.setDynamicInterval('validatorTask', secondsPerEpoch * 1000, async () => {
+      await this.syncValidatorData()
     })
-  }
-
-  private async fetchSpecs() : Promise<BeaconNodeSpecResults> {
-    console.log('Fetching node specs...')
-    const { data } = await this.utilsService.sendHttpRequest({
-      url: `${this.beaconUrl}/eth/v1/config/spec`,
-    });
-    return data.data
-  }
-
-  private async storeSpecs(specs: BeaconNodeSpecResults) {
-    console.log('Storing node spec data...')
-    const data = JSON.stringify(specs)
-    await this.specRepository.create({data})
   }
 
   private setDynamicInterval(name: string, milliseconds: number, callback: () => void) {
