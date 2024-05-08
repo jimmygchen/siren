@@ -1,11 +1,11 @@
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useMemo, useState } from 'react';
 import DashboardWrapper from '../../../src/components/DashboardWrapper/DashboardWrapper'
 import LogControls from '../../../src/components/LogControls/LogControls'
 import LogDisplay from '../../../src/components/LogDisplay/LogDisplay'
 import { OptionType } from '../../../src/components/SelectDropDown/SelectDropDown'
 import useNetworkMonitor from '../../../src/hooks/useNetworkMonitor'
 import useSWRPolling from '../../../src/hooks/useSWRPolling'
-import { LogType } from '../../../src/types'
+import { LogData, LogMetric, LogType } from '../../../src/types';
 import { BeaconNodeSpecResults, SyncData } from '../../../src/types/beacon'
 import { Diagnostics } from '../../../src/types/diagnostic'
 
@@ -13,9 +13,10 @@ export interface MainProps {
   initNodeHealth: Diagnostics
   beaconSpec: BeaconNodeSpecResults
   initSyncData: SyncData
+  initLogMetrics: LogMetric
 }
 
-const Main: FC<MainProps> = ({ initSyncData, beaconSpec, initNodeHealth }) => {
+const Main: FC<MainProps> = ({ initSyncData, beaconSpec, initNodeHealth, initLogMetrics }) => {
   const { SECONDS_PER_SLOT } = beaconSpec
   const { isValidatorError, isBeaconError } = useNetworkMonitor()
   const networkError = isValidatorError || isBeaconError
@@ -41,6 +42,20 @@ const Main: FC<MainProps> = ({ initSyncData, beaconSpec, initNodeHealth }) => {
     networkError,
   })
 
+  const { data: logMetrics } = useSWRPolling('/api/priority-logs', {
+    refreshInterval: slotInterval / 2,
+    fallbackData: initLogMetrics,
+    networkError,
+  })
+
+  const filteredLogs = useMemo(() => {
+    return {
+      warningLogs: logMetrics.warningLogs.filter(({type}) => type === logType),
+      errorLogs: logMetrics.errorLogs.filter(({type}) => type === logType),
+      criticalLogs: logMetrics.criticalLogs.filter(({type}) => type === logType)
+    }
+  }, [logMetrics, logType])
+
   const toggleLogType = (selection: OptionType) => {
     if (selection === logType) return
 
@@ -64,7 +79,7 @@ const Main: FC<MainProps> = ({ initSyncData, beaconSpec, initNodeHealth }) => {
     >
       <div className='w-full h-full pt-8 p-2 md:p-6 flex flex-col'>
         <LogControls logType={logType} onSetLoading={setLoading} onTypeSelect={toggleLogType} />
-        <LogDisplay isLoading={isLoading} type={logType} />
+        <LogDisplay priorityLogs={filteredLogs} isLoading={isLoading} type={logType} />
       </div>
     </DashboardWrapper>
   )

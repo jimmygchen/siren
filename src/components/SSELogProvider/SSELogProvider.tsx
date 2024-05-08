@@ -57,14 +57,9 @@ const SSELogProvider: FC<SSELogWrapperProps> = React.memo(function ({ children, 
   const beaconLogs = useTrackLogs('/beacon-logs', handleBeaconLogError, isReady)
   const validatorLogs = useTrackLogs('/validator-logs', handleValidatorLogError, isReady)
 
-  const { cleanLogs: cleanBeaconLogs } = beaconLogs
-  const { cleanLogs: cleanValLogs } = validatorLogs
-
   const triggerRefresh = useCallback(() => {
-    cleanBeaconLogs()
-    cleanValLogs()
     setTrigger((prevTrigger) => !prevTrigger)
-  }, [cleanBeaconLogs, cleanValLogs, setTrigger])
+  }, [setTrigger])
 
   const startRefreshInterval = useCallback(() => {
     const interval = setInterval(() => {

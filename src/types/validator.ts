@@ -23,6 +23,7 @@ export type Validator = {
 export type ValidatorDetail = {
   index: string
   pubkey: string
+  status: ValidatorStatus
   withdrawal_credentials: string
 }
 

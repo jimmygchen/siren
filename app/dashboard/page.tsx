@@ -8,6 +8,7 @@ import {
   fetchSyncData
 } from '../api/beacon';
 import { fetchBeaconNodeVersion, fetchGenesisData, fetchValidatorVersion } from '../api/config'
+import { fetchLogMetrics } from '../api/logs';
 import { fetchValCaches, fetchValStates } from '../api/validator'
 import Wrapper from './Wrapper'
 
@@ -27,6 +28,7 @@ export default async function Page() {
   const bnVersion = await fetchBeaconNodeVersion(token)
   const lighthouseVersion = await fetchValidatorVersion(token)
   const proposerDuties = await fetchProposerDuties(token)
+  const logMetrics = await fetchLogMetrics(token)
 
   return (
     <Wrapper
@@ -37,6 +39,7 @@ export default async function Page() {
       initSyncData={syncData}
       initInclusionRate={inclusion}
       initPeerData={peerData}
+      initLogMetrics={logMetrics}
       genesisTime={Number(genesisBlock.genesis_time)}
       lighthouseVersion={lighthouseVersion.version}
       bnVersion={bnVersion.version}

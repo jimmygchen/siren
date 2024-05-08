@@ -1,7 +1,7 @@
 import React, { FC, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { debounce } from '../../../utilities/debounce'
-import { LogType } from '../../types'
+import { LogMetric, LogType } from '../../types';
 import Input from '../Input/Input'
 import LogStats from '../LogStats/LogStats'
 import Spinner from '../Spinner/Spinner'
@@ -12,9 +12,10 @@ import LogRow from './LogRow'
 export interface LogDisplayProps {
   type: LogType
   isLoading?: boolean
+  priorityLogs: LogMetric
 }
 
-const LogDisplay: FC<LogDisplayProps> = React.memo(function ({ type, isLoading }) {
+const LogDisplay: FC<LogDisplayProps> = React.memo(function ({ type, isLoading, priorityLogs }) {
   const { t } = useTranslation()
   const [searchText, setText] = useState('')
   const scrollableRef = useRef<HTMLDivElement | null>(null)
@@ -25,7 +26,7 @@ const LogDisplay: FC<LogDisplayProps> = React.memo(function ({ type, isLoading }
     return type === LogType.BEACON ? beaconLogs : vcLogs
   }, [type, beaconLogs, vcLogs])
 
-  const { totalLogsPerHour, criticalPerHour, warningsPerHour, errorsPerHour, data } = logs
+  const { data } = logs
 
   useEffect(() => {
     if (isLoading) {
@@ -49,16 +50,6 @@ const LogDisplay: FC<LogDisplayProps> = React.memo(function ({ type, isLoading }
       behavior: 'smooth',
     })
   }
-
-  const logCounts = useMemo(
-    () => ({
-      totalLogsPerHour,
-      criticalPerHour,
-      warningsPerHour,
-      errorsPerHour,
-    }),
-    [totalLogsPerHour, criticalPerHour, warningsPerHour, errorsPerHour],
-  )
 
   const filteredLogs = useMemo(() => {
     const text = searchText.toLowerCase()
@@ -136,7 +127,7 @@ const LogDisplay: FC<LogDisplayProps> = React.memo(function ({ type, isLoading }
               size='lg'
               maxHeight='h-32 md:flex-1'
               maxWidth='w-full'
-              logCounts={logCounts}
+              metrics={priorityLogs}
             />
           </div>
         </>

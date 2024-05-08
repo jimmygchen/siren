@@ -1,21 +1,22 @@
-import { FC } from 'react'
+import { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next'
+import timeFilterObjArray from '../../../utilities/timeFilterObjArray';
 import toFixedIfNecessary from '../../../utilities/toFixedIfNecessary'
-import { LogCounts, StatusColor } from '../../types'
+import { LogMetric, StatusColor } from '../../types';
 import DiagnosticCard, { CardSize } from '../DiagnosticCard/DiagnosticCard'
 
 export interface LogStatsProps {
   critToolTip?: string
   warnToolTip?: string
   errorToolTip?: string
-  logCounts: LogCounts
+  metrics: LogMetric
   size?: CardSize
   maxHeight?: string
   maxWidth?: string
 }
 
 const LogStats: FC<LogStatsProps> = ({
-  logCounts,
+  metrics,
   size,
   maxHeight = 'flex-1',
   maxWidth,
@@ -24,31 +25,37 @@ const LogStats: FC<LogStatsProps> = ({
   errorToolTip,
 }) => {
   const { t } = useTranslation()
-  const { totalLogsPerHour, criticalPerHour, warningsPerHour, errorsPerHour } = logCounts
+  const { criticalLogs, warningLogs, errorLogs } = metrics
 
-  const criticalPercentage = (criticalPerHour / totalLogsPerHour) * 100
-  const warnPercentage = (warningsPerHour / totalLogsPerHour) * 100
-  const errorPercentage = (errorsPerHour / totalLogsPerHour) * 100
+  const hourlyCriticalLogs = useMemo(() => {
+    return timeFilterObjArray(criticalLogs, 'createdAt', 'minutes', 60)
+  }, [criticalLogs])
 
-  const critStatus = totalLogsPerHour
-    ? criticalPercentage > 0
-      ? StatusColor.ERROR
-      : StatusColor.SUCCESS
+  const hourlyWarningLogs = useMemo(() => {
+    return timeFilterObjArray(warningLogs, 'createdAt', 'minutes', 60)
+  }, [warningLogs])
+
+  const hourlyErrorLogs = useMemo(() => {
+    return timeFilterObjArray(errorLogs, 'createdAt', 'minutes', 60)
+  }, [errorLogs])
+
+  const criticalMetrics = hourlyCriticalLogs.length
+  const warningMetrics = hourlyWarningLogs.length
+  const errorMetrics = hourlyErrorLogs.length
+
+  const critStatus = criticalMetrics > 0
+    ? StatusColor.ERROR
     : StatusColor.SUCCESS
-  const errorStatus = totalLogsPerHour
-    ? errorPercentage <= 0
-      ? StatusColor.SUCCESS
-      : errorPercentage <= 2
-        ? StatusColor.WARNING
-        : StatusColor.ERROR
-    : StatusColor.SUCCESS
-  const warnStatus = totalLogsPerHour
-    ? warnPercentage < 5
-      ? StatusColor.SUCCESS
-      : warnPercentage <= 50
-        ? StatusColor.WARNING
-        : StatusColor.ERROR
-    : StatusColor.SUCCESS
+  const errorStatus = errorMetrics <= 0
+    ? StatusColor.SUCCESS
+    : errorMetrics <= 2
+      ? StatusColor.WARNING
+      : StatusColor.ERROR
+  const warnStatus = warningMetrics < 5
+    ? StatusColor.SUCCESS
+    : warningMetrics <= 50
+      ? StatusColor.WARNING
+      : StatusColor.ERROR
 
   return (
     <>
@@ -61,7 +68,7 @@ const LogStats: FC<LogStatsProps> = ({
         size={size}
         border='border-t-0 md:border-l-0 border-style500'
         subTitle={t('critical')}
-        metric={`${totalLogsPerHour ? toFixedIfNecessary(criticalPerHour, 2) : '0'} / HR`}
+        metric={`${toFixedIfNecessary(criticalMetrics, 2)} / HR`}
       />
       <DiagnosticCard
         isBackground={false}
@@ -73,7 +80,7 @@ const LogStats: FC<LogStatsProps> = ({
         size={size}
         border='border-t-0 md:border-l-0 border-style500'
         subTitle={t('logInfo.validatorLogs')}
-        metric={`${totalLogsPerHour ? toFixedIfNecessary(errorsPerHour, 2) : '0'} / HR`}
+        metric={`${toFixedIfNecessary(errorMetrics, 2)} / HR`}
       />
       <DiagnosticCard
         isBackground={false}
@@ -85,7 +92,7 @@ const LogStats: FC<LogStatsProps> = ({
         size={size}
         border='border-t-0 md:border-l-0 border-style500'
         subTitle={t('logInfo.validatorLogs')}
-        metric={`${totalLogsPerHour ? toFixedIfNecessary(warningsPerHour, 2) : '0'} / HR`}
+        metric={`${toFixedIfNecessary(warningMetrics, 2)} / HR`}
       />
     </>
   )
