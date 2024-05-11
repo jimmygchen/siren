@@ -122,7 +122,7 @@ const Main: FC<MainProps> = (props) => {
   const { isReady } = executionSync
   const { connected } = peerData
   const { natOpen } = nodeHealth
-  const warningCount = logMetrics.warningLogs.length
+  const warningCount = logMetrics.warningLogs?.length || 0
 
   useEffect(() => {
     setDuties(prev => formatUniqueObjectArray([...prev, ...valDuties]))

@@ -1,12 +1,9 @@
-import axios from 'axios';
-import {cookies} from 'next/headers';
 import { FC, ReactElement } from 'react'
 import { Control, useForm } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
 
 export interface AuthFormProps {
   children: (props: RenderProps) => ReactElement
-  onSuccess: (token: string) => void
+  onSubmit: (token: string) => void
 }
 
 export interface AuthForm {
@@ -17,12 +14,10 @@ export interface RenderProps {
   control: Control<AuthForm>
   isLoading: boolean
   isValid: boolean
-  onSubmit: () => void
+  onClick: () => void
 }
 
-const AuthenticationForm: FC<AuthFormProps> = ({ children, onSuccess }) => {
-  const { t } = useTranslation()
-
+const AuthenticationForm: FC<AuthFormProps> = ({ children, onSubmit }) => {
   const {
     control,
     watch,
@@ -35,18 +30,7 @@ const AuthenticationForm: FC<AuthFormProps> = ({ children, onSuccess }) => {
 
   const password = watch('password')
 
-  const onSubmit = async () => {
-    try {
-      const res = await axios.post('/api/authenticate', {password})
-
-      if(res.status === 200) {
-        onSuccess(res.data.token)
-      }
-
-    } catch (e) {
-      console.log(e, 'error')
-    }
-  }
+  const onClick = () => onSubmit(password)
 
   return (
     <form className='w-full h-full' action=''>
@@ -55,7 +39,7 @@ const AuthenticationForm: FC<AuthFormProps> = ({ children, onSuccess }) => {
           control,
           isLoading: false,
           isValid: !!password,
-          onSubmit,
+          onClick,
         })}
     </form>
   )

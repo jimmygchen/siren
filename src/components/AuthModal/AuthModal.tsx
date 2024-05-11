@@ -11,13 +11,13 @@ export interface AuthModalProps extends Omit<AuthFormProps, 'children'>{
   isVisible: boolean
 }
 
-const AuthModal:FC<AuthModalProps> = ({onSuccess, isVisible}) => {
+const AuthModal:FC<AuthModalProps> = ({onSubmit, isVisible}) => {
   const {t} = useTranslation()
 
   return (
     <RodalModal styles={{ maxWidth: '500px' }} isVisible={isVisible}>
-      <AuthenticationForm onSuccess={onSuccess}>
-        {({control, onSubmit, isValid, isLoading}) => (
+      <AuthenticationForm onSubmit={onSubmit}>
+        {({control, onClick, isValid, isLoading}) => (
           <div className="p-6">
             Authenticate
             <div>
@@ -36,7 +36,7 @@ const AuthModal:FC<AuthModalProps> = ({onSuccess, isVisible}) => {
                 )}
               />
               <div className="w-full flex items-center justify-center">
-                <Button onClick={onSubmit} isDisabled={!isValid} isLoading={isLoading} className="mt-4" type={ButtonFace.SECONDARY}>Submit</Button>
+                <Button onClick={onClick} isDisabled={!isValid} isLoading={isLoading} className="mt-4" type={ButtonFace.SECONDARY}>Submit</Button>
               </div>
             </div>
           </div>
