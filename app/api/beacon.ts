@@ -16,3 +16,8 @@ export const fetchBeaconSpec = async (token: string) => await fetchFromApi(`${ba
 export const fetchValidatorCountData = async (token: string) =>
   await fetchFromApi(`${backendUrl}/beacon/validator-count`, token, { next: { revalidate: 60 } })
 export const fetchProposerDuties = async (token: string) => fetchFromApi(`${backendUrl}/beacon/proposer-duties`, token,{ cache: 'no-store' })
+export const broadcastBlsChange = async (data: any, token: string) =>
+  await fetchFromApi(`${backendUrl}/beacon/bls-execution`, token, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })

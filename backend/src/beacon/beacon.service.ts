@@ -217,4 +217,10 @@ export class BeaconService {
       throwServerError('Unable to fetch proposer data');
     }
   }
+
+  async executeBlsChange(reqData: any) {
+    const {status} = await this.utilsService.sendHttpRequest({url: `${this.beaconUrl}/eth/v1/beacon/pool/bls_to_execution_changes`, method: 'POST', config: {data: JSON.parse(reqData.data), headers: {'Content-Type': 'application/json',}}})
+    return status
+  }
+
 }

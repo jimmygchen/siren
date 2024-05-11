@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation'
 import React, { FC, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSetRecoilState } from 'recoil'
+import BlsExecutionModal from '../../../src/components/BlsExecutionModal/BlsExecutionModal';
 import Button, { ButtonFace } from '../../../src/components/Button/Button'
 import DashboardWrapper from '../../../src/components/DashboardWrapper/DashboardWrapper'
 import DisabledTooltip from '../../../src/components/DisabledTooltip/DisabledTooltip'
@@ -127,7 +128,7 @@ const Main: FC<MainProps> = (props) => {
       nodeHealth={nodeHealth}
     >
       <>
-        {/* <BlsExecutionModal /> */}
+        <BlsExecutionModal />
         <div className='w-full grid grid-cols-1 lg:block pb-12 p-4 mb-28 lg:mb-0'>
           <div className='w-full space-y-6 mb-6'>
             <div className='w-full flex flex-col items-center lg:flex-row space-y-8 lg:space-y-0 justify-between'>

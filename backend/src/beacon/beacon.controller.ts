@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { BeaconService } from './beacon.service';
 import { SessionGuard } from '../session.guard';
 import { AuthGuard } from '../auth.guard';
@@ -46,5 +46,11 @@ export class BeaconController {
   @Get('proposer-duties')
   async getProposerDuties() {
     return this.beaconService.fetchProposerDuties();
+  }
+
+  @Post('bls-execution')
+  @UseGuards(AuthGuard)
+  async executeBls(@Body() blsData) {
+    return this.beaconService.executeBlsChange(blsData);
   }
 }

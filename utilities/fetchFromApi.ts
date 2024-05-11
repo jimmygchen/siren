@@ -4,6 +4,7 @@ const fetchFromApi = async (url: string, token: string, options?: NextFetchReque
   const defaultOptions: RequestInit = {
     method: 'GET',
     headers: {
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
     }
   }
@@ -14,12 +15,12 @@ const fetchFromApi = async (url: string, token: string, options?: NextFetchReque
     const response = await fetch(url, finalOptions)
 
     if (!response.ok) {
-      return { error: `HTTP error! status: ${response.status}` }
+      throw new Error(`HTTP error! Status: ${response.status}`)
     }
 
     return await response.json()
   } catch (e) {
-    return { error: `HTTP error! status: ${e}` }
+    throw e
   }
 }
 
