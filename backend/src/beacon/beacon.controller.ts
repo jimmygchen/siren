@@ -1,9 +1,10 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { BeaconService } from './beacon.service';
+import { SessionGuard } from '../session.guard';
 import { AuthGuard } from '../auth.guard';
 
 @Controller('beacon')
-@UseGuards(AuthGuard)
+@UseGuards(SessionGuard)
 export class BeaconController {
   constructor(private beaconService: BeaconService) {}
 

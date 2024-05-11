@@ -1,9 +1,9 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { NodeService } from './node.service';
-import { AuthGuard } from '../auth.guard';
+import { SessionGuard } from '../session.guard';
 
 @Controller('node')
-@UseGuards(AuthGuard)
+@UseGuards(SessionGuard)
 export class NodeController {
   constructor(private nodeService: NodeService) {}
 

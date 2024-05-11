@@ -1,38 +1,24 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  private apiToken = process.env.API_TOKEN;
-  constructor(private jwtService: JwtService) {}
+  private sessionPassword = process.env.SESSION_PASSWORD;
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
-    if (!token) {
-      throw new UnauthorizedException();
-    }
-    try {
-      request['user'] = await this.jwtService.verifyAsync(
-        token,
-        {
-          secret: this.apiToken
-        }
-      );
-    } catch {
-      throw new UnauthorizedException();
-    }
-    return true;
-  }
+    const passwordFromBody = request.body.password;
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+    if (!passwordFromBody) {
+      throw new UnauthorizedException('Password is missing in the request body');
+    }
+
+    if (passwordFromBody === this.sessionPassword) {
+      return true;
+    } else {
+      throw new UnauthorizedException('Invalid password');
+    }
   }
 }

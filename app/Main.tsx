@@ -73,9 +73,19 @@ const Main = () => {
     ? formatSemanticVersion(beaconNodeVersion as string)
     : undefined
 
-  const storeSessionCookie = (token: string) => {
-    setToken(token)
-    Cookies.set('session-token', token)
+  const storeSessionCookie = async (password: string) => {
+    try {
+      const {status, data} = await axios.post('/api/authenticate', {password})
+      const token = data.token;
+
+      if(status === 200) {
+        setToken(token)
+        Cookies.set('session-token', token)
+      }
+
+    } catch (e) {
+      console.log(e, 'error')
+    }
   }
 
   return (
@@ -156,7 +166,7 @@ const Main = () => {
           </div>
         </RodalModal>
       )}
-      <AuthModal isVisible={!sessionToken} onSuccess={storeSessionCookie}/>
+      <AuthModal isVisible={!sessionToken} onSubmit={storeSessionCookie}/>
       <div className='absolute top-0 left-0 w-full h-full bg-cover bg-lighthouse' />
       <div className='absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2'>
         <LoadingSpinner />
