@@ -1,10 +1,7 @@
 import { Protocol } from '../constants/enums'
 import { BeaconNodeSpecResults, SyncData } from './beacon'
 import {
-  BeaconSyncResult,
   Diagnostics,
-  HealthDiagnosticResult,
-  ValidatorSyncResult,
 } from './diagnostic'
 
 export interface NextFetchRequestInit extends RequestInit {

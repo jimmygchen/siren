@@ -158,7 +158,6 @@ export class ValidatorService {
   }
 
   async updateGraffiti(data: any) {
-    console.log(data)
     try {
       const {status} = await this.utilsService.sendHttpRequest({url: `${this.validatorUrl}/lighthouse/validators/${data.pubKey}`, method: 'PATCH', config: {
         data: JSON.stringify({graffiti: data.graffiti}),

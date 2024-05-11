@@ -90,14 +90,6 @@ export type FormattedValidatorCache = {
   [key: number]: number[]
 }
 
-export type ValidatorCacheResults = {
-  [key: string]: ValidatorCacheDataInfo
-}
-
-export type ValidatorCacheDataInfo = {
-  info: ValidatorEpochResult[]
-}
-
 export type ValidatorCache = {
   [key: number]: ValidatorEpochResult[]
 }
@@ -105,17 +97,6 @@ export type ValidatorCache = {
 export type ValidatorEpochResult = {
   epoch: number
   total_balance: number
-}
-
-export type activeValidatorDetail = {
-  status: ValidatorStatus
-  pubKey?: string
-  index: string
-  name: string
-}
-
-export type ValidatorGraffitiResults = {
-  [key: string]: string
 }
 
 export type SignedExitData = {
