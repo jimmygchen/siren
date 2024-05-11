@@ -21,7 +21,7 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule.register({
       global: true,
       secret: process.env.API_TOKEN,
-      // signOptions: { expiresIn: '60s' },
+      // signOptions: { expiresIn: '60s' }, set to  2 hours
     }),
     ScheduleModule.forRoot(),
     LogsModule,

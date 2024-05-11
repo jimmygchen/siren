@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ValidatorService } from './validator.service';
 import { SessionGuard } from '../session.guard';
 import { AuthGuard } from '../auth.guard';
@@ -28,7 +28,6 @@ export class ValidatorController {
     return this.validatorService.fetchValidatorCaches();
   }
 
-  @UseGuards(AuthGuard)
   @Get('metrics')
   async getValidatorMetrics() {
     return this.validatorService.fetchMetrics();
@@ -37,5 +36,10 @@ export class ValidatorController {
   @Get('metrics/:index')
   async getValidatorMetricsById(@Param('index') index: number) {
     return this.validatorService.fetchMetrics(index);
+  }
+  @Post('sign-exit')
+  @UseGuards(AuthGuard)
+  async signVoluntaryExit(@Body() signData) {
+    return this.validatorService.signVoluntaryExit(signData.pubKey)
   }
 }

@@ -223,4 +223,19 @@ export class BeaconService {
     return status
   }
 
+  async submitSignedExit(message: any) {
+    try {
+      const { status } = await this.utilsService.sendHttpRequest({url: `${this.beaconUrl}/eth/v1/beacon/pool/voluntary_exits`, method: 'POST', config: {
+          data: message,
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }})
+
+      return status
+    } catch (e) {
+      console.error(e)
+      throwServerError('Unable to sign voluntary exit')
+    }
+  }
 }

@@ -10,3 +10,8 @@ export const fetchValCaches = async (token: string,) =>
   await fetchFromApi(`${backendUrl}/validator/caches`, token,{ next: { revalidate: slotInterval } })
 export const fetchValMetrics = async (token: string, index?: string) =>
   await fetchFromApi(`${backendUrl}/validator/metrics${index ? `/${index}` : ''}`, token, { cache: 'no-store' })
+export const signVoluntaryExit = async (data: any, token: string) =>
+  await fetchFromApi(`${backendUrl}/validator/sign-exit`, token,{
+    method: 'POST',
+    body: JSON.stringify(data)
+  })

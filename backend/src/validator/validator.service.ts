@@ -139,4 +139,16 @@ export class ValidatorService {
       throwServerError('Unable to fetch validator validator-metrics')
     }
   }
+  async signVoluntaryExit(pubKey: string) {
+    try {
+      const { data } = await this.utilsService.sendHttpRequest({url: `${this.validatorUrl}/eth/v1/validator/${pubKey}/voluntary_exit`, method: 'POST', config: this.config})
+
+      if (data) {
+        return data?.data || data
+      }
+    } catch (e) {
+      console.error(e)
+      throwServerError('Unable to sign voluntary exit')
+    }
+  }
 }

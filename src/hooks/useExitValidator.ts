@@ -1,44 +1,41 @@
-import { useState } from 'react'
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import { useTranslation } from 'react-i18next'
 import displayToast from '../../utilities/displayToast'
-import { submitSignedExit } from '../api/beacon'
-import { signVoluntaryExit } from '../api/lighthouse'
 import { ToastType } from '../types'
 import { SignedExitData } from '../types/validator'
 
-const useExitValidator = (apiToken: string, pubKey: string, beaconUrl: string) => {
+const useExitValidator = (pubKey: string) => {
   const { t } = useTranslation()
-  const [isLoading, setLoading] = useState(false)
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${Cookies.get('session-token')}`
+    }
+  }
 
-  const getSignedExit = async (url: string): Promise<SignedExitData | undefined> => {
+  const getSignedExit = async (password: string): Promise<SignedExitData | undefined> => {
     try {
-      const { data } = await signVoluntaryExit(url, apiToken, pubKey)
+      const { data } = await axios.post('/api/sign-validator-exit', {pubKey, password}, config)
 
-      if (data) {
-        return data?.data || data
-      }
+      return data
     } catch (e) {
-      setLoading(false)
       displayToast(t('error.unableToSignExit'), ToastType.ERROR)
     }
   }
-  const submitSignedMessage = async (data: SignedExitData) => {
+  const submitSignedMessage = async (data: {data: SignedExitData, password: string}) => {
     try {
-      const { status } = await submitSignedExit(beaconUrl, data)
+      const { status } = await axios.post('/api/execute-validator-exit', data, config)
 
       if (status === 200) {
-        setLoading(false)
         displayToast(t('success.validatorExit'), ToastType.SUCCESS)
       }
     } catch (e) {
-      setLoading(false)
       displayToast(t('error.invalidExit'), ToastType.ERROR)
     }
   }
 
   return {
-    isLoading,
-    setLoading,
     getSignedExit,
     submitSignedMessage,
   }

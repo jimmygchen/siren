@@ -15,7 +15,3 @@ export const updateValidator = async (
     headers: { Authorization: `Bearer ${token}` },
   })
 
-export const signVoluntaryExit = async (baseUrl: string, token: string, pubkey: string) =>
-  await axios.post(`${baseUrl}/eth/v1/validator/${pubkey}/voluntary_exit`, null, {
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-  })

@@ -53,4 +53,10 @@ export class BeaconController {
   async executeBls(@Body() blsData) {
     return this.beaconService.executeBlsChange(blsData);
   }
+
+  @Post('execute-exit')
+  @UseGuards(AuthGuard)
+  async executeVoluntaryExit(@Body() message) {
+    return this.beaconService.submitSignedExit(message.data)
+  }
 }

@@ -21,3 +21,8 @@ export const broadcastBlsChange = async (data: any, token: string) =>
     method: 'POST',
     body: JSON.stringify(data)
   })
+export const submitSignedExit = async (data: any, token: string) =>
+  await fetchFromApi(`${backendUrl}/beacon/execute-exit`, token,{
+    method: 'POST',
+    body: JSON.stringify(data)
+  })

@@ -5,7 +5,7 @@ import formatValidatorEpochData from '../../../utilities/formatValidatorEpochDat
 import { ValidatorModalView } from '../../constants/enums'
 import useMediaQuery from '../../hooks/useMediaQuery'
 import useSWRPolling from '../../hooks/useSWRPolling';
-import { BeaconValidatorMetricResults, SyncData, ValidatorMetricResult } from '../../types/beacon';
+import { ValidatorMetricResult } from '../../types/beacon';
 import { ValidatorBalanceInfo } from '../../types/validator'
 import RodalModal from '../RodalModal/RodalModal'
 import Spinner from '../Spinner/Spinner'
