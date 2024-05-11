@@ -37,6 +37,18 @@ export class ValidatorController {
   async getValidatorMetricsById(@Param('index') index: number) {
     return this.validatorService.fetchMetrics(index);
   }
+
+  @Get('graffiti/:index')
+  async fetchValidatorGraffiti(@Param('index') index: string) {
+    return this.validatorService.fetchGraffiti(index)
+  }
+
+  @Put('graffiti')
+  @UseGuards(AuthGuard)
+  async updateValidatorGraffiti(@Body() graffitiData) {
+    return this.validatorService.updateGraffiti(graffitiData)
+  }
+
   @Post('sign-exit')
   @UseGuards(AuthGuard)
   async signVoluntaryExit(@Body() signData) {

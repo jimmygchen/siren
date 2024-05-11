@@ -15,3 +15,10 @@ export const signVoluntaryExit = async (data: any, token: string) =>
     method: 'POST',
     body: JSON.stringify(data)
   })
+export const fetchValGraffiti =  async (token: string, index: string) =>
+  await fetchFromApi(`${backendUrl}/validator/graffiti/${index}`, token, { cache: 'no-store' })
+export const updateValGraffiti = async (token: string, data: any) =>
+  await fetchFromApi(`${backendUrl}/validator/graffiti`, token,{
+    method: 'PUT',
+    body: JSON.stringify(data)
+  })

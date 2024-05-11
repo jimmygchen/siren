@@ -139,6 +139,41 @@ export class ValidatorService {
       throwServerError('Unable to fetch validator validator-metrics')
     }
   }
+
+  async fetchGraffiti(index: string) {
+    try {
+      const validatorData = await this.cacheManager.get('validators') as ValidatorDetail[]
+
+      const validator = validatorData.find((validator) => validator.index === index)
+      const {data} = await this.utilsService.sendHttpRequest({url: `${this.validatorUrl}/lighthouse/ui/graffiti`, config: this.config})
+
+      return {
+        data: data.data[validator.pubkey]
+      }
+
+    } catch (e) {
+      console.error(e);
+      throwServerError('Unable to fetch validator graffiti');
+    }
+  }
+
+  async updateGraffiti(data: any) {
+    console.log(data)
+    try {
+      const {status} = await this.utilsService.sendHttpRequest({url: `${this.validatorUrl}/lighthouse/validators/${data.pubKey}`, method: 'PATCH', config: {
+        data: JSON.stringify({graffiti: data.graffiti}),
+        headers: {
+          'Content-Type': 'application/json',
+          ...this.config.headers
+        }
+        }})
+      return status
+    } catch (e) {
+      console.error(e)
+      throwServerError('Unable to update validator graffiti')
+    }
+  }
+
   async signVoluntaryExit(pubKey: string) {
     try {
       const { data } = await this.utilsService.sendHttpRequest({url: `${this.validatorUrl}/eth/v1/validator/${pubKey}/voluntary_exit`, method: 'POST', config: this.config})
