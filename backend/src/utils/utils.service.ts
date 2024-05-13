@@ -9,6 +9,7 @@ import { ModelCtor, Model } from 'sequelize-typescript';
 import { FindOptions } from 'sequelize';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { BeaconNodeSpecResults } from '../../../src/types/beacon';
 
 @Injectable()
 export class UtilsService {
@@ -16,6 +17,11 @@ export class UtilsService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private httpService: HttpService
   ) {}
+
+  async getSlotInterval() {
+    const { SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
+    return SECONDS_PER_SLOT * 1000
+  }
 
   async sendHttpRequest<T>(data: {
     url: string;
