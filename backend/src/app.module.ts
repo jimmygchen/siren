@@ -11,9 +11,11 @@ import { dataBaseConfig } from './database/database.config';
 import {ScheduleModule} from '@nestjs/schedule'
 import { TasksModule } from './tasks/tasks.module';
 import { JwtModule } from '@nestjs/jwt';
+import { GracefulShutdownModule } from 'nestjs-graceful-shutdown';
 
 @Module({
   imports: [
+    GracefulShutdownModule.forRoot(),
     SequelizeModule.forRoot(dataBaseConfig),
     ConfigModule.forRoot({
       envFilePath: '../.env',
@@ -21,7 +23,7 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule.register({
       global: true,
       secret: process.env.API_TOKEN,
-      // signOptions: { expiresIn: '60s' }, set to  2 hours
+      signOptions: { expiresIn: '7200s' }, //set to  2 hours
     }),
     ScheduleModule.forRoot(),
     LogsModule,
