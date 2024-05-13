@@ -18,6 +18,26 @@ export class UtilsService {
     private httpService: HttpService
   ) {}
 
+  getErrorMessage(code: string) {
+    if(code === 'ECONNREFUSED') {
+      return 'Unable to connect to Beacon and Validator endpoints...'
+    }
+
+    if(code === 'NO_SESSION_PASSWORD') {
+      return 'No session password, please update env configuration...'
+    }
+
+    if(code === 'NO_API_TOKEN') {
+      return 'No api token found, please update env configuration...'
+    }
+
+    if(code === 'ERR_BAD_REQUEST') {
+      return 'Api token invalid, please update env configuration...'
+    }
+
+    return 'Unknown error...'
+  }
+
   async getSlotInterval() {
     const { SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
     return SECONDS_PER_SLOT * 1000

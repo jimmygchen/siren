@@ -13,6 +13,16 @@ import { LogsService } from '../logs/logs.service';
 import { LogType } from '../../../src/types';
 import { Log } from '../logs/entities/log.entity';
 
+class CustomError extends Error {
+  public code: any;
+
+  constructor(message, code) {
+    super(message);
+    this.code = code;
+    this.name = this.constructor.name;
+  }
+}
+
 @Injectable()
 export class TasksService implements OnApplicationBootstrap {
   constructor(
@@ -30,10 +40,19 @@ export class TasksService implements OnApplicationBootstrap {
   private beaconUrl = process.env.BEACON_URL;
   private validatorUrl = process.env.VALIDATOR_URL;
   private apiToken = process.env.API_TOKEN;
+  private sessionPassword = process.env.SESSION_PASSWORD;
 
   async onApplicationBootstrap(): Promise<void> {
     try {
       console.log('Application Bootstrapping....')
+      if(!this.sessionPassword) {
+        throw new CustomError('No session password found...', 'NO_SESSION_PASSWORD')
+      }
+
+      if(!this.apiToken) {
+        throw new CustomError('No api token found...', 'NO_API_TOKEN')
+      }
+
       await this.metricRepository.destroy({truncate: true})
       await this.logRepository.destroy({truncate: true})
 
@@ -48,6 +67,9 @@ export class TasksService implements OnApplicationBootstrap {
 
     } catch (e) {
       console.error('Unable to bootstrap application repositories...')
+      console.error(this.utilsService.getErrorMessage(e.code))
+      process.kill(process.pid, 'SIGINT');
+      process.exit(0);
     }
   }
 
@@ -146,8 +168,6 @@ export class TasksService implements OnApplicationBootstrap {
   private async initValidatorDataScheduler() {
     const { SLOTS_PER_EPOCH, SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
     const secondsPerEpoch = Number(SLOTS_PER_EPOCH) * Number(SECONDS_PER_SLOT)
-
-    console.log(secondsPerEpoch, 'init validator scheduler....')
 
     await this.syncValidatorData()
 
