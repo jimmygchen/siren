@@ -3,7 +3,8 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation'
-import { FC, useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import AlertIcon from '../src/components/AlertIcon/AlertIcon'
 import AppDescription from '../src/components/AppDescription/AppDescription'
@@ -14,11 +15,14 @@ import RodalModal from '../src/components/RodalModal/RodalModal'
 import Typography from '../src/components/Typography/Typography'
 import { REQUIRED_VALIDATOR_VERSION } from '../src/constants/constants'
 import formatSemanticVersion from '../utilities/formatSemanticVersion'
+import isExpiredToken from '../utilities/isExpiredToken';
 import isRequiredVersion from '../utilities/isRequiredVersion'
 
 const Main = () => {
   const { t } = useTranslation()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirect = searchParams.get('redirect')
   const [step, setStep] = useState<number>(1)
   const [isReady, setReady] = useState(false)
   const [isVersionError, setVersionError] = useState(false)
@@ -29,6 +33,11 @@ const Main = () => {
 
   useEffect(() => {
     if(sessionToken) {
+      if(isExpiredToken(sessionToken)) {
+        setToken(undefined)
+        return
+      }
+
       (async () => {
         try {
           const config = {
@@ -63,9 +72,9 @@ const Main = () => {
         return
       }
 
-      router.push('/setup/health-check')
+      router.push(redirect || '/setup/health-check')
     }
-  }, [beaconNodeVersion, lighthouseVersion, router])
+  }, [beaconNodeVersion, lighthouseVersion, router, redirect])
 
   const configError = !beaconNodeVersion || !lighthouseVersion
   const { major, minor, patch } = REQUIRED_VALIDATOR_VERSION
