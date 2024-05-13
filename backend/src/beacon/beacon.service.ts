@@ -53,7 +53,8 @@ export class BeaconService {
 
   async fetchSyncData() {
     try {
-      return await this.utilsService.fetchFromCache('syncData', await this.utilsService.getSlotInterval(), async () => {
+      const slotInterval = await this.utilsService.getSlotInterval()
+      return await this.utilsService.fetchFromCache('syncData', slotInterval, async () => {
         const [ beaconResponse, executionResponse] = await Promise.all(
           [
             this.utilsService.sendHttpRequest({
@@ -82,7 +83,7 @@ export class BeaconService {
             headSlot: Number(head_slot),
             slotDistance: distance,
             beaconPercentage: getPercentage(head_slot, distance),
-            beaconSyncTime: Number(sync_distance) * Number(SECONDS_PER_SLOT),
+            beaconSyncTime: Number(sync_distance) * (slotInterval / 1000),
             syncDistance: Number(sync_distance),
             isSyncing: is_syncing,
           },
