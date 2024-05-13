@@ -6,14 +6,13 @@ export class AppService {
   constructor(private jwtService: JwtService) {
   }
   private sessionPassword = process.env.SESSION_PASSWORD;
-  private apiToken = process.env.API_TOKEN;
 
   async authenticateSessionPassword(password: string) {
     if(password !== this.sessionPassword) {
-      throw new UnauthorizedException()
+      throw new UnauthorizedException('Invalid session password...')
     }
 
-    const payload = {sub: this.sessionPassword, username: this.apiToken}
+    const payload = {sub: 'authenticated_session'}
 
     return {
       access_token: await this.jwtService.signAsync(payload)
