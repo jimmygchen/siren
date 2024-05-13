@@ -53,9 +53,7 @@ export class BeaconService {
 
   async fetchSyncData() {
     try {
-      const { SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
-
-      return await this.utilsService.fetchFromCache('syncData', SECONDS_PER_SLOT * 1000, async () => {
+      return await this.utilsService.fetchFromCache('syncData', await this.utilsService.getSlotInterval(), async () => {
         const [ beaconResponse, executionResponse] = await Promise.all(
           [
             this.utilsService.sendHttpRequest({
@@ -129,9 +127,9 @@ export class BeaconService {
 
   async fetchInclusionRate() {
     try {
-      const { SLOTS_PER_EPOCH, SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
+      const { SLOTS_PER_EPOCH} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
 
-      return await this.utilsService.fetchFromCache('inclusionRate', SECONDS_PER_SLOT * 1000, async () => {
+      return await this.utilsService.fetchFromCache('inclusionRate', await this.utilsService.getSlotInterval(), async () => {
         const headSlot = await this.fetchCachedHeadSlot('inclusionRate')
 
         const epoch = Math.floor(Number(headSlot) / Number(SLOTS_PER_EPOCH)) - 1;
@@ -165,10 +163,12 @@ export class BeaconService {
 
   async fetchPeerData() {
     try {
-      const { data } = await this.utilsService.sendHttpRequest({
-        url: `${this.beaconUrl}/eth/v1/node/peer_count`,
-      });
-      return { connected: Number(data.data.connected) };
+      return this.utilsService.fetchFromCache('peerData', await this.utilsService.getSlotInterval(), async () => {
+        const { data } = await this.utilsService.sendHttpRequest({
+          url: `${this.beaconUrl}/eth/v1/node/peer_count`,
+        });
+        return { connected: Number(data.data.connected) };
+      })
     } catch (e) {
       console.error(e);
       throwServerError('Unable to fetch peer data');
@@ -177,10 +177,12 @@ export class BeaconService {
 
   async fetchValidatorCount() {
     try {
-      const { data } = await this.utilsService.sendHttpRequest({
-        url: `${this.beaconUrl}/lighthouse/ui/validator_count`,
-      });
-      return data.data;
+      return  this.utilsService.fetchFromCache('validatorCount', 60000, async () => {
+        const { data } = await this.utilsService.sendHttpRequest({
+          url: `${this.beaconUrl}/lighthouse/ui/validator_count`,
+        });
+        return data.data;
+      })
     } catch (e) {
       console.error(e);
       throwServerError('Unable to fetch validator count data');

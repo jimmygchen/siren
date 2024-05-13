@@ -10,6 +10,7 @@ import { Metric } from './entities/metric.entity';
 import getAverageKeyValue from '../../../utilities/getAverageKeyValue';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { BeaconNodeSpecResults } from '../../../src/types/beacon';
 
 @Injectable()
 export class ValidatorService {
@@ -52,34 +53,36 @@ export class ValidatorService {
 
   async fetchValidatorStates() {
     try {
-      const validatorData = await this.cacheManager.get('validators') as ValidatorDetail[]
-      const { data: states } = await this.utilsService.sendHttpRequest({
-        url: `${this.beaconUrl}/eth/v1/beacon/states/head/validators?id=${validatorData.map(({pubkey}) => pubkey)}`,
-      });
+      return this.utilsService.fetchFromCache('valStates', await this.utilsService.getSlotInterval(), async () => {
+        const validatorData = await this.cacheManager.get('validators') as ValidatorDetail[]
+        const { data: states } = await this.utilsService.sendHttpRequest({
+          url: `${this.beaconUrl}/eth/v1/beacon/states/head/validators?id=${validatorData.map(({pubkey}) => pubkey)}`,
+        });
 
-      const sortedStates = [...states.data].sort(
-        (a: BeaconValidatorResult, b: BeaconValidatorResult) =>
-          Number(a.index) - Number(b.index),
-      );
+        const sortedStates = [...states.data].sort(
+          (a: BeaconValidatorResult, b: BeaconValidatorResult) =>
+            Number(a.index) - Number(b.index),
+        );
 
-      return sortedStates.map(
-        ({ validator, index, status, balance }: BeaconValidatorResult) => {
-          return {
-            name: formatDefaultValName(index),
-            pubKey: validator.pubkey,
-            balance: Number(formatUnits(balance, 'gwei')),
-            rewards: Number(formatUnits(balance, 'gwei')) - 32,
-            index: Number(index),
-            slashed: validator.slashed,
-            withdrawalAddress: validator.withdrawal_credentials,
-            status: status,
-            processed: 0,
-            missed: 0,
-            attested: 0,
-            aggregated: 0,
-          };
-        },
-      );
+        return sortedStates.map(
+          ({ validator, index, status, balance }: BeaconValidatorResult) => {
+            return {
+              name: formatDefaultValName(index),
+              pubKey: validator.pubkey,
+              balance: Number(formatUnits(balance, 'gwei')),
+              rewards: Number(formatUnits(balance, 'gwei')) - 32,
+              index: Number(index),
+              slashed: validator.slashed,
+              withdrawalAddress: validator.withdrawal_credentials,
+              status: status,
+              processed: 0,
+              missed: 0,
+              attested: 0,
+              aggregated: 0,
+            };
+          },
+        );
+      })
     } catch (e) {
       throwServerError('Unable to fetch validator states');
     }
@@ -87,30 +90,32 @@ export class ValidatorService {
 
   async fetchValidatorCaches() {
     try {
-      const validatorData = await this.cacheManager.get('validators') as ValidatorDetail[]
-      const requestData = {
-        data: JSON.stringify({
-          indices: validatorData.map(({index}) => index),
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      };
+      return this.utilsService.fetchFromCache('valCache', await this.utilsService.getSlotInterval(), async () => {
+        const validatorData = await this.cacheManager.get('validators') as ValidatorDetail[]
+        const requestData = {
+          data: JSON.stringify({
+            indices: validatorData.map(({index}) => index),
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        };
 
-      const { data: caches } = await this.utilsService.sendHttpRequest({
-        url: `${this.beaconUrl}/lighthouse/ui/validator_info`,
-        method: 'POST',
-        config: requestData,
-      });
+        const { data: caches } = await this.utilsService.sendHttpRequest({
+          url: `${this.beaconUrl}/lighthouse/ui/validator_info`,
+          method: 'POST',
+          config: requestData,
+        });
 
-      return Object.fromEntries(
-        Object.entries(
-          caches.data.validators as Record<
-            number,
-            { info: { epoch: string; total_balance: string } }
-          >,
-        ).map(([key, data]) => [Number(key), data.info]),
-      );
+        return Object.fromEntries(
+          Object.entries(
+            caches.data.validators as Record<
+              number,
+              { info: { epoch: string; total_balance: string } }
+              >,
+          ).map(([key, data]) => [Number(key), data.info]),
+        );
+      })
     } catch (e) {
       console.error(e);
       throwServerError('Unable to fetch validator cache');
