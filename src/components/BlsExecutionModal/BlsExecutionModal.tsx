@@ -10,9 +10,10 @@ import { MOCK_BLS_JSON, WithdrawalInfoLink } from '../../constants/constants'
 import { Storage } from '../../constants/enums'
 import useLocalStorage from '../../hooks/useLocalStorage'
 import useMediaQuery from '../../hooks/useMediaQuery'
+import useUiMode from '../../hooks/useUiMode';
 import { isBlsExecutionModal, processingBlsValidators } from '../../recoil/atoms'
 import { ToastType } from '../../types'
-import AuthModal from '../AuthModal/AuthModal';
+import AuthPrompt from '../AuthPrompt/AuthPrompt';
 import { ButtonFace } from '../Button/Button'
 import CodeInput from '../CodeInput/CodeInput'
 import ValidatorDisclosure from '../Disclosures/ValidatorDisclosure'
@@ -22,6 +23,8 @@ import Typography from '../Typography/Typography'
 
 const BlsExecutionModal = () => {
   const { t } = useTranslation()
+  const { mode } = useUiMode()
+  const [isAuthPromptLoading, setAuthPromptLoad] = useState(false)
   const [isLoading, setLoading] = useState(false)
   const [isFocus, setFocused] = useState(false)
   const [isModal, toggleModal] = useRecoilState(isBlsExecutionModal)
@@ -51,11 +54,16 @@ const BlsExecutionModal = () => {
       message = t('error.invalidJson')
     }
 
+    if(code === 401) {
+      message = 'Unauthorized. Invalid session password.'
+    }
+
     displayToast(message, ToastType.ERROR)
   }
 
   const submitChange = async (password) => {
     setAuthModal(false)
+    setAuthPromptLoad(false)
     let targetIndices = getValuesFromObjArray(JSON.parse(blsJson), 'message.validator_index')
 
     try {
@@ -102,6 +110,10 @@ const BlsExecutionModal = () => {
     }
 
     setAuthModal(true)
+  }
+  const closeAuthPrompt = () => {
+    setAuthModal(false)
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -158,7 +170,7 @@ const BlsExecutionModal = () => {
           )}
         </div>
       </RodalModal>
-      <AuthModal isVisible={isAuthModal} onSubmit={submitChange}/>
+      <AuthPrompt mode={mode} isLoading={isAuthPromptLoading} isVisible={isAuthModal} onClose={closeAuthPrompt} onSubmit={submitChange}/>
     </>
   )
 }

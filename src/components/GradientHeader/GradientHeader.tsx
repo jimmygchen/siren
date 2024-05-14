@@ -15,7 +15,7 @@ const GradientHeader: FC<GradientHeaderProps> = ({ className, title }) => {
     <div className={classes}>
       <div
         className='w-full h-full bg-no-repeat bg-right opacity-10'
-        style={{ backgroundImage: `url(${Waves})` }}
+        style={{ backgroundImage: `url(${Waves.src})` }}
       />
       <div className='absolute top-0 left-0 w-3/4 h-full bg-gradient-to-r from-white dark:from-dark750 via-white dark:via-dark750 to-transparent' />
       {title && (
