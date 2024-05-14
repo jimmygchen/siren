@@ -38,9 +38,15 @@ const AuthenticationForm: FC<AuthFormProps> = ({ children, onSubmit, isVisible }
   const password = watch('password')
 
   const onClick = () => onSubmit(password)
+  const submitForm = (e) => {
+    e.preventDefault()
+    if(password) {
+      onSubmit(password)
+    }
+  }
 
   return (
-    <form className='w-full h-full' action=''>
+    <form className='w-full h-full' onSubmit={submitForm}>
       {children &&
         children({
           control,
