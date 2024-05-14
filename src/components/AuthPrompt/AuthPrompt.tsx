@@ -49,6 +49,7 @@ const AuthPrompt:FC<AuthModalProps> = ({onSubmit, isVisible, isLoading, mode, on
                 render={({ field: { ref: _ref, ...props }, fieldState }) => (
                   <Input
                     isAutoFocus
+                    autoComplete="new-password"
                     type="password"
                     uiMode={mode}
                     error={fieldState.error?.message}
