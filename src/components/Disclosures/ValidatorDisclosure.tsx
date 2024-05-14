@@ -21,7 +21,7 @@ const ValidatorDisclosure: FC<ValidatorDisclosureProps> = (props) => {
       <ViewDisclosures {...props} onClick={openModal} />
       <DisclosureModal
         mode={mode}
-        backgroundImage={validatorDisclosure}
+        backgroundImage={validatorDisclosure.src}
         onClose={closeModal}
         isOpen={isOpen}
       >

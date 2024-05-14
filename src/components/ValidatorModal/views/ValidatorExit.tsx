@@ -1,9 +1,14 @@
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import { FC, useContext, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import addClassString from '../../../../utilities/addClassString'
+import displayToast from '../../../../utilities/displayToast';
 import { ValidatorModalView } from '../../../constants/enums'
-import useExitValidator from '../../../hooks/useExitValidator'
-import AuthModal from '../../AuthModal/AuthModal';
+import useUiMode from '../../../hooks/useUiMode';
+import { ToastType } from '../../../types';
+import { SignedExitData } from '../../../types/validator';
+import AuthPrompt from '../../AuthPrompt/AuthPrompt';
 import BasicValidatorMetrics, {
   BasicValidatorMetricsProps,
 } from '../../BasicValidatorMetrics/BasicValidatorMetrics'
@@ -19,33 +24,82 @@ export interface ValidatorExitProps extends BasicValidatorMetricsProps {}
 const ValidatorExit: FC<ValidatorExitProps> = ({ validator, validatorEpochData }) => {
   const { t } = useTranslation()
   const { pubKey } = validator
+  const { mode } = useUiMode()
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${Cookies.get('session-token')}`
+    }
+  }
+  const [isPromptLoading, setPromptLoading] = useState(false)
   const [isLoading, setLoading] = useState(false)
   const [isAccept, setIsAccept] = useState(false)
   const [isAuthPrompt, setAuthPrompt] = useState(false)
   const { moveToView, closeModal } = useContext(ValidatorModalContext)
   const viewDetails = () => moveToView(ValidatorModalView.DETAILS)
-  const { getSignedExit, submitSignedMessage } = useExitValidator(pubKey)
 
   const acceptBtnClasses = addClassString('', [isAccept && 'border-success !text-success'])
   const checkMarkClasses = addClassString('bi bi-check-circle ml-4', [isAccept && 'text-success'])
 
+  const handleError = (e: any, defaultMessage: string) => {
+    let message = defaultMessage
+
+    if(e.response.status === 401) {
+      message = 'Unauthorized. Invalid session password provided.'
+    }
+    displayToast(message, ToastType.ERROR)
+    setPromptLoading(false)
+    // setAuthPrompt(false)
+    setLoading(false)
+  }
+
+  const getSignedExit = async (password: string): Promise<SignedExitData | undefined> => {
+    try {
+      const { data } = await axios.post('/api/sign-validator-exit', {pubKey, password}, config)
+
+      return data
+    } catch (e) {
+      handleError(e, t('error.unableToSignExit'))
+    }
+  }
+  const submitSignedMessage = async (data: {data: SignedExitData, password: string}) => {
+    try {
+      const { status } = await axios.post('/api/execute-validator-exit', data, config)
+
+      if (status === 200) {
+        displayToast(t('success.validatorExit'), ToastType.SUCCESS)
+      }
+    } catch (e) {
+      handleError(e, t('error.invalidExit'))
+    }
+  }
+
   const confirmExit = async (password: string) => {
-    setLoading(true)
+    setPromptLoading(true)
 
     const message = await getSignedExit(password)
 
     if (message) {
       await submitSignedMessage({data: message, password})
+      setPromptLoading(false)
+      setAuthPrompt(false)
       closeModal()
     }
   }
   const toggleAccept = () => setIsAccept((prev) => !prev)
-  const triggerPrompt = () => setAuthPrompt(true)
+  const triggerPrompt = () => {
+    setLoading(true)
+    setAuthPrompt(true)
+  }
+  const closePrompt = () => {
+    setLoading(false)
+    setAuthPrompt(false)
+  }
 
   return (
     <>
       <div className='pt-2 exit-validator-modal relative'>
-        <AuthModal isVisible={isAuthPrompt} onSubmit={confirmExit}/>
+        <AuthPrompt mode={mode} isLoading={isPromptLoading} onClose={closePrompt} isVisible={isAuthPrompt} onSubmit={confirmExit}/>
         <div className='py-4 px-6 flex justify-between'>
           <div className='space-x-4 flex items-center'>
             <i onClick={viewDetails} className='bi-chevron-left dark:text-dark300 cursor-pointer' />

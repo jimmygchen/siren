@@ -10,6 +10,11 @@ export async function POST(req: Request) {
 
     return NextResponse.json(res, {status: 200})
   } catch (error) {
-    return NextResponse.json({ error }, { status: 500 })
+    let status = 500;
+
+    if(error.message.includes('401')) {
+      status = 401
+    }
+    return NextResponse.json({ error }, { status })
   }
 }
