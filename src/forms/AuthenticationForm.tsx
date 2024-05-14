@@ -1,9 +1,10 @@
-import { FC, ReactElement } from 'react'
+import { FC, ReactElement, useEffect } from 'react';
 import { Control, useForm } from 'react-hook-form'
 
 export interface AuthFormProps {
   children: (props: RenderProps) => ReactElement
   onSubmit: (token: string) => void
+  isVisible: boolean
 }
 
 export interface AuthForm {
@@ -12,21 +13,27 @@ export interface AuthForm {
 
 export interface RenderProps {
   control: Control<AuthForm>
-  isLoading: boolean
   isValid: boolean
   onClick: () => void
 }
 
-const AuthenticationForm: FC<AuthFormProps> = ({ children, onSubmit }) => {
+const AuthenticationForm: FC<AuthFormProps> = ({ children, onSubmit, isVisible }) => {
   const {
     control,
     watch,
+    reset,
   } = useForm<AuthForm>({
     defaultValues: {
       password: '',
     },
     mode: 'onChange'
   })
+
+  useEffect(() => {
+    if(!isVisible) {
+      reset()
+    }
+  }, [isVisible, reset])
 
   const password = watch('password')
 
@@ -37,7 +44,6 @@ const AuthenticationForm: FC<AuthFormProps> = ({ children, onSubmit }) => {
       {children &&
         children({
           control,
-          isLoading: false,
           isValid: !!password,
           onClick,
         })}

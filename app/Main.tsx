@@ -1,28 +1,31 @@
-'use client'
+'use client';
 
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation'
-import { useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import AlertIcon from '../src/components/AlertIcon/AlertIcon'
-import AppDescription from '../src/components/AppDescription/AppDescription'
-import AuthModal from '../src/components/AuthModal/AuthModal';
-import Button, { ButtonFace } from '../src/components/Button/Button'
-import LoadingSpinner from '../src/components/LoadingSpinner/LoadingSpinner'
-import RodalModal from '../src/components/RodalModal/RodalModal'
-import Typography from '../src/components/Typography/Typography'
-import { REQUIRED_VALIDATOR_VERSION } from '../src/constants/constants'
-import formatSemanticVersion from '../utilities/formatSemanticVersion'
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import AlertIcon from '../src/components/AlertIcon/AlertIcon';
+import AppDescription from '../src/components/AppDescription/AppDescription';
+import AuthPrompt from '../src/components/AuthPrompt/AuthPrompt';
+import Button, { ButtonFace } from '../src/components/Button/Button';
+import LoadingSpinner from '../src/components/LoadingSpinner/LoadingSpinner';
+import RodalModal from '../src/components/RodalModal/RodalModal';
+import Typography from '../src/components/Typography/Typography';
+import { REQUIRED_VALIDATOR_VERSION } from '../src/constants/constants';
+import formatSemanticVersion from '../utilities/formatSemanticVersion';
 import isExpiredToken from '../utilities/isExpiredToken';
-import isRequiredVersion from '../utilities/isRequiredVersion'
+import isRequiredVersion from '../utilities/isRequiredVersion';
+import displayToast from '../utilities/displayToast';
+import { ToastType } from '../src/types';
+import { UiMode } from '../src/constants/enums';
 
 const Main = () => {
   const { t } = useTranslation()
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect')
+  const [isLoading, setLoading] = useState(false)
   const [step, setStep] = useState<number>(1)
   const [isReady, setReady] = useState(false)
   const [isVersionError, setVersionError] = useState(false)
@@ -84,8 +87,10 @@ const Main = () => {
 
   const storeSessionCookie = async (password: string) => {
     try {
+      setLoading(true)
       const {status, data} = await axios.post('/api/authenticate', {password})
       const token = data.token;
+      setLoading(false)
 
       if(status === 200) {
         setToken(token)
@@ -93,7 +98,8 @@ const Main = () => {
       }
 
     } catch (e) {
-      console.log(e, 'error')
+      setLoading(false)
+      displayToast('Unable to verify session password', ToastType.ERROR)
     }
   }
 
@@ -175,7 +181,7 @@ const Main = () => {
           </div>
         </RodalModal>
       )}
-      <AuthModal isVisible={!sessionToken} onSubmit={storeSessionCookie}/>
+      <AuthPrompt mode={UiMode.LIGHT} isLoading={isLoading} isVisible={!sessionToken} onSubmit={storeSessionCookie}/>
       <div className='absolute top-0 left-0 w-full h-full bg-cover bg-lighthouse' />
       <div className='absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2'>
         <LoadingSpinner />

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import displayToast from '../../../utilities/displayToast';
 import { ToastType } from '../../types';
 import { ValidatorInfo } from '../../types/validator';
-import AuthModal from '../AuthModal/AuthModal';
+import AuthPrompt from '../AuthPrompt/AuthPrompt';
 import ValidatorGraffitiInput from '../ValidatorGraffitiInput/ValidatorGraffitiInput';
 
 export interface ValidatorGraffitiProps {
@@ -73,7 +73,7 @@ const ValidatorGraffiti:FC<ValidatorGraffitiProps> = ({validator}) => {
 
   return (
     <>
-      <AuthModal isVisible={isAuth} onSubmit={updateGraffiti} />
+      <AuthPrompt isVisible={isAuth} onSubmit={updateGraffiti} />
       <ValidatorGraffitiInput isLoading={isLoading} onSubmit={storeGraffitiInput} value={graffiti} />
     </>
   )
