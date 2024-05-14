@@ -13,12 +13,12 @@ import LoadingSpinner from '../src/components/LoadingSpinner/LoadingSpinner';
 import RodalModal from '../src/components/RodalModal/RodalModal';
 import Typography from '../src/components/Typography/Typography';
 import { REQUIRED_VALIDATOR_VERSION } from '../src/constants/constants';
+import { UiMode } from '../src/constants/enums';
+import { ToastType } from '../src/types';
+import displayToast from '../utilities/displayToast';
 import formatSemanticVersion from '../utilities/formatSemanticVersion';
 import isExpiredToken from '../utilities/isExpiredToken';
 import isRequiredVersion from '../utilities/isRequiredVersion';
-import displayToast from '../utilities/displayToast';
-import { ToastType } from '../src/types';
-import { UiMode } from '../src/constants/enums';
 
 const Main = () => {
   const { t } = useTranslation()

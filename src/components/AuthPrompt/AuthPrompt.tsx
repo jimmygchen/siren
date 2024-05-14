@@ -1,15 +1,15 @@
+import Image from 'next/image';
 import { FC } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import Lighthouse from '../../assets/images/lightHouse.svg'
+import Waves from '../../assets/images/waves.png';
 import { UiMode } from '../../constants/enums';
 import AuthenticationForm, { AuthFormProps } from '../../forms/AuthenticationForm';
 import Button, { ButtonFace } from '../Button/Button';
 import Input from '../Input/Input';
 import RodalModal from '../RodalModal/RodalModal';
-import Waves from '../../assets/images/waves.png';
 import Typography from '../Typography/Typography';
-import Image from 'next/image';
-import Lighthouse from '../../assets/images/lightHouse.svg'
 
 export interface AuthModalProps extends Omit<AuthFormProps, 'children'>{
   isVisible: boolean
