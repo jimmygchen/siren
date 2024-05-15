@@ -36,50 +36,52 @@ const EditValidator: FC<EditValidatorProps> = ({ validatorEpochData, validator }
         border='border border-primary100 dark:border-primary'
         icon='bi-pencil-square'
       />
-      <RodalModal
-        styles={{
-          width: 'fit-content',
-          maxWidth: isTablet ? '448px' : '900px',
-          height: isTablet ? '540px' : 'max-content',
-        }}
-        onClose={closeModal}
-        isVisible={isOpen}
-      >
-        <div className='py-4 px-6 space-x-12 flex justify-between'>
-          <div className='flex items-center'>
-            <Typography type='text-subtitle1' fontWeight='font-light'>
-              {t('validatorEdit.title')}
-            </Typography>
-          </div>
-          <BasicValidatorMetrics validatorEpochData={validatorEpochData} validator={validator} />
-        </div>
-        <ValidatorInfoHeader validator={validator} />
-        <EditValidatorForm validator={validator}>
-          {({ control, isValid, onSubmit }) => (
-            <div className='p-6 space-y-8'>
-              <Controller
-                name='nameString'
-                control={control as any}
-                render={({ field: { ref: _ref, ...props }, fieldState }) => (
-                  <Input
-                    isAutoFocus
-                    placeholder={formatDefaultValName(String(index))}
-                    uiMode={mode}
-                    error={fieldState.error?.message}
-                    label={t('validatorEdit.label')}
-                    {...props}
-                  />
-                )}
-              />
-              <div className='flex justify-end'>
-                <Button isDisabled={!isValid} onClick={onSubmit} type={ButtonFace.SECONDARY}>
-                  {t('validatorEdit.cta')}
-                </Button>
-              </div>
+      {isOpen && (
+        <RodalModal
+          styles={{
+            width: 'fit-content',
+            maxWidth: isTablet ? '448px' : '900px',
+            height: isTablet ? '540px' : 'max-content',
+          }}
+          onClose={closeModal}
+          isVisible={isOpen}
+        >
+          <div className='py-4 px-6 space-x-12 flex justify-between'>
+            <div className='flex items-center'>
+              <Typography type='text-subtitle1' fontWeight='font-light'>
+                {t('validatorEdit.title')}
+              </Typography>
             </div>
-          )}
-        </EditValidatorForm>
-      </RodalModal>
+            <BasicValidatorMetrics validatorEpochData={validatorEpochData} validator={validator} />
+          </div>
+          <ValidatorInfoHeader validator={validator} />
+          <EditValidatorForm validator={validator}>
+            {({ control, isValid, onSubmit }) => (
+              <div className='p-6 space-y-8'>
+                <Controller
+                  name='nameString'
+                  control={control as any}
+                  render={({ field: { ref: _ref, ...props }, fieldState }) => (
+                    <Input
+                      isAutoFocus
+                      placeholder={formatDefaultValName(String(index))}
+                      uiMode={mode}
+                      error={fieldState.error?.message}
+                      label={t('validatorEdit.label')}
+                      {...props}
+                    />
+                  )}
+                />
+                <div className='flex justify-end'>
+                  <Button isDisabled={!isValid} onClick={onSubmit} type={ButtonFace.SECONDARY}>
+                    {t('validatorEdit.cta')}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </EditValidatorForm>
+        </RodalModal>
+      )}
     </>
   )
 }
