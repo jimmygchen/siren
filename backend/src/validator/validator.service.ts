@@ -66,11 +66,17 @@ export class ValidatorService {
 
         return sortedStates.map(
           ({ validator, index, status, balance }: BeaconValidatorResult) => {
+            let initialBalance = 32;
+
+            if(status === 'withdrawal_done') {
+              initialBalance = 0
+            }
+
             return {
               name: formatDefaultValName(index),
               pubKey: validator.pubkey,
               balance: Number(formatUnits(balance, 'gwei')),
-              rewards: Number(formatUnits(balance, 'gwei')) - 32,
+              rewards: Number(formatUnits(balance, 'gwei')) - initialBalance,
               index: Number(index),
               slashed: validator.slashed,
               withdrawalAddress: validator.withdrawal_credentials,
