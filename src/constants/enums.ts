@@ -67,6 +67,7 @@ export enum Network {
   Goerli = 'Goerli',
   Mainnet = 'Mainnet',
   LocalTestnet = 'Local TestNet',
+  Holesky = 'Holesky'
 }
 
 export enum ValidatorModalView {

@@ -17,6 +17,8 @@ export const selectBnChain = selector({
         return Network.Mainnet
       case '4242':
         return Network.LocalTestnet
+      case '17000':
+        return Network.Holesky
       default:
         return
     }
