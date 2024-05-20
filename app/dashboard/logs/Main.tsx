@@ -42,7 +42,7 @@ const Main: FC<MainProps> = ({ initSyncData, beaconSpec, initNodeHealth, initLog
     networkError,
   })
 
-  const { data: logMetrics } = useSWRPolling('/api/priority-logs', {
+  const { data: logMetrics } = useSWRPolling<LogMetric>('/api/priority-logs', {
     refreshInterval: slotInterval / 2,
     fallbackData: initLogMetrics,
     networkError,

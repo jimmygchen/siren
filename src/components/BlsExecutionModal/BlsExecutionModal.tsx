@@ -61,7 +61,7 @@ const BlsExecutionModal = () => {
     displayToast(message, ToastType.ERROR)
   }
 
-  const submitChange = async (password) => {
+  const submitChange = async (password: string) => {
     setAuthModal(false)
     setAuthPromptLoad(false)
     let targetIndices = getValuesFromObjArray(JSON.parse(blsJson), 'message.validator_index')

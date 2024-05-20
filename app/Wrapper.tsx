@@ -5,10 +5,10 @@ import Main from './Main'
 import Providers from './Providers'
 import '../src/i18n'
 
-const Wrapper = (props) => {
+const Wrapper = () => {
   return (
     <Providers>
-      <Main {...props} />
+      <Main />
     </Providers>
   )
 }

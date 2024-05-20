@@ -27,7 +27,7 @@ const AlertInfo: FC<AlertInfoProps> = ({metrics, ...props}) => {
   const priorityLogAlerts = useMemo(() => {
     return Object.values(metrics).flat().filter(({level}) =>
       level === LogLevels.CRIT || level === LogLevels.ERRO)
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [metrics]);
 
   const setFilterValue = (value: FilterValue) => setFilter(value)

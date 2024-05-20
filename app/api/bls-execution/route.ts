@@ -11,9 +11,11 @@ export async function POST(req: Request) {
     return NextResponse.json('done', {status: 200})
   } catch (error) {
     let status = 500
-    if(error?.message.includes('401')) {
-      status = 401
+    let message = 'Unknown error occurred...'
+    if (error instanceof Error && error.message.includes('401')) {
+      status = 401;
+      message = error.message
     }
-    return NextResponse.json({ error }, { status })
+    return NextResponse.json({ error: message }, { status })
   }
 }

@@ -34,10 +34,10 @@ const ValidatorModal: FC<ValidatorModalProps> = ({
   const [view, setView] = useState<ValidatorModalView>(ValidatorModalView.EXIT)
   const isTablet = useMediaQuery('(max-width: 768px)')
   const isLargeScreen = useMediaQuery('(min-width: 1540px)')
-  const { index } = validator
+  const { index, status } = validator
 
   const { data: validatorMetric } = useSWRPolling<ValidatorMetricResult>(
-    `/api/validator-metrics?index=${index}`,
+    status !== 'withdrawal_done' ? `/api/validator-metrics?index=${index}` : null,
     { refreshInterval: 5 * 1000 },
   )
 
@@ -92,7 +92,7 @@ const ValidatorModal: FC<ValidatorModalProps> = ({
       }}
       onClose={closeModal}
     >
-      {validator && validatorMetric ? (
+      {validator ? (
         <ValidatorModalContext.Provider value={{ moveToView, closeModal }}>
           <Carousel swiping={false} slideIndex={activeIndex} dragging={false} withoutControls>
             <ValidatorDetails

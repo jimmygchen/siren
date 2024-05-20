@@ -3,6 +3,7 @@ import Cookies from 'js-cookie';
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import displayToast from '../../../utilities/displayToast';
+import useUiMode from '../../hooks/useUiMode';
 import { ToastType } from '../../types';
 import { ValidatorInfo } from '../../types/validator';
 import AuthPrompt from '../AuthPrompt/AuthPrompt';
@@ -15,6 +16,7 @@ export interface ValidatorGraffitiProps {
 const ValidatorGraffiti:FC<ValidatorGraffitiProps> = ({validator}) => {
   const { t } = useTranslation()
   const { index, pubKey } = validator
+  const {mode} = useUiMode()
 
   const config = {
     headers: {
@@ -73,7 +75,7 @@ const ValidatorGraffiti:FC<ValidatorGraffitiProps> = ({validator}) => {
 
   return (
     <>
-      <AuthPrompt isVisible={isAuth} onSubmit={updateGraffiti} />
+      <AuthPrompt isLoading={isLoading} mode={mode} isVisible={isAuth} onSubmit={updateGraffiti} />
       <ValidatorGraffitiInput isLoading={isLoading} onSubmit={storeGraffitiInput} value={graffiti} />
     </>
   )

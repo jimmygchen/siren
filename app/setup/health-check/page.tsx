@@ -5,7 +5,7 @@ import Wrapper from './Wrapper'
 
 export default async function Page() {
   const cookieStore = cookies()
-  const token = cookieStore.get('session-token').value
+  const token = cookieStore?.get('session-token')?.value || ''
 
   const nodeHealth = await fetchNodeHealth(token)
   const beaconSpec = await fetchBeaconSpec(token)

@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const swrGetFetcher = ([url, token]) => axios.get(url, {
+const swrGetFetcher = ([url, token]: [string, string]) => axios.get(url, {
   headers: {
     Authorization: `Bearer ${token}`
   }

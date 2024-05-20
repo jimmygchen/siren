@@ -24,7 +24,7 @@ import ValidatorActions from '../ValidatorActions'
 
 export interface ValidatorDetailsProps {
   validator: ValidatorInfo
-  validatorMetrics: ValidatorMetricResult
+  validatorMetrics: ValidatorMetricResult | undefined
   validatorCacheData: ValidatorCache
 }
 
@@ -37,7 +37,7 @@ const ValidatorDetails: FC<ValidatorDetailsProps> = ({
   const processingValidators = useRecoilValue(processingBlsValidators)
   const { index, balance, status, withdrawalAddress } = validator || {}
   const data = useRecoilValue(exchangeRates)
-  const { targetEffectiveness, hitEffectiveness, totalEffectiveness } = validatorMetrics
+  const { targetEffectiveness, hitEffectiveness, totalEffectiveness } = validatorMetrics || {}
   const validatorEpochData = useMemo<ValidatorBalanceInfo>(() => {
     return formatValidatorEpochData([validator], validatorCacheData)
   }, [validator, validatorCacheData])

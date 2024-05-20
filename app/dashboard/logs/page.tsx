@@ -6,7 +6,7 @@ import Wrapper from './Wrapper'
 
 export default async function Page() {
   const cookieStore = cookies()
-  const token = cookieStore.get('session-token').value
+  const token = cookieStore?.get('session-token')?.value || ''
 
   const logMetrics = await fetchLogMetrics(token)
 

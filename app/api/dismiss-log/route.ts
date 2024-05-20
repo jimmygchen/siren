@@ -4,13 +4,23 @@ import { dismissLogAlert } from '../logs';
 
 export async function GET(req: Request) {
   try {
-    const url = new URL(req.url)
-    const index = url.searchParams.get('index')
-    const token = getReqAuthToken(req)
+    const url = new URL(req.url);
+    const index = url.searchParams.get('index');
+    const token = getReqAuthToken(req);
 
-    const data = await dismissLogAlert(token, index)
-    return NextResponse.json(data)
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch validator metrics' }, { status: 500 })
+    if (!index) {
+      return NextResponse.json({ error: 'No log index found' }, { status: 400 });
+    }
+
+    if (!token) {
+      return NextResponse.json({ error: 'Authentication token is missing' }, { status: 401 });
+    }
+
+    const data = await dismissLogAlert(token, index);
+    return NextResponse.json(data);
+  } catch (error: any) {
+    console.error('Error dismissing log alert:', error);
+    const errorMessage = error.message || 'Failed to dismiss log alert';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

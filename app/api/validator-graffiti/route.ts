@@ -8,9 +8,19 @@ export async function GET(req: Request) {
     const index = url.searchParams.get('index')
     const token = getReqAuthToken(req)
 
+    if (!index) {
+      return NextResponse.json({ error: 'No validator index found' }, { status: 400 });
+    }
+
+    if (!token) {
+      return NextResponse.json({ error: 'Authentication token is missing' }, { status: 401 });
+    }
+
     const data = await fetchValGraffiti(token, index)
     return NextResponse.json(data)
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch validator metrics' }, { status: 500 })
+  } catch (error: any) {
+    console.error('Error fetching val graffiti:', error);
+    const errorMessage = error.message || 'Failed to fetch validator graffiti';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

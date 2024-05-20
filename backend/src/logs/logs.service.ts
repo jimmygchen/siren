@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import {Subject} from 'rxjs';
+import { Subject } from 'rxjs';
 import { Request, Response } from 'express';
 import * as EventSource from 'eventsource';
 import { LogLevels, LogType, SSELog } from '../../../src/types';
 import { InjectModel } from '@nestjs/sequelize';
 import { Log } from './entities/log.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class LogsService {
@@ -12,6 +13,8 @@ export class LogsService {
     @InjectModel(Log)
     private logRepository: typeof Log
   ) {}
+
+  private logTypes = [LogType.BEACON, LogType.VALIDATOR];
 
   private sseStreams: Map<string, Subject<any>> = new Map();
 
@@ -73,14 +76,18 @@ export class LogsService {
   }
 
   async readLogMetrics(type?: LogType) {
+    if(type && !this.logTypes.includes(type)) {
+      throw new Error('Invalid log type');
+    }
+
     let warnOptions = { where: { level: LogLevels.WARN } } as any
     let errorOptions = { where: { level: LogLevels.ERRO } } as any
     let critOptions = { where: { level: LogLevels.CRIT } } as any
 
     if(type) {
-      warnOptions.where.type = type
-      errorOptions.where.type = type
-      critOptions.where.type = type
+      warnOptions.where.type = { [Op.eq]: type };
+      errorOptions.where.type = { [Op.eq]: type };
+      critOptions.where.type = { [Op.eq]: type };
     }
 
     const warningLogs = (await this.logRepository.findAll(warnOptions)).map(data => data.dataValues)

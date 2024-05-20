@@ -1,4 +1,4 @@
-import { FC, ReactElement, useEffect } from 'react';
+import { FC, FormEvent, ReactElement, useEffect } from 'react';
 import { Control, useForm } from 'react-hook-form'
 
 export interface AuthFormProps {
@@ -38,7 +38,7 @@ const AuthenticationForm: FC<AuthFormProps> = ({ children, onSubmit, isVisible }
   const password = watch('password')
 
   const onClick = () => onSubmit(password)
-  const submitForm = (e) => {
+  const submitForm = (e: FormEvent) => {
     e.preventDefault()
     if(password) {
       onSubmit(password)

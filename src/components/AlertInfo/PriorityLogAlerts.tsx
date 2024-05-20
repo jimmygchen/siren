@@ -23,7 +23,7 @@ const PriorityLogAlerts:FC<LogAlertsProps> = ({alerts}) => {
     return data.filter(({isHidden}) => !isHidden)
   }, [data])
 
-  const dismissAlert = async (id) => {
+  const dismissAlert = async (id: number) => {
     try {
       const token = Cookies.get('session-token')
       await axios.get(`/api/dismiss-log?index=${id}`, {
@@ -35,9 +35,13 @@ const PriorityLogAlerts:FC<LogAlertsProps> = ({alerts}) => {
       setData(prev => {
         let log = prev.find(alert => alert.id === id)
 
+        if(!log) {
+          return prev
+        }
+
         log.isHidden = true
 
-        return [...prev.filter(alert => alert.id !== id), log]
+        return [...prev.filter(alert => alert.id !== id), log] as LogData[]
       })
     } catch (e) {
       console.log('error updating log...')
