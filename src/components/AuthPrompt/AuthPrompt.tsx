@@ -39,8 +39,7 @@ const AuthPrompt:FC<AuthModalProps> = ({onSubmit, isVisible, isLoading, mode, on
               </div>
               <div className="py-8">
                 <Typography type="text-caption1" color="text-dark500">
-                  This action requires authentication. Please provide your session password to continue. Please review your configuration file
-                  and make appropriate adjustments if necessary.
+                  {t('authPrompt.authRequired')}
                 </Typography>
               </div>
               <Controller
@@ -58,7 +57,7 @@ const AuthPrompt:FC<AuthModalProps> = ({onSubmit, isVisible, isLoading, mode, on
                 )}
               />
               <div className="w-full flex items-center justify-center mt-4">
-                <Button onClick={onClick} isDisabled={!isValid} isLoading={isLoading} className="mt-4" type={ButtonFace.SECONDARY}>Submit</Button>
+                <Button onClick={onClick} isDisabled={!isValid} isLoading={isLoading} className="mt-4" type={ButtonFace.SECONDARY}>{t('authPrompt.authenticate')}</Button>
               </div>
             </div>
           </div>
