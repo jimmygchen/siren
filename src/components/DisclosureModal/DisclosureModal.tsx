@@ -31,6 +31,7 @@ const DisclosureModal: FC<DisclosureModalProps> = ({
     <RodalModal
       isVisible={isOpen}
       onClose={onClose}
+      uiMode={mode ? { mode } : undefined}
       styles={{
         maxWidth: isTablet ? '448px' : '949px',
       }}
