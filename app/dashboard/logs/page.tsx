@@ -1,5 +1,5 @@
 import '../../../src/global.css'
-import { cookies, headers } from 'next/headers';
+import { cookies } from 'next/headers';
 import { fetchBeaconSpec, fetchNodeHealth, fetchSyncData } from '../../api/beacon'
 import { fetchLogMetrics } from '../../api/logs';
 import Wrapper from './Wrapper'

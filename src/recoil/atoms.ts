@@ -1,17 +1,15 @@
 import { atom } from 'recoil'
-import { AppView, ContentView, OnboardView, SetupSteps, UiMode } from '../constants/enums'
+import { AppView, ContentView, OnboardView, UiMode } from '../constants/enums'
 import {
   ActiveDevice,
   AlertMessage,
-  DeviceList,
   EthExchangeRates,
-  OptionalString,
   ProposerDuty,
   ValAliases,
 } from '../types'
 import { BeaconNodeSpecResults, BeaconValidatorMetricResults } from '../types/beacon'
-import { BeaconSyncResult, HealthDiagnosticResult, ValidatorSyncResult } from '../types/diagnostic'
-import { BeaconValidatorResult, ValidatorCache } from '../types/validator'
+import { HealthDiagnosticResult } from '../types/diagnostic'
+import { ValidatorCache } from '../types/validator'
 
 export const uiMode = atom<UiMode>({
   key: 'UiMode',

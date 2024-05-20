@@ -252,7 +252,6 @@ const Main: FC<MainProps> = (props) => {
           <DiagnosticTable
             metrics={logMetrics}
             bnSpec={beaconSpec}
-            genesisTime={genesisTime}
             syncData={syncData}
             beanHealth={nodeHealth}
           />

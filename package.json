@@ -28,6 +28,7 @@
     "crypto-js": "^4.1.1",
     "dotenv": "^16.4.5",
     "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-unused-imports": "^3.2.0",
     "ethers": "^5.7.1",
     "event-source-polyfill": "^1.0.31",
     "eventsource": "^2.0.2",

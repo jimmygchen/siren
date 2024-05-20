@@ -1,8 +1,7 @@
 import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-import formatExecSyncInfo from '../../../utilities/formatExecSyncInfo'
 import { formatLocalCurrency } from '../../../utilities/formatLocalCurrency'
-import { ValidatorSyncInfo, ValidatorSyncResult } from '../../types/diagnostic'
+import { ValidatorSyncInfo } from '../../types/diagnostic'
 import SyncCard from '../SyncCard/SyncCard'
 
 export interface ValidatorSyncCardProps {

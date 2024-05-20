@@ -1,19 +1,12 @@
-import { FC, useState } from 'react'
+import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useRecoilValue } from 'recoil'
-import useLocalStorage from '../../hooks/useLocalStorage'
-import useUiMode from '../../hooks/useUiMode'
-import { activeDevice } from '../../recoil/atoms'
-import { DeviceListStorage } from '../../types/storage'
 import Button, { ButtonFace } from '../Button/Button'
-import SessionAuthModal from '../SessionAuthModal/SessionAuthModal'
 import Typography from '../Typography/Typography'
 
 export interface ViewDisclosuresProps {
   onClick?: () => void
   onAccept?: () => void
   ctaText?: string
-  isSensitive?: boolean
   isDisabled?: boolean
   ctaType?: ButtonFace
   isLoading?: boolean
@@ -25,48 +18,12 @@ const ViewDisclosures: FC<ViewDisclosuresProps> = ({
   ctaText,
   ctaType,
   isDisabled,
-  isSensitive,
   isLoading,
 }) => {
   const { t } = useTranslation()
-  // const { mode } = useUiMode()
-  // const { apiToken, deviceName } = useRecoilValue(activeDevice)
-  // const [isSessionModal, toggleAuthModal] = useState(false)
-  // const [devices] = useLocalStorage<DeviceListStorage>('deviceList', undefined)
-  // const encryptedToken = devices?.[deviceName]?.apiToken
-
-  // const closeAuthModal = () => toggleAuthModal(false)
-  // const openAuthModal = () => toggleAuthModal(true)
-
-  // const onSuccessAuth = () => {
-  //   closeAuthModal()
-  //   onAccept?.()
-  // }
 
   const renderCta = () => {
     if (!onAccept || !ctaText) return null
-
-    // if (isSensitive) {
-    //   return (
-    //     <SessionAuthModal
-    //       mode={mode}
-    //       onSuccess={onSuccessAuth}
-    //       isOpen={isSessionModal}
-    //       onClose={closeAuthModal}
-    //       defaultToken={apiToken}
-    //       encryptedToken={encryptedToken}
-    //     >
-    //       <Button
-    //         isLoading={isLoading}
-    //         isDisabled={isDisabled}
-    //         type={ctaType}
-    //         onClick={openAuthModal}
-    //       >
-    //         {ctaText}
-    //       </Button>
-    //     </SessionAuthModal>
-    //   )
-    // }
 
     return (
       <Button isLoading={isLoading} isDisabled={isDisabled} type={ctaType} onClick={onAccept}>

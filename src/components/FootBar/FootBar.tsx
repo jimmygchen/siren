@@ -1,8 +1,8 @@
-import { FC, Suspense } from 'react'
+import { FC } from 'react'
 import Siren from '../../assets/images/siren.svg'
 import { DiscordUrl, LighthouseBookUrl } from '../../constants/constants'
 import Button, { ButtonFace } from '../Button/Button'
-import HealthMetric, { HealthMetricFallback, HealthMetricProps } from './HealthMetric'
+import HealthMetric, { HealthMetricProps } from './HealthMetric'
 
 export interface FootBarProps extends HealthMetricProps {}
 

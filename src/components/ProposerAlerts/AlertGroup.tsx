@@ -2,7 +2,6 @@ import { FC, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import getSlotTimeData from '../../../utilities/getSlotTimeData'
 import { ProposerDuty, StatusColor } from '../../types'
-import { BeaconSyncInfo } from '../../types/diagnostic';
 import StatusBar from '../StatusBar/StatusBar'
 import Typography from '../Typography/Typography'
 import ProposalAlert from './ProposalAlert'
@@ -10,12 +9,11 @@ import ProposalAlert from './ProposalAlert'
 export interface AlertGroupProps {
   duties: ProposerDuty[]
   onClick: (ids: string[]) => void
-  genesis: number
   secondsPerSlot: number
   headSlot: number
 }
 
-const AlertGroup: FC<AlertGroupProps> = ({ duties, genesis, secondsPerSlot, onClick, headSlot }) => {
+const AlertGroup: FC<AlertGroupProps> = ({ duties, secondsPerSlot, onClick, headSlot }) => {
   const { t } = useTranslation()
   const indices = duties.map(({ validator_index }) => validator_index)
   const uuids = duties.map(({ uuid }) => uuid)

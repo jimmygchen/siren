@@ -1,7 +1,6 @@
 import { FC, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import formatValidatorEpochData from '../../../utilities/formatValidatorEpochData'
-import { BeaconValidatorMetricResults, ValidatorMetricResult } from '../../types/beacon';
 import {
   ValidatorBalanceInfo,
   ValidatorCache,

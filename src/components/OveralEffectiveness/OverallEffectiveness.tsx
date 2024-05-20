@@ -1,9 +1,8 @@
 import { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-import formatValidatorEffectiveness from '../../../utilities/formatValidatorEffectiveness'
 import getAvgEffectivenessStatus from '../../../utilities/getAvgEffectivenessStatus'
 import toFixedIfNecessary from '../../../utilities/toFixedIfNecessary'
-import { BeaconValidatorMetricResults, ValidatorMetricResult } from '../../types/beacon';
+import { ValidatorMetricResult } from '../../types/beacon';
 import EffectivenessBreakdown from '../EffectivenessBreakdown/EffectivenessBreakdown'
 import Status from '../Status/Status'
 import Typography from '../Typography/Typography'

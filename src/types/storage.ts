@@ -1,5 +1,5 @@
 import { UiMode } from '../constants/enums'
-import { DeviceList, OptionalBoolean, OptionalString } from './index'
+import { DeviceList, OptionalString } from './index'
 
 export type UiThemeStorage = UiMode | undefined
 export type UsernameStorage = OptionalString

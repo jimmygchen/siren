@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios'
 import Cookies from 'js-cookie';
 import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState } from 'recoil'
 import displayToast from '../../../utilities/displayToast'
 import getValuesFromObjArray from '../../../utilities/getValuesFromObjArray'
 import isValidJSONArray from '../../../utilities/isValidJson'

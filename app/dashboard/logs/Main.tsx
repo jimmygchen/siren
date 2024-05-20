@@ -5,7 +5,7 @@ import LogDisplay from '../../../src/components/LogDisplay/LogDisplay'
 import { OptionType } from '../../../src/components/SelectDropDown/SelectDropDown'
 import useNetworkMonitor from '../../../src/hooks/useNetworkMonitor'
 import useSWRPolling from '../../../src/hooks/useSWRPolling'
-import { LogData, LogMetric, LogType } from '../../../src/types';
+import { LogMetric, LogType } from '../../../src/types';
 import { BeaconNodeSpecResults, SyncData } from '../../../src/types/beacon'
 import { Diagnostics } from '../../../src/types/diagnostic'
 

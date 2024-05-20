@@ -12,10 +12,9 @@ export interface ProposerAlertsProps {
   duties: ProposerDuty[]
   syncData: SyncData
   bnSpec: BeaconNodeSpecResults
-  genesisTime: number
 }
 
-const ProposerAlerts: FC<ProposerAlertsProps> = ({ duties, bnSpec, genesisTime, syncData }) => {
+const ProposerAlerts: FC<ProposerAlertsProps> = ({ duties, bnSpec, syncData }) => {
   const { SECONDS_PER_SLOT } = bnSpec
   const { beaconSync: {headSlot} } = syncData
   const setProposers = useSetRecoilState(proposerDuties)
@@ -32,7 +31,6 @@ const ProposerAlerts: FC<ProposerAlertsProps> = ({ duties, bnSpec, genesisTime, 
             <AlertGroup
               headSlot={headSlot}
               onClick={removeAlert}
-              genesis={genesisTime}
               secondsPerSlot={SECONDS_PER_SLOT}
               duties={group}
               key={index}
