@@ -63,6 +63,7 @@ export class TasksService implements OnApplicationBootstrap {
       await this.logsService.startSse(`${this.validatorUrl}/lighthouse/logs`, LogType.VALIDATOR)
       await this.logsService.startSse(`${this.beaconUrl}/lighthouse/logs`, LogType.BEACON)
 
+      await this.initMetricsCleaningScheduler()
       this.initLogCleaningScheduler()
 
     } catch (e) {
@@ -88,14 +89,13 @@ export class TasksService implements OnApplicationBootstrap {
     })
   }
 
-  private async initMetricDataScheduler() {
-    const { SLOTS_PER_EPOCH, SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
-    const secondsPerEpoch = (Number(SLOTS_PER_EPOCH) * Number(SECONDS_PER_SLOT))
-    await this.syncMetricData()
-    const interval = (secondsPerEpoch + 1) * 1000
-
+  private async initMetricsCleaningScheduler() {
+    const interval = await this.utilsService.getEpochInterval(1)
     this.setDynamicInterval('clean-metrics', interval / 2, async () => {
       console.log('cleaning metric database....')
+
+      const { SLOTS_PER_EPOCH, SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
+      const secondsPerEpoch = (Number(SLOTS_PER_EPOCH) * Number(SECONDS_PER_SLOT))
       const thresholdDate = moment().subtract(secondsPerEpoch * 10, 'seconds').toDate();
 
       await this.metricRepository.destroy({
@@ -106,6 +106,11 @@ export class TasksService implements OnApplicationBootstrap {
         }
       });
     })
+  }
+
+  private async initMetricDataScheduler() {
+    const interval = await this.utilsService.getEpochInterval(1)
+    await this.syncMetricData()
 
     this.setDynamicInterval('metricTask', interval, async () => {
       await this.syncMetricData()

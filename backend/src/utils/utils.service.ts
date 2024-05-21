@@ -43,6 +43,13 @@ export class UtilsService {
     return SECONDS_PER_SLOT * 1000
   }
 
+  async getEpochInterval(offset: number) {
+    const { SLOTS_PER_EPOCH, SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
+    const secondsPerEpoch = (Number(SLOTS_PER_EPOCH) * Number(SECONDS_PER_SLOT))
+
+    return (secondsPerEpoch + (offset || 0)) * 1000
+  }
+
   async sendHttpRequest<T>(data: {
     url: string;
     method?: Method;
