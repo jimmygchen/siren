@@ -40,7 +40,7 @@ export default async function Page() {
       initInclusionRate={inclusion}
       initPeerData={peerData}
       initLogMetrics={logMetrics}
-      genesisTime={Number(genesisBlock.genesis_time)}
+      genesisTime={genesisBlock}
       lighthouseVersion={lighthouseVersion.version}
       bnVersion={bnVersion.version}
       beaconSpec={beaconSpec}

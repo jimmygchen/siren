@@ -17,7 +17,7 @@ export class BeaconService {
   ) {}
   private beaconUrl = process.env.BEACON_URL;
 
-  async fetchBeaconNodeVersion() {
+  async fetchBeaconNodeVersion(): Promise<string> {
     try {
       return await this.utilsService.fetchFromCache('bnVersion', 0, async () => {
         const { data } = await this.utilsService.sendHttpRequest({
@@ -32,14 +32,14 @@ export class BeaconService {
     }
   }
 
-  async fetchGenesisData() {
+  async fetchGenesisData(): Promise<number> {
     try {
       return await this.utilsService.fetchFromCache('genesis', 0, async () => {
         const { data } = await this.utilsService.sendHttpRequest({
           url: `${this.beaconUrl}/eth/v1/beacon/genesis`,
         });
 
-        return data.data
+        return Number(data.data.genesis_time)
       })
     } catch (e) {
       console.error(e);
