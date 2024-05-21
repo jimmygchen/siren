@@ -6,8 +6,9 @@ import getStatus from '../../../utilities/getInclusionRateStatus';
 import { ProposerDuty } from '../../../src/types';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { BeaconNodeSpecResults } from '../../../src/types/beacon';
-import { ValidatorDetail } from '../../../src/types/validator';
+import { BeaconNodeSpecResults, SyncData } from '../../../src/types/beacon';
+import { ValidatorCountResult, ValidatorDetail, ValidatorInclusionData } from '../../../src/types/validator';
+import { PeerDataResults } from '../../../src/types/diagnostic';
 
 @Injectable()
 export class BeaconService {
@@ -47,11 +48,11 @@ export class BeaconService {
     }
   }
 
-  async fetchSpecData() {
-    return await this.cacheManager.get('specs') as BeaconNodeSpecResults
+  async fetchSpecData(): Promise<BeaconNodeSpecResults> {
+    return await this.cacheManager.get('specs')
   }
 
-  async fetchSyncData() {
+  async fetchSyncData(): Promise<SyncData> {
     try {
       const slotInterval = await this.utilsService.getSlotInterval()
       return await this.utilsService.fetchFromCache('syncData', slotInterval, async () => {
@@ -104,7 +105,7 @@ export class BeaconService {
     }
   }
 
-  async fetchCachedHeadSlot(api) {
+  async fetchCachedHeadSlot(api): Promise<number> {
     let syncData = await this.cacheManager.get('syncData') as any
 
     if(!syncData) {
@@ -126,7 +127,7 @@ export class BeaconService {
     return  syncData.beaconSync.headSlot;
   }
 
-  async fetchInclusionRate() {
+  async fetchInclusionRate(): Promise<ValidatorInclusionData> {
     try {
       const { SLOTS_PER_EPOCH} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
 
@@ -162,7 +163,7 @@ export class BeaconService {
     }
   }
 
-  async fetchPeerData() {
+  async fetchPeerData(): Promise<PeerDataResults> {
     try {
       return this.utilsService.fetchFromCache('peerData', await this.utilsService.getSlotInterval(), async () => {
         const { data } = await this.utilsService.sendHttpRequest({
@@ -176,7 +177,7 @@ export class BeaconService {
     }
   }
 
-  async fetchValidatorCount() {
+  async fetchValidatorCount(): Promise<ValidatorCountResult> {
     try {
       return  this.utilsService.fetchFromCache('validatorCount', 60000, async () => {
         const { data } = await this.utilsService.sendHttpRequest({
@@ -190,7 +191,7 @@ export class BeaconService {
     }
   }
 
-  async fetchProposerDuties() {
+  async fetchProposerDuties(): Promise<ProposerDuty[]> {
     try {
       const { SLOTS_PER_EPOCH, SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
       const halfEpochInterval = ((Number(SECONDS_PER_SLOT) * Number(SLOTS_PER_EPOCH)) / 2) * 1000
@@ -221,12 +222,12 @@ export class BeaconService {
     }
   }
 
-  async executeBlsChange(reqData: any) {
+  async executeBlsChange(reqData: any): Promise<number> {
     const {status} = await this.utilsService.sendHttpRequest({url: `${this.beaconUrl}/eth/v1/beacon/pool/bls_to_execution_changes`, method: 'POST', config: {data: JSON.parse(reqData.data), headers: {'Content-Type': 'application/json',}}})
     return status
   }
 
-  async submitSignedExit(message: any) {
+  async submitSignedExit(message: any): Promise<number> {
     try {
       const { status } = await this.utilsService.sendHttpRequest({url: `${this.beaconUrl}/eth/v1/beacon/pool/voluntary_exits`, method: 'POST', config: {
           data: message,
