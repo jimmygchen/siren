@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { throwServerError } from '../utilities';
 import { UtilsService } from '../utils/utils.service';
 import {
-  BeaconValidatorResult, ValidatorDetail
+  BeaconValidatorResult, ValidatorCache, ValidatorDetail, ValidatorInfo
 } from '../../../src/types/validator';
 import formatDefaultValName from '../../../utilities/formatDefaultValName';
 import { formatUnits } from 'ethers/lib/utils';
@@ -10,7 +10,7 @@ import { Metric } from './entities/metric.entity';
 import getAverageKeyValue from '../../../utilities/getAverageKeyValue';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { BeaconNodeSpecResults } from '../../../src/types/beacon';
+import { ValidatorMetricResult } from '../../../src/types/beacon';
 
 @Injectable()
 export class ValidatorService {
@@ -28,7 +28,7 @@ export class ValidatorService {
     },
   };
 
-  async fetchValidatorAuthKey() {
+  async fetchValidatorAuthKey(): Promise<{token_path: string}> {
     try {
       const data = await this.utilsService.sendHttpRequest({
         url: `${this.validatorUrl}/lighthouse/auth`,
@@ -39,7 +39,7 @@ export class ValidatorService {
     }
   }
 
-  async fetchValidatorVersion() {
+  async fetchValidatorVersion(): Promise<{version: string}> {
     try {
       const { data } = await this.utilsService.sendHttpRequest({
         url: `${this.validatorUrl}/lighthouse/version`,
@@ -51,7 +51,7 @@ export class ValidatorService {
     }
   }
 
-  async fetchValidatorStates() {
+  async fetchValidatorStates(): Promise<ValidatorInfo[]> {
     try {
       return this.utilsService.fetchFromCache('valStates', await this.utilsService.getSlotInterval(), async () => {
         const validatorData = await this.cacheManager.get('validators') as ValidatorDetail[]
@@ -94,7 +94,7 @@ export class ValidatorService {
     }
   }
 
-  async fetchValidatorCaches() {
+  async fetchValidatorCaches(): Promise<ValidatorCache> {
     try {
       return this.utilsService.fetchFromCache('valCache', await this.utilsService.getSlotInterval(), async () => {
         const validatorData = await this.cacheManager.get('validators') as ValidatorDetail[]
@@ -128,7 +128,7 @@ export class ValidatorService {
     }
   }
 
-  async fetchMetrics(index?: number) {
+  async fetchMetrics(index?: number): Promise<ValidatorMetricResult> {
     try {
       const options = index ? {where: {index}} : undefined
       const metrics = await this.utilsService.fetchAll(Metric, options)
@@ -151,7 +151,7 @@ export class ValidatorService {
     }
   }
 
-  async fetchGraffiti(index: string) {
+  async fetchGraffiti(index: string): Promise<{data: string}> {
     try {
       const validatorData = await this.cacheManager.get('validators') as ValidatorDetail[]
 

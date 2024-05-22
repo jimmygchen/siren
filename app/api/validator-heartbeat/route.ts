@@ -7,9 +7,9 @@ const errorMessage = 'Failed to maintain validator heartbeat'
 export async function GET(req: Request) {
   try {
     const token = getReqAuthToken(req)
-    const data = await fetchValidatorAuthKey(token)
+    const {token_path} = await fetchValidatorAuthKey(token)
 
-    if (data?.token_path) {
+    if (token_path) {
       return NextResponse.json({ data: 'success' }, { status: 200 })
     }
 
