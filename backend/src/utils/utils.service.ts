@@ -18,7 +18,7 @@ export class UtilsService {
     private httpService: HttpService
   ) {}
 
-  getErrorMessage(code: string) {
+  getErrorMessage(code: string): string {
     if(code === 'ECONNREFUSED') {
       return 'Unable to connect to Beacon and Validator endpoints...'
     }
@@ -38,12 +38,12 @@ export class UtilsService {
     return 'Unknown error...'
   }
 
-  async getSlotInterval() {
+  async getSlotInterval(): Promise<number> {
     const { SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
-    return SECONDS_PER_SLOT * 1000
+    return Number(SECONDS_PER_SLOT) * 1000
   }
 
-  async getEpochInterval(offset: number) {
+  async getEpochInterval(offset: number): Promise<number> {
     const { SLOTS_PER_EPOCH, SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
     const secondsPerEpoch = (Number(SLOTS_PER_EPOCH) * Number(SECONDS_PER_SLOT))
 
@@ -64,7 +64,7 @@ export class UtilsService {
     return firstValueFrom(observable$);
   }
 
-  getHealthStatus(statuses: StatusColor[]) {
+  getHealthStatus(statuses: StatusColor[]): StatusColor {
     return statuses.includes(StatusColor.ERROR)
       ? StatusColor.ERROR
       : statuses.includes(StatusColor.WARNING)
@@ -72,7 +72,7 @@ export class UtilsService {
         : StatusColor.SUCCESS;
   }
 
-  getHealthCondition(status: StatusColor) {
+  getHealthCondition(status: StatusColor): DiagnosticRate {
     return status === StatusColor.ERROR
       ? DiagnosticRate.POOR
       : status === StatusColor.WARNING
