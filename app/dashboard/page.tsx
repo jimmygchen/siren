@@ -1,5 +1,5 @@
 import '../../src/global.css'
-import { cookies } from 'next/headers';
+import getSessionCookie from '../../utilities/getSessionCookie';
 import {
   fetchBeaconSpec,
   fetchInclusionRate,
@@ -13,11 +13,9 @@ import { fetchValCaches, fetchValStates } from '../api/validator'
 import Wrapper from './Wrapper'
 
 export default async function Page() {
-  const cookieStore = cookies()
-  const token = cookieStore?.get('session-token')?.value || ''
+  const token = getSessionCookie()
 
   const beaconSpec = await fetchBeaconSpec(token)
-
   const genesisBlock = await fetchGenesisData(token)
   const peerData = await fetchPeerData(token)
   const syncData = await fetchSyncData(token)

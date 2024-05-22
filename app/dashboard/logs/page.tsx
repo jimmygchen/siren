@@ -1,15 +1,13 @@
 import '../../../src/global.css'
-import { cookies } from 'next/headers';
+import getSessionCookie from '../../../utilities/getSessionCookie';
 import { fetchBeaconSpec, fetchNodeHealth, fetchSyncData } from '../../api/beacon'
 import { fetchLogMetrics } from '../../api/logs';
 import Wrapper from './Wrapper'
 
 export default async function Page() {
-  const cookieStore = cookies()
-  const token = cookieStore?.get('session-token')?.value || ''
+  const token = getSessionCookie()
 
   const logMetrics = await fetchLogMetrics(token)
-
   const beaconSpec = await fetchBeaconSpec(token)
   const syncData = await fetchSyncData(token)
   const nodeHealth = await fetchNodeHealth(token)
