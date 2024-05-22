@@ -8,6 +8,7 @@ import { throwServerError } from '../utilities';
 import { BeaconNodeSpecResults } from '../../../src/types/beacon';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { Diagnostics } from '../../../src/types/diagnostic';
 
 @Injectable()
 export class NodeService {
@@ -19,7 +20,7 @@ export class NodeService {
   private apiToken = process.env.API_TOKEN;
   private beaconUrl = process.env.BEACON_URL;
 
-  async fetchNodeHealth() {
+  async fetchNodeHealth(): Promise<Diagnostics> {
     try {
       const { SECONDS_PER_SLOT} = await this.cacheManager.get('specs') as BeaconNodeSpecResults
       return this.utilsService.fetchFromCache('nodeHealth', (SECONDS_PER_SLOT * 1000) / 2, async () => {
