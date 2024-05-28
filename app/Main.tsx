@@ -26,7 +26,7 @@ const Main = () => {
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect')
   const [isLoading, setLoading] = useState(false)
-  const [step, setStep] = useState<number>(1)
+  const [step] = useState<number>(1)
   const [isReady, setReady] = useState(false)
   const [isVersionError, setVersionError] = useState(false)
   const [sessionToken, setToken] = useState(Cookies.get('session-token'))

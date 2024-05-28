@@ -2,4 +2,18 @@
 . "$(dirname "$0")/_/husky.sh"
 
 export PATH="/Users/rickimoore/lighthouse-ui:$PATH"
+
+# Run the Next.js linter with auto-fixing
 npx next lint --fix
+
+# Navigate to the backend directory
+cd backend
+
+# Run Jest tests using yarn
+yarn test
+
+# Check if the Jest tests passed
+if [ $? -ne 0 ]; then
+  echo "Jest tests failed. Aborting commit."
+  exit 1
+fi
