@@ -4,10 +4,8 @@ import { ValidatorCache } from '../types/validator'
 const useFilteredValidatorCacheData = (
   validatorCacheData: ValidatorCache,
   indices?: string[],
-): ValidatorCache | undefined => {
+): ValidatorCache => {
   return useMemo(() => {
-    if (!validatorCacheData) return undefined
-
     if (!indices) return validatorCacheData
 
     return Object.keys(validatorCacheData)
@@ -16,7 +14,7 @@ const useFilteredValidatorCacheData = (
         return Object.assign(obj, {
           [key]: validatorCacheData[Number(key)],
         })
-      }, {})
+      }, {}) as ValidatorCache
   }, [validatorCacheData, indices])
 }
 

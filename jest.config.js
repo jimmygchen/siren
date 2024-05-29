@@ -1,19 +1,14 @@
 // eslint-disable-next-line no-undef
 module.exports = {
-  roots: ['<rootDir>/src'],
+  roots: ['<rootDir>/src', '<rootDir>/utilities'],
   preset: 'ts-jest',
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
-    '^.+.(css|styl|less|gif|sass|scss|png|jpg|jpeg|svg|ttf|woff|woff2)$': 'jest-transform-stub',
+    '^.+\\.tsx?$': ['ts-jest', { tsconfig: 'tsconfig.jest.json' }],
+    '^.+\\.(css|styl|less|gif|sass|scss|png|jpg|jpeg|svg|ttf|woff|woff2)$': 'jest-transform-stub',
   },
   testMatch: ['**/?(*.)+(spec).+(ts|tsx)'],
   moduleFileExtensions: ['js', 'jsx', 'json', 'node', 'ts', 'tsx'],
   setupFilesAfterEnv: ['./setup-test.ts'],
-  // globals: {
-  //   'ts-jest': {
-  //     tsconfig: 'tsconfig.jest.json',
-  //   },
-  // },
   testEnvironment: 'jsdom',
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
@@ -30,6 +25,8 @@ module.exports = {
       lines: 1.1,
     },
   },
+  transformIgnorePatterns: ['/node_modules/(?!rodal)'],
+
   moduleNameMapper: {
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
       '<rootDir>/assetsTransformer.js',

@@ -7,6 +7,7 @@ export const mockBeaconSpec = {
   DEPOSIT_CONTRACT_ADDRESS: 'mock-address',
   DEPOSIT_NETWORK_ID: 'mock-network-id',
   SECONDS_PER_SLOT: '12',
+  SLOTS_PER_EPOCH: '32'
 }
 
 export const mockDiagnostics = {

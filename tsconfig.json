@@ -22,6 +22,6 @@
       }
     ]
   },
-  "include": ["src", "custom.d.ts", ".next/types/**/*.ts"],
+  "include": ["src", "src/**/*.ts", "src/**/*.tsx", "custom.d.ts", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }

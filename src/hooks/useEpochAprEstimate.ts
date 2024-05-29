@@ -14,13 +14,12 @@ const useEpochAprEstimate = (validatorCacheData: ValidatorCache, indices?: strin
   const filteredValidatorCache = useFilteredValidatorCacheData(validatorCacheData, indices)
 
   const formattedCache = useMemo(() => {
-    if (!filteredValidatorCache) return
     return Object.values(filteredValidatorCache).map((cache) =>
       cache.map(({ total_balance }) => total_balance),
     )
   }, [filteredValidatorCache])
 
-  const isValidEpochCount = formattedCache && formattedCache.every((subArr) => subArr.length > 1)
+  const isValidEpochCount = formattedCache.every((subArr) => subArr.length > 1)
 
   const formatForWithdrawal = (arr: number[]) => {
     const foundIndex = arr.findIndex((value) => value > 32 && value < 32.001)

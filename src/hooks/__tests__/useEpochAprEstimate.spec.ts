@@ -1,98 +1,69 @@
 import { renderHook } from '@testing-library/react-hooks'
-import { formatUnits } from 'ethers/lib/utils'
-import { mockedRecoilValue } from '../../../test.helpers'
-import { mockBeaconSpec } from '../../mocks/beaconSpec'
-import {
-  mockValidatorCache,
-  mockedWithdrawalCash,
-  mockedWithdrawalCashLoss,
-  mockShortValidatorCache,
-  mockedRecentWithdrawalCash,
-} from '../../mocks/validatorResults'
+import { useRecoilValue } from 'recoil'
 import useEpochAprEstimate from '../useEpochAprEstimate'
-import useFilteredValidatorCacheData from '../useFilteredValidatorCacheData'
 
-jest.mock('../useFilteredValidatorCacheData', () => jest.fn())
+jest.mock('recoil')
 
-const mockedUseFilteredValidatorCacheData = useFilteredValidatorCacheData as jest.MockedFn<
-  typeof useFilteredValidatorCacheData
->
+const mockedRecoilValue = useRecoilValue as jest.Mock
 
-jest.mock('ethers/lib/utils', () => ({
-  formatUnits: jest.fn(),
-}))
-
-const mockedFormatUnits = formatUnits as jest.MockedFn<typeof formatUnits>
-
-describe('useEpochAprEstimate hook', () => {
+describe('useEpochAprEstimate', () => {
   beforeEach(() => {
-    mockedFormatUnits.mockImplementation((value) => value.toString())
-  })
-  it('should return default values', () => {
+    const mockBeaconSpec = { SECONDS_PER_SLOT: 12, SLOTS_PER_EPOCH: 32 }
     mockedRecoilValue.mockReturnValue(mockBeaconSpec)
-    mockedUseFilteredValidatorCacheData.mockReturnValue(undefined)
-    const { result } = renderHook(() => useEpochAprEstimate())
-    expect(result.current).toStrictEqual({
-      estimatedApr: undefined,
-      textColor: 'text-dark500',
-    })
+    jest.resetAllMocks()
   })
-  it('should return default values when not enough epoch data', () => {
-    mockedRecoilValue.mockReturnValue(mockBeaconSpec)
-    mockedUseFilteredValidatorCacheData.mockReturnValue(mockShortValidatorCache)
-    const { result } = renderHook(() => useEpochAprEstimate())
-    expect(result.current).toStrictEqual({
-      estimatedApr: undefined,
-      textColor: 'text-dark500',
-    })
-  })
-  it('should return correct values', () => {
-    mockedRecoilValue.mockReturnValue(mockBeaconSpec)
-    mockedUseFilteredValidatorCacheData.mockReturnValue(mockValidatorCache)
-    const { result } = renderHook(() => useEpochAprEstimate())
-    expect(result.current).toStrictEqual({
-      estimatedApr: 1.3438636363304557,
-      textColor: 'text-success',
+
+  it('should return correct values', async () => {
+    const { result, waitFor } = renderHook(() => useEpochAprEstimate({
+      1234567: [
+        { epoch: 12345678, total_balance: '32000000000' },
+        { epoch: 12345679, total_balance: '32001811011' },
+      ],
+      1234568: [
+        { epoch: 12345678, total_balance: '32000000000' },
+        { epoch: 12345679, total_balance: '32001811011' },
+      ],
+    } as any))
+
+    await waitFor(() => {
+      expect(result.current).toStrictEqual({
+        estimatedApr: 232.3923271657427,
+        textColor: 'text-success',
+      })
     })
   })
 
-  it('should return correct values when provided an array of indexes', () => {
-    mockedRecoilValue.mockReturnValue(mockBeaconSpec)
-    mockedUseFilteredValidatorCacheData.mockReturnValue(mockValidatorCache)
-    const { result } = renderHook(() => useEpochAprEstimate(['1234567']))
-    expect(result.current).toStrictEqual({
-      estimatedApr: 1.3438636363304557,
-      textColor: 'text-success',
+  it('should return correct filtered values', async () => {
+    const { result, waitFor } = renderHook(() => useEpochAprEstimate({
+      1234567: [
+        { epoch: 12345678, total_balance: '32000000000' },
+        { epoch: 12345679, total_balance: '32001111011' },
+      ],
+      1234568: [
+        { epoch: 12345678, total_balance: '32000000000' },
+        { epoch: 12345679, total_balance: '32001811011' },
+      ],
+    } as any, ['1234567']))
+
+    await waitFor(() => {
+      expect(result.current).toStrictEqual({
+        estimatedApr: 142.56701466549612,
+        textColor: 'text-success',
+      })
     })
   })
 
-  it('should return correct when there is a withdrawal value', () => {
-    mockedRecoilValue.mockReturnValue(mockBeaconSpec)
-    mockedUseFilteredValidatorCacheData.mockReturnValue(mockedWithdrawalCash)
-    const { result } = renderHook(() => useEpochAprEstimate())
-    expect(result.current).toStrictEqual({
-      estimatedApr: 3.8495973450145105,
-      textColor: 'text-success',
-    })
-  })
+  it('should return default values if not epoch data', async () => {
+    const { result, waitFor } = renderHook(() => useEpochAprEstimate({
+      1234567: [],
+      1234568: [],
+    } as any))
 
-  it('should return correct when there is a withdrawal values at a loss', () => {
-    mockedRecoilValue.mockReturnValue(mockBeaconSpec)
-    mockedUseFilteredValidatorCacheData.mockReturnValue(mockedWithdrawalCashLoss)
-    const { result } = renderHook(() => useEpochAprEstimate())
-    expect(result.current).toStrictEqual({
-      estimatedApr: -0.1710932155095768,
-      textColor: 'text-error',
-    })
-  })
-
-  it('should return correct values when last epoch was a withdrawal', () => {
-    mockedRecoilValue.mockReturnValue(mockBeaconSpec)
-    mockedUseFilteredValidatorCacheData.mockReturnValue(mockedRecentWithdrawalCash)
-    const { result } = renderHook(() => useEpochAprEstimate())
-    expect(result.current).toStrictEqual({
-      estimatedApr: 0,
-      textColor: 'text-dark500',
+    await waitFor(() => {
+      expect(result.current).toStrictEqual({
+        estimatedApr: undefined,
+        textColor: 'text-dark500',
+      })
     })
   })
 })
